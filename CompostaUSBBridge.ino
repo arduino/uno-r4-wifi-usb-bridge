@@ -15,16 +15,21 @@
 #include "WiFiClient.h"
 #include <WiFiClientSecure.h>
 
+#include "USB.h"
+#include "USBCDC.h"
+
 //#define DEBUG_AT
 
-#define SERIAL_USER            Serial
-#define SERIAL_DEBUG           Serial
-#define SERIAL_USER_INTERNAL   Serial0
+USBCDC USBSerial(0);
+
+#define SERIAL_USER            USBSerial
+#define SERIAL_DEBUG           USBSerial
+#define SERIAL_USER_INTERNAL   Serial
 
 #define MAX_CLIENT_AVAILABLE   16
 
 #ifdef DEBUG_AT
-#define SERIAL_AT              Serial
+#define SERIAL_AT              USBSerial
 #else
 #define SERIAL_AT              Serial1
 #endif
@@ -1200,6 +1205,9 @@ void setup() {
   while (!SERIAL_AT);
   SERIAL_AT.println("READY");
 #else
+  USB.VID(0x2341);
+  USB.PID(0x1002);
+  USB.begin();
   SERIAL_USER.onEvent(usbEventCallback);
   SERIAL_USER.enableReboot(false);
   SERIAL_USER.begin(115200);
@@ -1238,10 +1246,6 @@ void setup() {
   });
 
 }
-
-#if !ARDUINO_USB_CDC_ON_BOOT
-#error "Please set USB_CDC_ON_BOOT to make Serial object the USB one"
-#endif
 
 /*
    arduino-builder -compile -fqbn=espressif:esp32:esp32s3:JTAGAdapter=default,PSRAM=disabled,FlashMode=qio,FlashSize=4M,LoopCore=1,EventsCore=1,USBMode=default,CDCOnBoot=cdc,MSCOnBoot=default,DFUOnBoot=default,UploadMode=default,PartitionScheme=huge_app,CPUFreq=240,UploadSpeed=921600,DebugLevel=none,EraseFlash=none -vid-pid=303A_1001 -ide-version=10820 CompostaUSBBridge.ino
