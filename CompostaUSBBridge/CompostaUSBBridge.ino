@@ -85,6 +85,8 @@ chAT::Server at_srv;
 
 std::unordered_map<std::string, std::function<chAT::CommandStatus(chAT::Server&, chAT::ATParser&)>> command_table = {
   { "", [](auto & srv, auto & parser) {
+      srv.write_cstr("TEST - ");     // report some CMDs
+      srv.write_line_end();
       return chAT::CommandStatus::OK;
     }
   },
@@ -1193,8 +1195,12 @@ std::unordered_map<std::string, std::function<chAT::CommandStatus(chAT::Server&,
 
 bool enableSTA(bool enable);
 bool enableAP(bool enable);
-void setup() {
 
+/* -------------------------------------------------------------------------- */
+/*                                 SETUP                                      */
+/* -------------------------------------------------------------------------- */
+void setup() {
+/* -------------------------------------------------------------------------- */
   pinMode(GPIO_BOOT, OUTPUT);
   pinMode(GPIO_RST, OUTPUT);
   digitalWrite(GPIO_BOOT, HIGH);
@@ -1253,37 +1259,11 @@ void setup() {
 
 static uint32_t baud = 0;
 
-static void usbEventCallback(void* arg, esp_event_base_t event_base, int32_t event_id, void* event_data) {
-  if (event_base == ARDUINO_USB_CDC_EVENTS) {
-    arduino_usb_cdc_event_data_t * data = (arduino_usb_cdc_event_data_t*)event_data;
-    switch (event_id) {
-      case ARDUINO_USB_CDC_LINE_CODING_EVENT:
-        auto baud = data->line_coding.bit_rate;
-        if (baud == 1200) {
-          digitalWrite(GPIO_BOOT, HIGH);
-          digitalWrite(GPIO_RST, LOW);
-          delay(100);
-          digitalWrite(GPIO_RST, HIGH);
-          delay(100);
-          digitalWrite(GPIO_RST, LOW);
-          delay(100);
-          digitalWrite(GPIO_RST, HIGH);
-        } else if (baud == 2400) {
-          digitalWrite(GPIO_BOOT, LOW);
-          digitalWrite(GPIO_RST, HIGH);
-          delay(100);
-          digitalWrite(GPIO_RST, LOW);
-          delay(100);
-          digitalWrite(GPIO_RST, HIGH);
-        } else {
-          SERIAL_USER_INTERNAL.updateBaudRate(baud);
-        }
-        break;
-    }
-  }
-}
-
+/* -------------------------------------------------------------------------- */
+/*                                 LOOP                                       */
+/* -------------------------------------------------------------------------- */
 void loop() {
+/* -------------------------------------------------------------------------- */  
 
 #ifndef DEBUG_AT
 
@@ -1313,4 +1293,37 @@ void loop() {
   at_srv.run();
   //delay(1);
   yield();
+}
+
+/* -------------------------------------------------------------------------- */
+/*                        USB EVENT CALLBACK                                  */
+/* -------------------------------------------------------------------------- */
+static void usbEventCallback(void* arg, esp_event_base_t event_base, int32_t event_id, void* event_data) {
+  if (event_base == ARDUINO_USB_CDC_EVENTS) {
+    arduino_usb_cdc_event_data_t * data = (arduino_usb_cdc_event_data_t*)event_data;
+    switch (event_id) {
+      case ARDUINO_USB_CDC_LINE_CODING_EVENT:
+        auto baud = data->line_coding.bit_rate;
+        if (baud == 1200) {
+          digitalWrite(GPIO_BOOT, HIGH);
+          digitalWrite(GPIO_RST, LOW);
+          delay(100);
+          digitalWrite(GPIO_RST, HIGH);
+          delay(100);
+          digitalWrite(GPIO_RST, LOW);
+          delay(100);
+          digitalWrite(GPIO_RST, HIGH);
+        } else if (baud == 2400) {
+          digitalWrite(GPIO_BOOT, LOW);
+          digitalWrite(GPIO_RST, HIGH);
+          delay(100);
+          digitalWrite(GPIO_RST, LOW);
+          delay(100);
+          digitalWrite(GPIO_RST, HIGH);
+        } else {
+          SERIAL_USER_INTERNAL.updateBaudRate(baud);
+        }
+        break;
+    }
+  }
 }
