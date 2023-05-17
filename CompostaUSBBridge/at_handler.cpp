@@ -1,4 +1,5 @@
 #include "at_handler.h"
+#include "commands.h"
 
 using namespace SudoMaker;
 
@@ -51,12 +52,14 @@ void CAtHandler::onWiFiEvent(WiFiEvent_t event) {
 /* -------------------------------------------------------------------------- */
 CAtHandler::CAtHandler(HardwareSerial *s)  {
 /* -------------------------------------------------------------------------- */   
-
+   
+   /* Set up wifi event */
    WiFi.onEvent(onWiFiEvent);
-
-
+   
+   /* set up serial */
    serial = s;
 
+   /* set up chatAt server callbacks */
    at_srv.set_io_callback({
       .callback_io_read = [this](auto buf, auto len) {
          if (!serial->available()) {
@@ -68,9 +71,9 @@ CAtHandler::CAtHandler(HardwareSerial *s)  {
       .callback_io_write = [this](auto buf, auto len) {
          return serial->write(buf, len);
       },
-  });
+   });
 
-  at_srv.set_command_callback([this](chAT::Server & srv, const std::string & command) {
+   at_srv.set_command_callback([this](chAT::Server & srv, const std::string & command) {
       auto it = command_table.find(command);
 
       if (it == command_table.end()) {
@@ -78,32 +81,29 @@ CAtHandler::CAtHandler(HardwareSerial *s)  {
       } else {
          return it->second(srv, srv.parser());
       }
-  });
+   });
 
-
-
-
-
+   /* +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ */ 
+   /*                          SET UP COMMAND TABLE                           */
+   /* +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ */
    command_table = {
-     { "", [](auto & srv, auto & parser) {
-         srv.write_cstr("TEST"); 
-         srv.write_line_end();
-         return chAT::CommandStatus::OK;
-       }
-     },
-     { "+RST", [](auto & srv, auto & parser) {
+         {  "", [](auto & srv, auto & parser) {
+            return chAT::CommandStatus::OK;
+         }
+      },
+      { "+RST", [](auto & srv, auto & parser) {
          ESP.restart();
          return chAT::CommandStatus::OK;
-       }
-     },
-     { "+GMR", [](auto & srv, auto & parser) {
+         }
+      },
+      { "+GMR", [](auto & srv, auto & parser) {
          //srv.write_response_prompt();
          srv.write_cstr("<len>"); // TODO: report some useful information
          srv.write_line_end();
          return chAT::CommandStatus::OK;
-       }
-     },
-     { "+CMD", [&](auto & srv, auto & parser) {
+         }
+      },
+      { "+CMD", [&](auto & srv, auto & parser) {
          switch (parser.cmd_mode) {
            case chAT::CommandMode::Read: {
                srv.write_response_prompt();
@@ -312,7 +312,7 @@ CAtHandler::CAtHandler(HardwareSerial *s)  {
          }
        }
      },
-     { "+WIFICWLAP",  [&](auto & srv, auto & parser) {
+     { _WIFISCAN,  [&](auto & srv, auto & parser) {
          switch (parser.cmd_mode) {
            case chAT::CommandMode::Run: {
                int n = WiFi.scanNetworks();

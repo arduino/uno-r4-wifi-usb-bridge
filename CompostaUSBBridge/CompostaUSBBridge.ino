@@ -71,32 +71,6 @@ void setup() {
 #endif
   
 
-  
-  /*
-  at_srv.set_io_callback({
-    .callback_io_read = [](auto buf, auto len) {
-      if (!SERIAL_AT.available()) {
-        yield();
-        return (unsigned int)0;
-      }
-      return SERIAL_AT.read(buf, len);
-    },
-    .callback_io_write = [](auto buf, auto len) {
-      return SERIAL_AT.write(buf, len);
-    },
-  });
-
-  at_srv.set_command_callback([&](chAT::Server & srv, const std::string & command) {
-    auto it = command_table.find(command);
-
-    if (it == command_table.end()) {
-      return chAT::CommandStatus::ERROR;
-    } else {
-      return it->second(srv, srv.parser());
-    }
-  });
-  */
-
 }
 
 /*
@@ -108,10 +82,8 @@ void loop() {
 /* -------------------------------------------------------------------------- */  
 
 #ifndef DEBUG_AT
-
   if (SERIAL_USER.baudRate() != baud) {
     baud = SERIAL_USER.baudRate();
-
   }
 
   uint8_t buf[2048];

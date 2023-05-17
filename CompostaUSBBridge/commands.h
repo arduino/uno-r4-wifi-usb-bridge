@@ -2,6 +2,18 @@
 #define CWMODE "AT+CWMODE"
 #define CWSTATE "AT+CWSTATE"
 
+
+#define _AT                "AT"
+#define _ENDL              "\r\n" 
+#define _WIFISCAN          "+WIFISCAN"
+
+#define CMD(x)             _AT x _ENDL
+
+
+
+
+
+
 /*
 AT+CWJAP
 
