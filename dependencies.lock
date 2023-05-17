@@ -1,0 +1,21 @@
+dependencies:
+  espressif/esp-serial-flasher:
+    component_hash: a2adb04792f158df054ea0bc1284d6efd403b05d770d236930b19c3d288d742b
+    source:
+      service_url: https://api.components.espressif.com/
+      type: service
+    version: 0.0.7
+  espressif/tinyusb:
+    component_hash: 820a2eef39c7ff0b810e859efd7035a4e5b9b44e77c49020a50ef0668fc941ae
+    source:
+      service_url: https://api.components.espressif.com/
+      type: service
+    version: 0.14.2
+  idf:
+    component_hash: null
+    source:
+      type: idf
+    version: 5.1.0
+manifest_hash: caad0d8020ba41d75a6fdf1824beaebf06495289eddc4cf33938362d17d7af09
+target: esp32s3
+version: 1.0.0
