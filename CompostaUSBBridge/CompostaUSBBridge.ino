@@ -85,7 +85,7 @@ chAT::Server at_srv;
 
 std::unordered_map<std::string, std::function<chAT::CommandStatus(chAT::Server&, chAT::ATParser&)>> command_table = {
   { "", [](auto & srv, auto & parser) {
-      srv.write_cstr("TEST - ");     // report some CMDs
+      srv.write_cstr("TEST"); 
       srv.write_line_end();
       return chAT::CommandStatus::OK;
     }
@@ -352,6 +352,7 @@ std::unordered_map<std::string, std::function<chAT::CommandStatus(chAT::Server&,
                   default:
                     scan_results += "unknown\r\n";
                 }
+                scan_results += "PIPPO\r\n";
                 srv.write_str((const char *)(scan_results.c_str()));
               }
             }
@@ -711,12 +712,29 @@ std::unordered_map<std::string, std::function<chAT::CommandStatus(chAT::Server&,
               return chAT::CommandStatus::ERROR;
             }
 
-            auto &data_p = parser.args[2];
-            if (data_p.empty()) {
-              return chAT::CommandStatus::ERROR;
-            }
+            int data_size = atoi(size_p.c_str());
 
-            if (!(clients[sock]->write(data_p.c_str(), atoi(size_p.c_str())))) {
+            std::vector<uint8_t> data_p;
+
+            data_p = srv.inhibit_read(data_size);
+            auto data_p_pos = data_p.size();
+            data_p.resize(data_size);
+            srv.write_str(String(data_p_pos).c_str());
+            
+            uint8_t buf[data_size];
+            size_t buffered_len = 0;
+            do {
+              buffered_len += SERIAL_AT.read(buf + buffered_len, data_size - buffered_len);
+              //uart_get_buffered_data_len(UART_NUM_0, &buffered_len);
+            } while (buffered_len < data_size);
+
+            
+            //uart_read_bytes(UART_NUM_0, buf, data_size, portMAX_DELAY);
+            srv.write_cstr((char*)buf, data_size);
+
+            auto ok = clients[sock]->write(buf, data_size);
+            srv.continue_read();
+            if (!ok) {
               return chAT::CommandStatus::ERROR;
             }
 
@@ -746,7 +764,8 @@ std::unordered_map<std::string, std::function<chAT::CommandStatus(chAT::Server&,
             clients[sock]->stop();
             clients_num--;
 
-            free(clients[sock]);// = nullptr;
+            delete clients[sock];
+            clients[sock] = nullptr;
             return chAT::CommandStatus::OK;
           }
         default:
@@ -865,7 +884,7 @@ std::unordered_map<std::string, std::function<chAT::CommandStatus(chAT::Server&,
         case chAT::CommandMode::Run: { // run to do the pop of the client list
             Serial.println(WiFi.localIP());
             WiFiClient client = serverWiFi.available();
-            if (client && clients_num < MAX_CLIENT_AVAILABLE)
+            if (client && (clients_num < MAX_CLIENT_AVAILABLE))
             {
               Serial.println("Server?");
               Serial.println("yes");
@@ -1195,12 +1214,8 @@ std::unordered_map<std::string, std::function<chAT::CommandStatus(chAT::Server&,
 
 bool enableSTA(bool enable);
 bool enableAP(bool enable);
-
-/* -------------------------------------------------------------------------- */
-/*                                 SETUP                                      */
-/* -------------------------------------------------------------------------- */
 void setup() {
-/* -------------------------------------------------------------------------- */
+
   pinMode(GPIO_BOOT, OUTPUT);
   pinMode(GPIO_RST, OUTPUT);
   digitalWrite(GPIO_BOOT, HIGH);
@@ -1259,11 +1274,37 @@ void setup() {
 
 static uint32_t baud = 0;
 
-/* -------------------------------------------------------------------------- */
-/*                                 LOOP                                       */
-/* -------------------------------------------------------------------------- */
+static void usbEventCallback(void* arg, esp_event_base_t event_base, int32_t event_id, void* event_data) {
+  if (event_base == ARDUINO_USB_CDC_EVENTS) {
+    arduino_usb_cdc_event_data_t * data = (arduino_usb_cdc_event_data_t*)event_data;
+    switch (event_id) {
+      case ARDUINO_USB_CDC_LINE_CODING_EVENT:
+        auto baud = data->line_coding.bit_rate;
+        if (baud == 1200) {
+          digitalWrite(GPIO_BOOT, HIGH);
+          digitalWrite(GPIO_RST, LOW);
+          delay(100);
+          digitalWrite(GPIO_RST, HIGH);
+          delay(100);
+          digitalWrite(GPIO_RST, LOW);
+          delay(100);
+          digitalWrite(GPIO_RST, HIGH);
+        } else if (baud == 2400) {
+          digitalWrite(GPIO_BOOT, LOW);
+          digitalWrite(GPIO_RST, HIGH);
+          delay(100);
+          digitalWrite(GPIO_RST, LOW);
+          delay(100);
+          digitalWrite(GPIO_RST, HIGH);
+        } else {
+          SERIAL_USER_INTERNAL.updateBaudRate(baud);
+        }
+        break;
+    }
+  }
+}
+
 void loop() {
-/* -------------------------------------------------------------------------- */  
 
 #ifndef DEBUG_AT
 
@@ -1293,37 +1334,4 @@ void loop() {
   at_srv.run();
   //delay(1);
   yield();
-}
-
-/* -------------------------------------------------------------------------- */
-/*                        USB EVENT CALLBACK                                  */
-/* -------------------------------------------------------------------------- */
-static void usbEventCallback(void* arg, esp_event_base_t event_base, int32_t event_id, void* event_data) {
-  if (event_base == ARDUINO_USB_CDC_EVENTS) {
-    arduino_usb_cdc_event_data_t * data = (arduino_usb_cdc_event_data_t*)event_data;
-    switch (event_id) {
-      case ARDUINO_USB_CDC_LINE_CODING_EVENT:
-        auto baud = data->line_coding.bit_rate;
-        if (baud == 1200) {
-          digitalWrite(GPIO_BOOT, HIGH);
-          digitalWrite(GPIO_RST, LOW);
-          delay(100);
-          digitalWrite(GPIO_RST, HIGH);
-          delay(100);
-          digitalWrite(GPIO_RST, LOW);
-          delay(100);
-          digitalWrite(GPIO_RST, HIGH);
-        } else if (baud == 2400) {
-          digitalWrite(GPIO_BOOT, LOW);
-          digitalWrite(GPIO_RST, HIGH);
-          delay(100);
-          digitalWrite(GPIO_RST, LOW);
-          delay(100);
-          digitalWrite(GPIO_RST, HIGH);
-        } else {
-          SERIAL_USER_INTERNAL.updateBaudRate(baud);
-        }
-        break;
-    }
-  }
 }
