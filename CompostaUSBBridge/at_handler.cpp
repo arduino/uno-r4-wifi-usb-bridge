@@ -1,5 +1,6 @@
 #include "at_handler.h"
 #include "commands.h"
+#include "cmds_esp_generic.h"
 
 using namespace SudoMaker;
 
@@ -91,121 +92,9 @@ CAtHandler::CAtHandler(HardwareSerial *s)  {
             return chAT::CommandStatus::OK;
          }
       },
-      { "+RST", [](auto & srv, auto & parser) {
-         ESP.restart();
-         return chAT::CommandStatus::OK;
-         }
-      },
-      { "+GMR", [](auto & srv, auto & parser) {
-         //srv.write_response_prompt();
-         srv.write_cstr("<len>"); // TODO: report some useful information
-         srv.write_line_end();
-         return chAT::CommandStatus::OK;
-         }
-      },
-      { "+CMD", [&](auto & srv, auto & parser) {
-         switch (parser.cmd_mode) {
-           case chAT::CommandMode::Read: {
-               srv.write_response_prompt();
-               srv.write_cstr("<test>");     // report some CMDs
-               srv.write_line_end();
-               return chAT::CommandStatus::OK;
-             }
-           default:
-             return chAT::CommandStatus::ERROR;
-         }
-       }
-     },
-     { "+FS", [&](auto & srv, auto & parser) {
-         switch (parser.cmd_mode) {
-           case chAT::CommandMode::Write: {
-               // <type>,<operation>,<filename>,<offset>,<length>
-               if (parser.args.size() < 3) {
-                 return chAT::CommandStatus::ERROR;
-               }
-
-               auto &type_str = parser.args[0];
-               if (type_str.empty()) {
-                 return chAT::CommandStatus::ERROR;
-               }
-               size_t _type = std::stoi(type_str);
-
-               auto &operation_str = parser.args[1];
-               if (operation_str.empty()) {
-                 return chAT::CommandStatus::ERROR;
-               }
-               size_t operation = std::stoi(operation_str);
-
-               auto &filename = parser.args[2];
-               if (filename.empty()) {
-                 return chAT::CommandStatus::ERROR;
-               }
-
-               size_t offset = 0;
-               if (parser.args.size() >= 3) {
-                 auto &offset_str = parser.args[3];
-                 if (offset_str.empty()) {
-                   return chAT::CommandStatus::ERROR;
-                 }
-                 offset = std::stoi(offset_str);
-               }
-
-               size_t length = 0;
-               if (parser.args.size() >= 4) {
-                 auto &length_str = parser.args[4];
-                 if (length_str.empty()) {
-                   return chAT::CommandStatus::ERROR;
-                 }
-                 length = std::stoi(length_str);
-               }
-
-               FILE* f;
-               if (_type == 0) {
-                 switch (operation) {
-                   case 0: //delete
-                     remove(filename.c_str());
-                     break;
-                   case 1: //write
-                     f = fopen(filename.c_str(), "w");
-                     break;
-                   case 2: //read
-                     f = fopen(filename.c_str(), "r");
-                     fseek(f, offset, 1);
-                     uint8_t buf[length];
-                     fread(buf, length, 1, f);
-                     srv.write_cstr((const char*)buf, length);
-                     break;
-                 }
-               }
-
-               srv.write_response_prompt();
-               srv.write_cstr("<test>");
-               srv.write_line_end();
-               return chAT::CommandStatus::OK;
-             }
-           default:
-             return chAT::CommandStatus::ERROR;
-         }
-       }
-     },
-     { "+FSMOUNT", [&](auto & srv, auto & parser) {
-         switch (parser.cmd_mode) {
-           case chAT::CommandMode::Write: {
-               // <type>,<operation>,<filename>,<offset>,<length>
-               srv.write_response_prompt();
-               srv.write_cstr("<test>");
-               srv.write_line_end();
-               return chAT::CommandStatus::OK;
-             }
-           default:
-             return chAT::CommandStatus::ERROR;
-         }
-       }
-     },
-     { "+EXIT", [&](auto & srv, auto & cmd) {
-         return chAT::CommandStatus::OK;
-       }
-     },
+      
+      
+     
      // Object WiFi
      { "+WIFIMODE",  [&](auto & srv, auto & parser) {
          switch (parser.cmd_mode) {
@@ -312,6 +201,7 @@ CAtHandler::CAtHandler(HardwareSerial *s)  {
          }
        }
      },
+     #ifdef PIPPO
      { _WIFISCAN,  [&](auto & srv, auto & parser) {
          switch (parser.cmd_mode) {
            case chAT::CommandMode::Run: {
@@ -365,6 +255,7 @@ CAtHandler::CAtHandler(HardwareSerial *s)  {
          }
        }
      },
+     #endif
 
      { "+WIFICWQAP",  [&](auto & srv, auto & parser) {
          switch (parser.cmd_mode) {
@@ -1208,4 +1099,7 @@ CAtHandler::CAtHandler(HardwareSerial *s)  {
        }
      }//, add here your new command
    };
+
+   add_cmds_esp_generic();
+   add_cmds_wifi_station();
 }

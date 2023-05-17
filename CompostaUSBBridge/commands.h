@@ -7,6 +7,13 @@
 #define _ENDL              "\r\n" 
 #define _WIFISCAN          "+WIFISCAN"
 
+#define _RESET             "+RESET"
+#define _GMR               "+GMR"
+#define _GENERIC_CMD       "+CMD"
+#define _FILESYSTEM        "+FS"
+#define _MOUNTFS           "+MOUNTFS"
+#define _EXIT              "+EXIT"
+
 #define CMD(x)             _AT x _ENDL
 
 

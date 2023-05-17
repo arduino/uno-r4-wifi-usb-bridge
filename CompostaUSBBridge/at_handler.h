@@ -22,6 +22,9 @@ private:
    std::unordered_map<std::string, std::function<chAT::CommandStatus(chAT::Server&, chAT::ATParser&)>> command_table;
    chAT::Server at_srv;
    HardwareSerial *serial;
+
+   void add_cmds_esp_generic();
+   void add_cmds_wifi_station(); 
 public:
    CAtHandler(HardwareSerial *s);
    void run();
