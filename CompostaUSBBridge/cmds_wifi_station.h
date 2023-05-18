@@ -146,9 +146,16 @@ void CAtHandler::add_cmds_wifi_station() {
             if (password.empty()) {
               return chAT::CommandStatus::ERROR;
             }
-            WiFi.begin(ssid.c_str(), password.c_str());
+            int res = WiFi.begin(ssid.c_str(), password.c_str());
+            if(res == WL_CONNECTED ){
+               String status = String(res) + "\r\n";
+               srv.write_response_prompt();
+               srv.write_str((const char *)status.c_str());
+               srv.write_line_end();
                return chAT::CommandStatus::OK;
+            }
          }
+            return chAT::CommandStatus::ERROR;
          default:
             return chAT::CommandStatus::ERROR;
       } 
