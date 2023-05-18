@@ -17,9 +17,21 @@ void CAtHandler::add_cmds_wifi_station() {
             } 
             else {
                String scan_results = "";
+
                srv.write_response_prompt();
                for (int i = 0; i < n; ++i) {
-                  scan_results += WiFi.SSID(i) + "|" + String(WiFi.RSSI(i)) + " | " + String(WiFi.channel(i)) + " | ";
+                  uint8_t *mac = WiFi.BSSID(i);
+                  String bssid = "";
+                  for(int k = 0; k < 6; k++) {
+                     if(*(mac + k) < 0x10) {
+                        bssid += "0";
+                     }
+                     bssid += String(*(mac + k),HEX);
+                     if(k < 5)
+                        bssid += ":";
+                  }
+
+                  scan_results += WiFi.SSID(i) + " | " + bssid + " | " + String(WiFi.RSSI(i)) + " | " + String(WiFi.channel(i)) + " | ";
                   switch (WiFi.encryptionType(i)) {
                      case WIFI_AUTH_OPEN:
                        scan_results += "open\r\n";

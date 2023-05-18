@@ -44,3 +44,4 @@
 #define _SSLCLIENTRECEIVE  "+SSLCLIENTRECEIVE"
 
 #define CMD(x)             _AT x _ENDL
+#define CMD_RES(x)         x ":"

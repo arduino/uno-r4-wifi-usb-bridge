@@ -262,10 +262,11 @@ void CAtHandler::add_cmds_wifi_SSL() {
                return chAT::CommandStatus::ERROR;
             }
             int sock = atoi(socket_num.c_str());
+            WiFiClientSecure* tmp_clt = (WiFiClientSecure*) clients[sock];
 
             String res = "";
-            while (sslClients[sock]->available()) {
-               res += sslClients[sock]->readStringUntil('\r');
+            while (tmp_clt->available()) {
+               res += tmp_clt->readStringUntil('\r');
             }
             srv.write_response_prompt();
             srv.write_str((const char *)(res.c_str()));
