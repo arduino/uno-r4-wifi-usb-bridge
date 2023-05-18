@@ -25,6 +25,9 @@ private:
 
    void add_cmds_esp_generic();
    void add_cmds_wifi_station(); 
+   void add_cmds_wifi_softAP(); 
+   void add_cmds_wifi_SSL();
+   void add_cmds_wifi_netif();
 public:
    CAtHandler(HardwareSerial *s);
    void run();
