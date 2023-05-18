@@ -16,6 +16,7 @@ class CAtHandler {
 private:
    
    static void onWiFiEvent(WiFiEvent_t event);
+   WiFiServer   serverWiFi;
    WiFiClient * clients[MAX_CLIENT_AVAILABLE];
    WiFiClientSecure * sslClients[MAX_CLIENT_AVAILABLE];
    int clients_num = 0;

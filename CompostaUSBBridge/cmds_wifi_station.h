@@ -1,10 +1,11 @@
 #ifndef CMDS_WIFI_STATION_H
 #define CMDS_WIFI_STATION_H
 
-
 #include "at_handler.h"
 
+/* -------------------------------------------------------------------------- */
 void CAtHandler::add_cmds_wifi_station() {
+/* -------------------------------------------------------------------------- */   
    
    /* ....................................................................... */
    command_table[_WIFISCAN] = [this](auto & srv, auto & parser) {
@@ -60,159 +61,156 @@ void CAtHandler::add_cmds_wifi_station() {
       }
    };
 
-  /* ....................................................................... */
-  command_table[_MODE] = [this](auto & srv, auto & parser) {
-  /* ....................................................................... */     
-    switch (parser.cmd_mode) {
-       case chAT::CommandMode::Write: {
-           if (parser.args.size() <= 0 || parser.args.size() > 2) {
-             return chAT::CommandStatus::ERROR;
-           }
-
-           auto &conn_type = parser.args[0];
-           if (conn_type.empty()) {
-             return chAT::CommandStatus::ERROR;
-           }
-
-           switch (atoi(conn_type.c_str())) {
-             case 0: {
-                 WiFi.mode(WIFI_MODE_NULL);
-                 break;
-               }
-             case 1: {
-                 WiFi.mode(WIFI_MODE_STA);
-                 break;
-               }
-             case 2: {
-                 WiFi.mode(WIFI_MODE_AP);
-                 break;
-               }
-             case 3: {
-                 WiFi.mode(WIFI_MODE_APSTA);
-                 break;
-               }
-             default: {
-                 return chAT::CommandStatus::ERROR;
-               }
-           }
-
-           auto &auto_Conn = parser.args[1];
-           if (!auto_Conn.empty()) {
-             bool autoconn = atoi(auto_Conn.c_str());
-             WiFi.setAutoConnect(autoconn);
-           }
-           return chAT::CommandStatus::OK;
-         }
-       case chAT::CommandMode::Read: {
-           String mode_read = String(WiFi.getMode()) + "\r\n";
-           srv.write_response_prompt();
-           srv.write_str((const char *)(mode_read.c_str()));
-           srv.write_line_end();
-           return chAT::CommandStatus::OK;
-         }
-       default:
-         return chAT::CommandStatus::ERROR;
-     }    
-  };
-
-  /* ....................................................................... */
-  command_table[_BEGINSTA] = [this](auto & srv, auto & parser) {
-  /* ....................................................................... */     
+   /* ....................................................................... */
+   command_table[_MODE] = [this](auto & srv, auto & parser) {
+   /* ....................................................................... */     
       switch (parser.cmd_mode) {
-           case chAT::CommandMode::Write: {
-               if (parser.args.size() != 2) {
-                 return chAT::CommandStatus::ERROR;
-               }
+         case chAT::CommandMode::Write: {
+            if (parser.args.size() <= 0 || parser.args.size() > 2) {
+               return chAT::CommandStatus::ERROR;
+            }
 
-               auto &ssid = parser.args[0];
-               if (ssid.empty()) {
-                 return chAT::CommandStatus::ERROR;
-               }
+            auto &conn_type = parser.args[0];
+            if (conn_type.empty()) {
+               return chAT::CommandStatus::ERROR;
+            }
 
-               auto &password = parser.args[1];
-               if (password.empty()) {
-                 return chAT::CommandStatus::ERROR;
+            switch (atoi(conn_type.c_str())) {
+               case 0: {
+                  WiFi.mode(WIFI_MODE_NULL);
+                  break;
                }
-               WiFi.begin(ssid.c_str(), password.c_str());
-               return chAT::CommandStatus::OK;
-             }
-           default:
-             return chAT::CommandStatus::ERROR;
+               case 1: {
+                  WiFi.mode(WIFI_MODE_STA);
+                  break;
+               }
+               case 2: {
+                  WiFi.mode(WIFI_MODE_AP);
+                  break;
+               }
+               case 3: {
+                  WiFi.mode(WIFI_MODE_APSTA);
+                  break;
+               }
+               default: {
+                  return chAT::CommandStatus::ERROR;
+               }
+            }
+
+            auto &auto_Conn = parser.args[1];
+            if (!auto_Conn.empty()) {
+               bool autoconn = atoi(auto_Conn.c_str());
+               WiFi.setAutoConnect(autoconn);
+            }
+            return chAT::CommandStatus::OK;
          }
-       
-  };
+         case chAT::CommandMode::Read: {
+            String mode_read = String(WiFi.getMode()) + "\r\n";
+            srv.write_response_prompt();
+            srv.write_str((const char *)(mode_read.c_str()));
+            srv.write_line_end();
+            return chAT::CommandStatus::OK;
+         }
+         default:
+            return chAT::CommandStatus::ERROR;
+      }    
+   };
+
+   /* ....................................................................... */
+   command_table[_BEGINSTA] = [this](auto & srv, auto & parser) {
+   /* ....................................................................... */     
+      switch (parser.cmd_mode) {
+         case chAT::CommandMode::Write: {
+            if (parser.args.size() != 2) {
+              return chAT::CommandStatus::ERROR;
+            }
+
+            auto &ssid = parser.args[0];
+            if (ssid.empty()) {
+              return chAT::CommandStatus::ERROR;
+            }
+
+            auto &password = parser.args[1];
+            if (password.empty()) {
+              return chAT::CommandStatus::ERROR;
+            }
+            WiFi.begin(ssid.c_str(), password.c_str());
+               return chAT::CommandStatus::OK;
+         }
+         default:
+            return chAT::CommandStatus::ERROR;
+      } 
+   };
 
   /* ....................................................................... */
   command_table[_RECONNECT] = [this](auto & srv, auto & parser) {
   /* ....................................................................... */     
       switch (parser.cmd_mode) {
-           case chAT::CommandMode::Read: {
-               String line = String(WiFi.getAutoReconnect());
+         case chAT::CommandMode::Read: {
+            String line = String(WiFi.getAutoReconnect());
 
-               srv.write_response_prompt();
-               srv.write_str((const char *)(line.c_str()));
-               srv.write_line_end();
+            srv.write_response_prompt();
+            srv.write_str((const char *)(line.c_str()));
+            srv.write_line_end();
 
-               return chAT::CommandStatus::OK;
-             }
-           case chAT::CommandMode::Write: {
-               if (parser.args.size() != 1) {
-                 return chAT::CommandStatus::ERROR;
-               }
-
-               auto &enable = parser.args[0];
-               if (enable.empty()) {
-                 return chAT::CommandStatus::ERROR;
-               }
-               WiFi.setAutoReconnect(atoi(enable.c_str()));
-               return chAT::CommandStatus::OK;
-             }
-           default:
-             return chAT::CommandStatus::ERROR;
+            return chAT::CommandStatus::OK;
          }
-       
-  };
+         case chAT::CommandMode::Write: {
+            if (parser.args.size() != 1) {
+               return chAT::CommandStatus::ERROR;
+            }
+
+            auto &enable = parser.args[0];
+            if (enable.empty()) {
+               return chAT::CommandStatus::ERROR;
+            }
+            WiFi.setAutoReconnect(atoi(enable.c_str()));
+               return chAT::CommandStatus::OK;
+            }
+         default:
+            return chAT::CommandStatus::ERROR;
+      }
+   };
 
    /* ....................................................................... */
    command_table[_DISCONNECT] = [this](auto & srv, auto & parser) {
    /* ....................................................................... */     
       switch (parser.cmd_mode) {
-           case chAT::CommandMode::Run: {
-               WiFi.disconnect();
+         case chAT::CommandMode::Run: {
+            WiFi.disconnect();
                return chAT::CommandStatus::OK;
-             }
-           case chAT::CommandMode::Write: {
-               if (parser.args.size() != 1) {
-                 return chAT::CommandStatus::ERROR;
-               }
-
-               auto &wifi_off = parser.args[0];
-               if (wifi_off.empty()) {
-                 return chAT::CommandStatus::ERROR;
-               }
-               WiFi.disconnect(atoi(wifi_off.c_str()));
-               return chAT::CommandStatus::OK;
-             }
-           default:
-             return chAT::CommandStatus::ERROR;
          }
-       
+         case chAT::CommandMode::Write: {
+            if (parser.args.size() != 1) {
+               return chAT::CommandStatus::ERROR;
+            }
+
+            auto &wifi_off = parser.args[0];
+            if (wifi_off.empty()) {
+               return chAT::CommandStatus::ERROR;
+            }
+            WiFi.disconnect(atoi(wifi_off.c_str()));
+            return chAT::CommandStatus::OK;
+         }
+         default:
+            return chAT::CommandStatus::ERROR;
+      } 
    };
    
    /* ....................................................................... */
    command_table[_MACSTA] = [this](auto & srv, auto & parser) {
    /* ....................................................................... */     
       switch (parser.cmd_mode) {
-           case chAT::CommandMode::Read: {
-               srv.write_response_prompt();
-               String mac = WiFi.macAddress();
-               srv.write_str((const char *)(mac.c_str()));
+         case chAT::CommandMode::Read: {
+            srv.write_response_prompt();
+            String mac = WiFi.macAddress();
+            srv.write_str((const char *)(mac.c_str()));
 
-               return chAT::CommandStatus::OK;
-             }
-           default:
-             return chAT::CommandStatus::ERROR;
+            return chAT::CommandStatus::OK;
          }
+         default:
+            return chAT::CommandStatus::ERROR;
+      }
    };
 
 
@@ -220,30 +218,96 @@ void CAtHandler::add_cmds_wifi_station() {
    command_table[_AUTOCONNECT] = [this](auto & srv, auto & parser) {
    /* ....................................................................... */     
       switch (parser.cmd_mode) {
-           case chAT::CommandMode::Write: {
-               if (parser.args.size() != 1) {
-                 return chAT::CommandStatus::ERROR;
-               }
-               auto &auto_conn = parser.args[0];
-               if (auto_conn.empty()) {
-                 return chAT::CommandStatus::ERROR;
-               }
-               bool autoconn = atoi(auto_conn.c_str());
-               WiFi.setAutoConnect(autoconn);
-               return chAT::CommandStatus::OK;
-             }
-           case chAT::CommandMode::Read: {
-               srv.write_response_prompt();
-               String ac_state = String(WiFi.getAutoConnect()) + "\r\n";
-               srv.write_str((const char *)(ac_state.c_str()));
-               return chAT::CommandStatus::OK;
-             }
-           default:
-             return chAT::CommandStatus::ERROR;
+         case chAT::CommandMode::Write: {
+            if (parser.args.size() != 1) {
+               return chAT::CommandStatus::ERROR;
+            }
+            auto &auto_conn = parser.args[0];
+            if (auto_conn.empty()) {
+               return chAT::CommandStatus::ERROR;
+            }
+            bool autoconn = atoi(auto_conn.c_str());
+            WiFi.setAutoConnect(autoconn);
+            return chAT::CommandStatus::OK;
          }
+         case chAT::CommandMode::Read: {
+            srv.write_response_prompt();
+            String ac_state = String(WiFi.getAutoConnect()) + "\r\n";
+            srv.write_str((const char *)(ac_state.c_str()));
+            return chAT::CommandStatus::OK;
+         }
+         default:
+            return chAT::CommandStatus::ERROR;
+      }
+   };
+
+   /* ....................................................................... */
+   command_table[_IPSTA] = [this](auto & srv, auto & parser) {
+   /* ....................................................................... */     
+      switch (parser.cmd_mode) {
+         case chAT::CommandMode::Read: {
+            srv.write_response_prompt();
+            String res = "ip:" + WiFi.localIP().toString() + "\r\n";
+            srv.write_str((const char *)(res.c_str()));
+            srv.write_response_prompt();
+            res = "gateway:" + WiFi.gatewayIP().toString() + "\r\n";;
+            srv.write_str((const char *)(res.c_str()));
+            srv.write_response_prompt();
+            res = "netmask:" + WiFi.subnetMask().toString() + "\r\n";;
+            srv.write_str((const char *)(res.c_str()));
+            srv.write_line_end();
+
+            return chAT::CommandStatus::OK;
+         }
+         default:
+            return chAT::CommandStatus::ERROR;
+      }
    };
    
- 
+   /* ....................................................................... */
+   command_table[_HOSTNAME] = [this](auto & srv, auto & parser) {
+   /* ....................................................................... */     
+      switch (parser.cmd_mode) {
+         case chAT::CommandMode::Read: {
+            srv.write_response_prompt();
+            srv.write_str(WiFi.getHostname());
+            return chAT::CommandStatus::OK;
+         }
+         case chAT::CommandMode::Write: {
+            if (parser.args.size() != 1) {
+               return chAT::CommandStatus::ERROR;
+            }
+
+            auto &host_name = parser.args[0];
+            if (host_name.empty()) {
+               return chAT::CommandStatus::ERROR;
+            }
+            WiFi.setHostname(host_name.c_str());
+         }
+         default:
+            return chAT::CommandStatus::ERROR;
+      }
+   };
+
+   /* ....................................................................... */
+   command_table[_IPV6] = [this](auto & srv, auto & parser) {
+   /* ....................................................................... */     
+      switch (parser.cmd_mode) {
+         case chAT::CommandMode::Read: {
+            String ip_v6 = WiFi.localIPv6().toString() + "\r\n";
+            srv.write_response_prompt();
+            srv.write_str((const char *)(ip_v6.c_str()));
+            return chAT::CommandStatus::OK;
+         }
+         case chAT::CommandMode::Run: {
+            WiFi.enableIpV6();
+            return chAT::CommandStatus::OK;
+         }
+         default:
+            return chAT::CommandStatus::ERROR;
+      }
+   };
+
 }
 
 #endif
