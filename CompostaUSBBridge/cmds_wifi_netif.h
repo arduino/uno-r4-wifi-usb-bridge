@@ -135,7 +135,7 @@ void CAtHandler::add_cmds_wifi_netif() {
             auto data_p_pos = data_p.size();
             data_p.resize(data_size);
             srv.write_str(String(data_p_pos).c_str());
-            
+
             uint8_t buf[data_size];
             size_t buffered_len = 0;
             do {
@@ -143,7 +143,6 @@ void CAtHandler::add_cmds_wifi_netif() {
                 //uart_get_buffered_data_len(UART_NUM_0, &buffered_len);
             } while (buffered_len < data_size);
 
-            
             //uart_read_bytes(UART_NUM_0, buf, data_size, portMAX_DELAY);
             srv.write_cstr((char*)buf, data_size);
 
@@ -194,18 +193,6 @@ void CAtHandler::add_cmds_wifi_netif() {
    command_table[_IPCLIENT] = [this](auto & srv, auto & parser) {
    /* ....................................................................... */     
       switch (parser.cmd_mode) {
-         case chAT::CommandMode::Read: {
-            for (int i = 0; i < MAX_CLIENT_AVAILABLE; i++) {
-              if (clients[i] != nullptr) {
-                if (clients[i]->connected()) {
-                  String client_status = clients[i]->localIP().toString() + "\r\n";
-                  srv.write_response_prompt();
-                  srv.write_str((const char *)(client_status.c_str()));
-                }
-              }
-            }
-            return chAT::CommandStatus::OK;
-         }
          case chAT::CommandMode::Write: {
             if (parser.args.size() != 1) {
               return chAT::CommandStatus::ERROR;
@@ -333,17 +320,6 @@ void CAtHandler::add_cmds_wifi_netif() {
    command_table[_CLIENTRECEIVE] = [this](auto & srv, auto & parser) {
    /* ....................................................................... */     
       switch (parser.cmd_mode) {
-         case chAT::CommandMode::Read: {
-            String res = "";
-            while (clients[0]->available()) {
-              res += clients[0]->readStringUntil('\r');
-            }
-            srv.write_response_prompt();
-            srv.write_str((const char *)(res.c_str()));
-            srv.write_line_end();
-
-            return chAT::CommandStatus::OK;
-         }
          case chAT::CommandMode::Write: {
             if (parser.args.size() != 1) {
               return chAT::CommandStatus::ERROR;
