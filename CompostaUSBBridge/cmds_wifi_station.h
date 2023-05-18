@@ -139,7 +139,7 @@ void CAtHandler::add_cmds_wifi_station() {
            default:
              return chAT::CommandStatus::ERROR;
          }
-       }
+       
   };
 
   /* ....................................................................... */

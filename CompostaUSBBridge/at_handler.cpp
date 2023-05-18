@@ -2,6 +2,12 @@
 #include "commands.h"
 #include "cmds_esp_generic.h"
 
+
+#include "cmds_wifi_station.h"
+#include "cmds_wifi_softAP.h"
+#include "cmds_wifi_netif.h"
+#include "cmds_wifi_SSL.h"
+
 using namespace SudoMaker;
 
 static WiFiServer   serverWiFi(80);

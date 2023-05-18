@@ -109,9 +109,9 @@ void CAtHandler::add_cmds_wifi_softAP() {
            default:
              return chAT::CommandStatus::ERROR;
          }
-       }
+       
    };
-
+   #if 0
    /* ....................................................................... */
    command_table[ ] = [this](auto & srv, auto & parser) {
    /* ....................................................................... */     
@@ -147,6 +147,9 @@ void CAtHandler::add_cmds_wifi_softAP() {
    /* ....................................................................... */     
       
    };
+   #endif
 
  
 }
+
+#endif
