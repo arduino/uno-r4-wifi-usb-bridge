@@ -16,9 +16,10 @@ void CAtHandler::add_cmds_wifi_station() {
             if (n == 0) {
             } 
             else {
+               String scan_results = "";
+               srv.write_response_prompt();
                for (int i = 0; i < n; ++i) {
-                  srv.write_response_prompt();
-                  String scan_results = WiFi.SSID(i) + " | " + String(WiFi.RSSI(i)) + " | " + String(WiFi.channel(i)) + " | ";
+                  scan_results += WiFi.SSID(i) + "|" + String(WiFi.RSSI(i)) + " | " + String(WiFi.channel(i)) + " | ";
                   switch (WiFi.encryptionType(i)) {
                      case WIFI_AUTH_OPEN:
                        scan_results += "open\r\n";
@@ -49,10 +50,9 @@ void CAtHandler::add_cmds_wifi_station() {
                        break;
                      default:
                        scan_results += "unknown\r\n";
-                  }
-                  
-                  srv.write_str((const char *)(scan_results.c_str()));
+                  } 
                }
+               srv.write_str((const char *)(scan_results.c_str()));
             }
             return chAT::CommandStatus::OK;
          }
