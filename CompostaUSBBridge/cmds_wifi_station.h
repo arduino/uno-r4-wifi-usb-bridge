@@ -212,17 +212,14 @@ void CAtHandler::add_cmds_wifi_station() {
             }
 
             int res = WiFi.begin(ssid.c_str(), password.c_str());
-            
+
             String status = String(res);
             srv.write_response_prompt();
             srv.write_str((const char *)status.c_str());
             srv.write_line_end();
             return chAT::CommandStatus::OK;
-            
+
          }
-            
-            
-            return chAT::CommandStatus::ERROR;
          default:
             return chAT::CommandStatus::ERROR;
       } 
@@ -334,18 +331,35 @@ void CAtHandler::add_cmds_wifi_station() {
    command_table[_IPSTA] = [this](auto & srv, auto & parser) {
    /* ....................................................................... */     
       switch (parser.cmd_mode) {
-         case chAT::CommandMode::Read: {
+         case chAT::CommandMode::Write: {
+            if (parser.args.size() != 1) {
+               return chAT::CommandStatus::ERROR;
+            }
+            String res;
+            auto &ip_type = parser.args[0];
+            if (ip_type.empty()) {
+               return chAT::CommandStatus::ERROR;
+            }
+            switch(atoi(ip_type.c_str())) {
+               case IP_ADDR:{
+                  res = WiFi.localIP().toString() + "\r\n";
+                  break;
+               }
+               case GATEWAY_ADDR:{
+                  res = WiFi.gatewayIP().toString() + "\r\n";
+                  break;
+               }
+               case NETMASK_ADDR: {
+                  res = WiFi.subnetMask().toString() + "\r\n";
+                  break;
+               }
+               default:
+                return chAT::CommandStatus::ERROR;
+            }
+
             srv.write_response_prompt();
-            String res = "ip:" + WiFi.localIP().toString() + "\r\n";
-            srv.write_str((const char *)(res.c_str()));
-            srv.write_response_prompt();
-            res = "gateway:" + WiFi.gatewayIP().toString() + "\r\n";;
-            srv.write_str((const char *)(res.c_str()));
-            srv.write_response_prompt();
-            res = "netmask:" + WiFi.subnetMask().toString() + "\r\n";;
             srv.write_str((const char *)(res.c_str()));
             srv.write_line_end();
-
             return chAT::CommandStatus::OK;
          }
          default:
