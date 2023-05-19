@@ -10,6 +10,11 @@
 
 #define MAX_CLIENT_AVAILABLE   8
 
+enum{
+   IP_ADDR = 0,
+   GATEWAY_ADDR,
+   NETMASK_ADDR
+} ip_type;
 using namespace SudoMaker;
 
 class CAtHandler {
