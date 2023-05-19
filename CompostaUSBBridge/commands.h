@@ -43,6 +43,7 @@
 #define _SSLCLIENTCLOSE    "+SSLCLIENTCLOSE"
 #define _IPSSLCLIENT       "+IPSSLCLIENT"
 #define _SSLCLIENTRECEIVE  "+SSLCLIENTRECEIVE"
+#define _SETIP             "+SETIP"
 
 
 #define CMD(x)             _AT x _ENDL

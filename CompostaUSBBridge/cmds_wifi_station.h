@@ -77,10 +77,58 @@ void CAtHandler::add_cmds_wifi_station() {
    command_table[_GETSTATUS] = [this](auto & srv, auto & parser) {
    /* ....................................................................... */     
       switch (parser.cmd_mode) {
-         case chAT::CommandMode::Run: {
+         case chAT::CommandMode::Read: {
             srv.write_response_prompt();
             String status(WiFi.status());
             srv.write_str((const char *)(status.c_str()));
+            srv.write_line_end();
+            return chAT::CommandStatus::OK;
+         }
+         default:
+            return chAT::CommandStatus::ERROR;
+      }
+   };
+
+   /* This command sets the Ips: Ip address, gateway, netmask 
+      It is required that all that Ip adresses are provided */
+   /* ....................................................................... */
+   command_table[_SETIP] = [this](auto & srv, auto & parser) {
+   /* ....................................................................... */     
+      switch (parser.cmd_mode) {
+         case chAT::CommandMode::Write: {
+            if (parser.args.size() <= 0 || parser.args.size() > 3) {
+               return chAT::CommandStatus::ERROR;
+            }
+
+            /* reading ips */
+
+            auto &ip = parser.args[0];
+            if(ip.empty()) {
+               return chAT::CommandStatus::ERROR;
+            }
+            IPAddress _ip;
+            _ip.fromString(ip.c_str());
+
+            auto &gw = parser.args[1];
+            if(gw.empty()) {
+               return chAT::CommandStatus::ERROR;
+            }
+            IPAddress _gw;
+            _gw.fromString(gw.c_str());
+
+            auto &nm = parser.args[2];
+            if(nm.empty()) {
+               return chAT::CommandStatus::ERROR;
+            }
+            IPAddress _nm;
+            _nm.fromString(ip.c_str());
+
+            /* set ips */
+            if(!WiFi.config(_ip,_gw,_nm)) {
+               return chAT::CommandStatus::ERROR;
+            }
+
+            srv.write_response_prompt();
             srv.write_line_end();
             return chAT::CommandStatus::OK;
          }
@@ -216,7 +264,10 @@ void CAtHandler::add_cmds_wifi_station() {
       switch (parser.cmd_mode) {
          case chAT::CommandMode::Run: {
             WiFi.disconnect();
-               return chAT::CommandStatus::OK;
+
+            srv.write_response_prompt();
+            srv.write_line_end();
+            return chAT::CommandStatus::OK;
          }
          case chAT::CommandMode::Write: {
             if (parser.args.size() != 1) {
