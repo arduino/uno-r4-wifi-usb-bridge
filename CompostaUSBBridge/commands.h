@@ -14,6 +14,7 @@
 #define _EXIT              "+EXIT"
 #define _MODE              "+WIFIMODE"
 #define _BEGINSTA          "+BEGINSTA"
+#define _GETSTATUS         "+GETSTATUS"
 #define _RECONNECT         "+RECONNECT"
 #define _DISCONNECT        "+DISCONNECT"
 #define _BEGINSOFTAP       "+BEGINSOFTAP"
@@ -44,4 +45,6 @@
 #define _SSLCLIENTRECEIVE  "+SSLCLIENTRECEIVE"
 
 #define CMD(x)             _AT x _ENDL
-#define CMD_RES(x)         x ":"
+#define PROMPT(x)          x ":"
+#define CMD_WRITE(x)       _AT x "="
+#define CMD_READ(x)        _AT x "?" _ENDL
