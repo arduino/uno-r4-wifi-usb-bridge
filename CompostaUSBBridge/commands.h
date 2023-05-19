@@ -1,6 +1,12 @@
 // WiFi
 
-
+enum{
+   IP_ADDR = 0,
+   GATEWAY_ADDR,
+   NETMASK_ADDR,
+   DNS1_ADDR,
+   DNS2_ADDR
+} ip_type;
 
 #define _AT                "AT"
 #define _ENDL              "\r\n" 

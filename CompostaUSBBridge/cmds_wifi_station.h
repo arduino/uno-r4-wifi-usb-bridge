@@ -96,7 +96,8 @@ void CAtHandler::add_cmds_wifi_station() {
    /* ....................................................................... */     
       switch (parser.cmd_mode) {
          case chAT::CommandMode::Write: {
-            if (parser.args.size() <= 0 || parser.args.size() > 3) {
+            if (parser.args.size() <= 0 || parser.args.size() > 5) {
+               srv.write_str("1");
                return chAT::CommandStatus::ERROR;
             }
 
@@ -104,28 +105,92 @@ void CAtHandler::add_cmds_wifi_station() {
 
             auto &ip = parser.args[0];
             if(ip.empty()) {
+               srv.write_str("2");
                return chAT::CommandStatus::ERROR;
             }
             IPAddress _ip;
-            _ip.fromString(ip.c_str());
+            if(!_ip.fromString(ip.c_str())) {
+               srv.write_str("2");
+               return chAT::CommandStatus::ERROR;
+            }
+
 
             auto &gw = parser.args[1];
             if(gw.empty()) {
+               srv.write_str("3");
                return chAT::CommandStatus::ERROR;
             }
             IPAddress _gw;
-            _gw.fromString(gw.c_str());
+            if(!_gw.fromString(gw.c_str())) {
+               srv.write_str("4");
+               return chAT::CommandStatus::ERROR;
+            }
 
             auto &nm = parser.args[2];
             if(nm.empty()) {
+               srv.write_str("5");
                return chAT::CommandStatus::ERROR;
             }
             IPAddress _nm;
-            _nm.fromString(ip.c_str());
-
-            /* set ips */
-            if(!WiFi.config(_ip,_gw,_nm)) {
+            if(!_nm.fromString(nm.c_str())) {
+               srv.write_str("6");
                return chAT::CommandStatus::ERROR;
+            }
+
+            /* no dns server is provided */
+            if(parser.args.size() == 3) {
+               if(!WiFi.config(_ip,_gw,_nm)) {
+                  srv.write_str("7");
+                  return chAT::CommandStatus::ERROR;
+               }
+            }
+            /* 1 dns server is provided */
+            else if(parser.args.size() == 4) {
+               
+               auto &dns1 = parser.args[3];
+               if(dns1.empty()) {
+                  srv.write_str("8");
+                  return chAT::CommandStatus::ERROR;
+               }
+               IPAddress _dns1;
+               if(!_dns1.fromString(dns1.c_str())){
+                  return chAT::CommandStatus::ERROR;
+               }
+
+               if(!WiFi.config(_ip,_gw,_nm,_dns1)) {
+                  srv.write_str("9");
+                  return chAT::CommandStatus::ERROR;
+               }
+            }
+            /* 2 dns servers are provided */
+            else if(parser.args.size() == 5) {
+
+               auto &dns1 = parser.args[3];
+               if(dns1.empty()) {
+                  srv.write_str("10");
+                  return chAT::CommandStatus::ERROR;
+               }
+               IPAddress _dns1;
+               if(!_dns1.fromString(dns1.c_str())){
+                  srv.write_str("11");
+                  return chAT::CommandStatus::ERROR;
+               }
+
+               auto &dns2 = parser.args[4];
+               if(dns2.empty()) {
+                  srv.write_str("12");
+                  return chAT::CommandStatus::ERROR;
+               }
+               IPAddress _dns2;
+               if(!_dns2.fromString(dns2.c_str())){
+                  srv.write_str("13");
+                  return chAT::CommandStatus::ERROR;
+               }
+
+               if(!WiFi.config(_ip,_gw,_nm,_dns1,_dns2)) {
+                  srv.write_str("14");
+                  return chAT::CommandStatus::ERROR;
+               }
             }
 
             srv.write_response_prompt();
@@ -353,6 +418,15 @@ void CAtHandler::add_cmds_wifi_station() {
                   res = WiFi.subnetMask().toString() + "\r\n";
                   break;
                }
+               case DNS1_ADDR: {
+                  res = WiFi.dnsIP(0).toString() + "\r\n";
+                  break;
+               }
+               case DNS2_ADDR: {
+                  res = WiFi.dnsIP(1).toString() + "\r\n";
+                  break;
+               }
+
                default:
                 return chAT::CommandStatus::ERROR;
             }
