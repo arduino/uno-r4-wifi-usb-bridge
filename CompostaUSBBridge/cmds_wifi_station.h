@@ -131,6 +131,7 @@ void CAtHandler::add_cmds_wifi_station() {
                WiFi.setAutoConnect(autoconn);
             }
             srv.write_response_prompt();
+            srv.write_line_end();
             return chAT::CommandStatus::OK;
          }
          case chAT::CommandMode::Read: {
