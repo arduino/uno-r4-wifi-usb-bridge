@@ -43,10 +43,9 @@ void CAtHandler::add_cmds_wifi_softAP() {
             }
             case 2: {
                auto &_passphrase = parser.args[1];
-               if (_passphrase.empty()) {
-                  return chAT::CommandStatus::ERROR;
+               if (!_passphrase.empty()) {
+                   passphrase = _passphrase.c_str();
                }
-               passphrase = _passphrase.c_str();
             }
             case 1: {
                auto &_ssid = parser.args[0];
@@ -61,8 +60,13 @@ void CAtHandler::add_cmds_wifi_softAP() {
             }
          }
 
-         WiFi.softAP(ssid, passphrase, ch, ssid_hidden, max_connection);
-            return chAT::CommandStatus::OK;
+         int res = WiFi.softAP(ssid, passphrase, ch, ssid_hidden, max_connection);
+         String status = String(res);
+         srv.write_response_prompt();
+         srv.write_str((const char *)status.c_str());
+         srv.write_line_end();
+
+         return chAT::CommandStatus::OK;
          }
          default:
             return chAT::CommandStatus::ERROR;

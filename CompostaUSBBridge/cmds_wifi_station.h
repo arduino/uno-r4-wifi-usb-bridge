@@ -284,11 +284,12 @@ void CAtHandler::add_cmds_wifi_station() {
             if (parser.args.size() != 1) {
                return chAT::CommandStatus::ERROR;
             }
-            String res;
+            String res = "";
             auto &ip_type = parser.args[0];
             if (ip_type.empty()) {
                return chAT::CommandStatus::ERROR;
             }
+
             switch(atoi(ip_type.c_str())) {
                case IP_ADDR:{
                   res = WiFi.localIP().toString() + "\r\n";
@@ -303,7 +304,7 @@ void CAtHandler::add_cmds_wifi_station() {
                   break;
                }
                default:
-                return chAT::CommandStatus::ERROR;
+                  return chAT::CommandStatus::ERROR;
             }
 
             srv.write_response_prompt();
