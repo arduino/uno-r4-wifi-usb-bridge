@@ -344,6 +344,37 @@ void CAtHandler::add_cmds_wifi_netif() {
             return chAT::CommandStatus::ERROR;
       }
    };
+
+   /* ....................................................................... */
+   command_table[_GETHOSTBYNAME] = [this](auto & srv, auto & parser) {
+   /* ....................................................................... */     
+      switch (parser.cmd_mode) {
+         case chAT::CommandMode::Write: {
+            if (parser.args.size() != 1) {
+              return chAT::CommandStatus::ERROR;
+            }
+            
+            auto &hostname = parser.args[0];
+            if (hostname.empty()) {
+              return chAT::CommandStatus::ERROR;
+            }
+            
+            IPAddress address;
+
+            if(!WiFiGenericClass::hostByName(hostname.c_str(), address)) {
+               return chAT::CommandStatus::ERROR;
+            }
+
+            srv.write_response_prompt();
+            srv.write_str((const char *)(address.toString().c_str()));
+            srv.write_line_end();
+
+            return chAT::CommandStatus::OK;
+         }
+         default:
+            return chAT::CommandStatus::ERROR;
+      }
+   };
 }
 
 #endif

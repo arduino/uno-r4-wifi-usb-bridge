@@ -50,6 +50,7 @@ enum{
 #define _IPSSLCLIENT       "+IPSSLCLIENT"
 #define _SSLCLIENTRECEIVE  "+SSLCLIENTRECEIVE"
 #define _SETIP             "+SETIP"
+#define _GETHOSTBYNAME     "+HOSTBYNAME"
 
 
 #define CMD(x)             _AT x _ENDL
