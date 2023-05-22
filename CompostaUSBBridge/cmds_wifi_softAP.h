@@ -106,6 +106,7 @@ void CAtHandler::add_cmds_wifi_softAP() {
             srv.write_response_prompt();
             String ap_mac = WiFi.softAPmacAddress();
             srv.write_str((const char *)(ap_mac.c_str()));
+            srv.write_line_end();
 
             return chAT::CommandStatus::OK;
          }

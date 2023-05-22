@@ -356,6 +356,7 @@ void CAtHandler::add_cmds_wifi_station() {
             srv.write_response_prompt();
             String mac = WiFi.macAddress();
             srv.write_str((const char *)(mac.c_str()));
+            srv.write_line_end();
 
             return chAT::CommandStatus::OK;
          }
