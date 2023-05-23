@@ -117,12 +117,27 @@ void CAtHandler::add_cmds_wifi_softAP() {
 
    /* ....................................................................... */
    command_table[_IPSOFTAP] = [this](auto & srv, auto & parser) {
-   /* ....................................................................... */     
+   /* ....................................................................... */
       switch (parser.cmd_mode) {
          case chAT::CommandMode::Run: {
             srv.write_response_prompt();
             String ap_ip = WiFi.softAPIP().toString() + "\r\n";
             srv.write_str((const char *)(ap_ip.c_str()));
+            return chAT::CommandStatus::OK;
+         }
+         default:
+            return chAT::CommandStatus::ERROR;
+      }
+   };
+
+      /* ....................................................................... */
+   command_table[_GETSOFTAPSSID] = [this](auto & srv, auto & parser) {
+   /* ....................................................................... */
+      switch (parser.cmd_mode) {
+         case chAT::CommandMode::Read: {
+            String ip_v6 = WiFi.softAPSSID() + "\r\n";
+            srv.write_response_prompt();
+            srv.write_str((const char *)(ip_v6.c_str()));
             return chAT::CommandStatus::OK;
          }
          default:

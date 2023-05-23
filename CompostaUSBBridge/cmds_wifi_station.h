@@ -317,7 +317,7 @@ void CAtHandler::add_cmds_wifi_station() {
                return chAT::CommandStatus::ERROR;
             }
             WiFi.setAutoReconnect(atoi(enable.c_str()));
-               return chAT::CommandStatus::OK;
+            return chAT::CommandStatus::OK;
             }
          default:
             return chAT::CommandStatus::ERROR;
@@ -466,6 +466,7 @@ void CAtHandler::add_cmds_wifi_station() {
                return chAT::CommandStatus::ERROR;
             }
             WiFi.setHostname(host_name.c_str());
+            return chAT::CommandStatus::OK;
          }
          default:
             return chAT::CommandStatus::ERROR;
@@ -474,7 +475,7 @@ void CAtHandler::add_cmds_wifi_station() {
 
    /* ....................................................................... */
    command_table[_IPV6] = [this](auto & srv, auto & parser) {
-   /* ....................................................................... */     
+   /* ....................................................................... */
       switch (parser.cmd_mode) {
          case chAT::CommandMode::Read: {
             String ip_v6 = WiFi.localIPv6().toString() + "\r\n";
@@ -491,6 +492,50 @@ void CAtHandler::add_cmds_wifi_station() {
       }
    };
 
+   /* ....................................................................... */
+   command_table[_GETRSSI] = [this](auto & srv, auto & parser) {
+   /* ....................................................................... */
+      switch (parser.cmd_mode) {
+         case chAT::CommandMode::Read: {
+            String rssi = String(WiFi.RSSI()) + "\r\n";
+            srv.write_response_prompt();
+            srv.write_str((const char *)(rssi.c_str()));
+            return chAT::CommandStatus::OK;
+         }
+         default:
+            return chAT::CommandStatus::ERROR;
+      }
+   };
+
+   /* ....................................................................... */
+   command_table[_GETSSID] = [this](auto & srv, auto & parser) {
+   /* ....................................................................... */
+      switch (parser.cmd_mode) {
+         case chAT::CommandMode::Read: {
+            String ssid = WiFi.SSID() + "\r\n";
+            srv.write_response_prompt();
+            srv.write_str((const char *)(ssid.c_str()));
+            return chAT::CommandStatus::OK;
+         }
+         default:
+            return chAT::CommandStatus::ERROR;
+      }
+   };
+
+   /* ....................................................................... */
+   command_table[_GETBSSID] = [this](auto & srv, auto & parser) {
+   /* ....................................................................... */
+      switch (parser.cmd_mode) {
+         case chAT::CommandMode::Read: {
+            String bssid = WiFi.BSSIDstr() + "\r\n";
+            srv.write_response_prompt();
+            srv.write_str((const char *)(bssid.c_str()));
+            return chAT::CommandStatus::OK;
+         }
+         default:
+            return chAT::CommandStatus::ERROR;
+      }
+   };
 }
 
 #endif
