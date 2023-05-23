@@ -1,4 +1,5 @@
-// WiFi
+#ifndef WIFI_COMMANDS_H
+#define WIFI_COMMANDS_H
 
 enum{
    IP_ADDR = 0,
@@ -34,7 +35,8 @@ enum{
 #define _HOSTNAME          "+HOSTNAME"
 #define _BEGINCLIENT       "+BEGINCLIENT"
 #define _CLIENTSTATE       "+CLIENTSTATE"
-#define _CLIENTCONNECT     "+CLIENTCONNECT"
+#define _CLIENTCONNECTIP   "+CLIENTCONNECTIP"
+#define _CLIENTCONNECTNAME "+CLIENTCONNECTNAME"
 #define _CLIENTSEND        "+CLIENTSEND"
 #define _CLIENTRECEIVE     "+CLIENTRECEIVE"
 #define _CLIENTCLOSE       "+CLIENTCLOSE"
@@ -51,9 +53,16 @@ enum{
 #define _SSLCLIENTRECEIVE  "+SSLCLIENTRECEIVE"
 #define _SETIP             "+SETIP"
 #define _GETHOSTBYNAME     "+HOSTBYNAME"
-
+#define _AVAILABLE         "+AVAILABLE"
+#define _PEEK              "+PEEK"
+#define _CLIENTFLUSH       "+FLUSH"
+#define _REMOTEIP          "+REMOTEIP"
+#define _REMOTEPORT        "+REMOTEPORT"
+#define _CLIENTSTATUS      "+CLIENTSTATUS"
 
 #define CMD(x)             _AT x _ENDL
 #define PROMPT(x)          x ":"
 #define CMD_WRITE(x)       _AT x "="
 #define CMD_READ(x)        _AT x "?" _ENDL
+
+#endif

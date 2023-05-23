@@ -61,6 +61,11 @@ void CAtHandler::onWiFiEvent(WiFiEvent_t event) {
 CAtHandler::CAtHandler(HardwareSerial *s)  : serverWiFi(80) {
 /* -------------------------------------------------------------------------- */   
    
+  for(int i = 0; i < MAX_CLIENT_AVAILABLE; i++) {
+    clients[i] = nullptr;
+  }
+
+
   /* Set up wifi event */
   WiFi.onEvent(onWiFiEvent);
    
