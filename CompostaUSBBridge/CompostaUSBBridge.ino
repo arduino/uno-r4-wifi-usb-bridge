@@ -12,6 +12,7 @@
 
 #include "USB.h"
 #include "USBCDC.h"
+#include "DAP.h"
 
 //#define DEBUG_AT
 
@@ -54,8 +55,11 @@ void setup() {
   while (!SERIAL_AT);
   SERIAL_AT.println("READY");
 #else
+  DAP.begin();
   USB.VID(0x2341);
   USB.PID(0x1002);
+  USB.productName("UNO WiFi R4");
+  USB.enableDFU();
   USB.begin();
   SERIAL_USER.onEvent(usbEventCallback);
   SERIAL_USER.enableReboot(false);

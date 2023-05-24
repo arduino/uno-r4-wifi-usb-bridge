@@ -1,0 +1,40 @@
+#include "USB.h"
+#include "USBHID.h"
+extern "C" {
+    #include "freedap.h"
+}
+
+extern USBHID HID;
+
+static uint8_t const report_descriptor[] =
+{
+  TUD_HID_REPORT_DESC_GENERIC_INOUT(CFG_TUD_HID_EP_BUFSIZE)
+};
+
+class DAPHIDDevice: public USBHIDDevice {
+public:
+  DAPHIDDevice(void){
+    static bool initialized = false;
+    if(!initialized){
+      initialized = true;
+      HID.addDevice(this, sizeof(report_descriptor));
+    }
+  }
+  
+  void begin(void){
+    HID.begin();
+    dap_init();
+  }
+    
+  uint16_t _onGetDescriptor(uint8_t* buffer){
+    memcpy(buffer, report_descriptor, sizeof(report_descriptor));
+    return sizeof(report_descriptor);
+  }
+  void _onOutput(uint8_t report_id, const uint8_t* buffer, uint16_t len) {
+    static uint8_t TxDataBuffer[CFG_TUD_HID_EP_BUFSIZE];
+    dap_process_request((uint8_t*)buffer, len, TxDataBuffer, sizeof(TxDataBuffer));
+    HID.SendReport(0, TxDataBuffer, sizeof(TxDataBuffer));
+  }
+};
+
+extern DAPHIDDevice DAP;
