@@ -67,6 +67,13 @@ func reboot_unor4() error {
 	}
 	fmt.Printf("Serial Number String: %s\n", s)
 
+	// get version
+	g := make([]byte, 65)
+	if _, err := d.GetFeatureReport(g); err != nil {
+		return err
+	}
+	fmt.Printf("FW version: %d.%d.%d\n", g[1], g[2], g[3])
+
 	// Reboot
 	b[0] = 0
 	b[1] = 0xAA

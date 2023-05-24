@@ -6,6 +6,10 @@ extern "C" {
     #include "freedap.h"
 }
 
+#define FIRMWARE_MAYOR    0
+#define FIRMWARE_MINOR    0
+#define FIRMWARE_PATCH    1
+
 extern USBHID HID;
 
 static uint8_t const report_descriptor[] =
@@ -41,6 +45,12 @@ public:
     if (buffer[0] == 0xAA) {
       usb_persist_restart(RESTART_BOOTLOADER);
     }
+  }
+  uint16_t _onGetFeature(uint8_t report_id, uint8_t* buffer, uint16_t len) {
+    buffer[0] = FIRMWARE_MAYOR;
+    buffer[1] = FIRMWARE_MINOR;
+    buffer[2] = FIRMWARE_PATCH;
+    return 3;
   }
 };
 
