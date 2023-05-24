@@ -1,6 +1,8 @@
 #include "USB.h"
 #include "USBHID.h"
+
 extern "C" {
+    #include "esp32-hal-tinyusb.h"
     #include "freedap.h"
 }
 
@@ -33,7 +35,12 @@ public:
   void _onOutput(uint8_t report_id, const uint8_t* buffer, uint16_t len) {
     static uint8_t TxDataBuffer[CFG_TUD_HID_EP_BUFSIZE];
     dap_process_request((uint8_t*)buffer, len, TxDataBuffer, sizeof(TxDataBuffer));
-    HID.SendReport(0, TxDataBuffer, sizeof(TxDataBuffer));
+    HID.SendReport(report_id, TxDataBuffer, sizeof(TxDataBuffer), 5);
+  }
+  void _onSetFeature(uint8_t report_id, const uint8_t* buffer, uint16_t len){
+    if (buffer[0] == 0xAA) {
+      usb_persist_restart(RESTART_BOOTLOADER);
+    }
   }
 };
 

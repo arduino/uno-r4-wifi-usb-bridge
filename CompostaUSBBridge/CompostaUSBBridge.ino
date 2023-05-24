@@ -55,12 +55,11 @@ void setup() {
   while (!SERIAL_AT);
   SERIAL_AT.println("READY");
 #else
-  DAP.begin();
   USB.VID(0x2341);
   USB.PID(0x1002);
-  USB.productName("UNO WiFi R4");
-  USB.enableDFU();
-  USB.begin();
+  USB.productName("UNO WiFi R4 CMSIS-DAP");
+  //USB.enableDFU();
+  DAP.begin();
   SERIAL_USER.onEvent(usbEventCallback);
   SERIAL_USER.enableReboot(false);
   SERIAL_USER.begin(115200);
@@ -72,6 +71,7 @@ void setup() {
   SERIAL_AT.setRxBufferSize(8192);
   SERIAL_AT.setTxBufferSize(8192);
   SERIAL_AT.begin(115200, SERIAL_8N1, 6, 5);
+  USB.begin();
 #endif
   
 
