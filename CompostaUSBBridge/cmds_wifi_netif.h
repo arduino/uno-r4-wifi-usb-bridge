@@ -13,10 +13,11 @@ void CAtHandler::add_cmds_wifi_netif() {
       switch (parser.cmd_mode) {
          case chAT::CommandMode::Run: {
             if (clients_num < MAX_CLIENT_AVAILABLE) {
-               for (int i = 5; i < MAX_CLIENT_AVAILABLE; i++) {
+               for (int i = 0; i < MAX_CLIENT_AVAILABLE; i++) {
                   if (clients[i] == nullptr) {
                      clients[i] = new WiFiClient();
                      if(clients[i] == nullptr) {
+                        srv.write_str("A0");
                         return chAT::CommandStatus::ERROR;
                      }
                      clients_num++;
@@ -27,6 +28,7 @@ void CAtHandler::add_cmds_wifi_netif() {
                   }
                }
             }
+            srv.write_str("A1");
             return chAT::CommandStatus::ERROR;
          }
          case chAT::CommandMode::Write: {
@@ -282,9 +284,7 @@ void CAtHandler::add_cmds_wifi_netif() {
             if (!ok) {
               return chAT::CommandStatus::ERROR;
             }
-            srv.write_str("PIPPO ");
-            srv.write_data(data_received.data(), data_received.size());
-            srv.write_line_end();
+            
             return chAT::CommandStatus::OK;
          }
          default:
@@ -487,20 +487,23 @@ void CAtHandler::add_cmds_wifi_netif() {
             if (size.empty()) {
               return chAT::CommandStatus::ERROR;
             }
-            int to_be_received = atoi(size.c_str());
-            if(to_be_received <= 0) {
+            int data_wanted = atoi(size.c_str());
+            if(data_wanted <= 0) {
                return chAT::CommandStatus::ERROR;
             } 
 
-            std::vector<uint8_t> data_received;
-            data_received.resize(to_be_received);
+            int data_available = clients[sock]->available();
+            data_wanted = (data_wanted < data_available) ? data_wanted : data_available;
 
-            int res = clients[sock]->read(data_received.data(), to_be_received);
-            String results = String(res) + " | ";
+            std::vector<uint8_t> data_received;
+            data_received.resize(data_wanted);
+
+            int res = clients[sock]->read(data_received.data(), data_wanted);
+            String results = String(data_received.size()) + "|";
             
             srv.write_response_prompt();
             srv.write_str((const char *)(results.c_str()));
-            srv.write_data(data_received.data(), data_received.size());
+            srv.write_vec8(data_received);
             srv.write_line_end();
 
             return chAT::CommandStatus::OK;
