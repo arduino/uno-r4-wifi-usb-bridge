@@ -7,6 +7,8 @@
 
 #include "WiFiClient.h"
 #include <WiFiClientSecure.h>
+#include "FS.h"
+#include "SPIFFS.h"
 
 #define MAX_CLIENT_AVAILABLE   8
 
