@@ -131,6 +131,35 @@ void CAtHandler::add_cmds_esp_generic() {
    /* ....................................................................... */     
       return chAT::CommandStatus::OK;
    };
+
+
+   /* ....................................................................... */
+   command_table[_SOFTRESETWIFI] = [this](auto & srv, auto & parser) {
+   /* ....................................................................... */     
+      switch (parser.cmd_mode) {
+         case chAT::CommandMode::Run: {
+            for (int i = 0; i < MAX_CLIENT_AVAILABLE; i++) {
+               if (clients[i] != nullptr) {
+                  
+                  clients[i]->stop();
+                  delete clients[i];
+                  clients[i] = nullptr;
+               }
+            }
+            clients_num = 0;
+
+            WiFi.disconnect();
+            WiFi.softAPdisconnect();
+                  
+            srv.write_response_prompt();
+            srv.write_line_end();
+            return chAT::CommandStatus::OK;      
+               
+         }
+         default:
+            return chAT::CommandStatus::ERROR;
+      } 
+   };
  
 }
 

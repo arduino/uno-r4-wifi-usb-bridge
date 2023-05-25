@@ -63,6 +63,7 @@ enum{
 #define _REMOTEIP          "+REMOTEIP"
 #define _REMOTEPORT        "+REMOTEPORT"
 #define _CLIENTSTATUS      "+CLIENTSTATUS"
+#define _SOFTRESETWIFI     "+SOFTRESETWIFI"
 
 #define CMD(x)             _AT x _ENDL
 #define PROMPT(x)          x ":"

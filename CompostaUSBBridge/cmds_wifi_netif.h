@@ -17,7 +17,6 @@ void CAtHandler::add_cmds_wifi_netif() {
                   if (clients[i] == nullptr) {
                      clients[i] = new WiFiClient();
                      if(clients[i] == nullptr) {
-                        srv.write_str("A0");
                         return chAT::CommandStatus::ERROR;
                      }
                      clients_num++;
@@ -28,7 +27,6 @@ void CAtHandler::add_cmds_wifi_netif() {
                   }
                }
             }
-            srv.write_str("A1");
             return chAT::CommandStatus::ERROR;
          }
          case chAT::CommandMode::Write: {
@@ -219,31 +217,31 @@ void CAtHandler::add_cmds_wifi_netif() {
                to be transmitted */
 
             if (parser.args.size() != 2) {
-               srv.write_str("A");
+               
                return chAT::CommandStatus::ERROR;
             }
 
             /* socket */
             auto &sock_num = parser.args[0];
             if (sock_num.empty()) {
-               srv.write_str("B");
+               
                return chAT::CommandStatus::ERROR;
             }
 
             int sock = atoi(sock_num.c_str());
             if(sock < 0 || sock >= MAX_CLIENT_AVAILABLE) {
-               srv.write_str("C");
+               
                return chAT::CommandStatus::ERROR;
             }
             if (clients[sock] == nullptr) {
-               srv.write_str("D");
+               
                return chAT::CommandStatus::ERROR;
             }
 
             /* data len */
             auto &size_p = parser.args[1];
             if (size_p.empty()) {
-               srv.write_str("E");
+               
                return chAT::CommandStatus::ERROR;
             }
 
