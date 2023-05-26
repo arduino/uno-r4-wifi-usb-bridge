@@ -64,10 +64,14 @@ enum{
 #define _REMOTEPORT        "+REMOTEPORT"
 #define _CLIENTSTATUS      "+CLIENTSTATUS"
 #define _SOFTRESETWIFI     "+SOFTRESETWIFI"
+#define _SERVERAVAILABLE   "+SERVERAVAILABLE"
+#define _SERVEREND         "+SERVEREND"
 
 #define CMD(x)             _AT x _ENDL
 #define PROMPT(x)          x ":"
 #define CMD_WRITE(x)       _AT x "="
 #define CMD_READ(x)        _AT x "?" _ENDL
+
+#define START_CLIENT_SERVER_SOCK 1000
 
 #endif

@@ -11,6 +11,41 @@
 using namespace SudoMaker;
 
 /* -------------------------------------------------------------------------- */
+CClientWrapper CAtHandler::getClient(int sock) {
+/* -------------------------------------------------------------------------- */
+   CClientWrapper rv;
+   
+   bool is_server = false;
+   int internal_sock = -1;
+
+   if(sock >= START_CLIENT_SERVER_SOCK) {
+      internal_sock = sock - START_CLIENT_SERVER_SOCK;
+      is_server = true;
+   }
+   else {
+      internal_sock = sock;
+   }
+
+   if(internal_sock < 0 || internal_sock >= MAX_CLIENT_AVAILABLE) {
+      rv.client = nullptr;
+      rv.can_delete = -1;
+      return rv;
+   }
+
+   if(is_server) {
+      rv.client = &serverClients[internal_sock];
+      rv.can_delete = -1;
+   }
+   else {
+      rv.client = clients[internal_sock];
+      rv.can_delete = internal_sock;
+   }
+   return rv;
+}
+
+
+
+/* -------------------------------------------------------------------------- */
 void CAtHandler::run() {
 /* -------------------------------------------------------------------------- */   
    at_srv.run();
@@ -58,13 +93,16 @@ void CAtHandler::onWiFiEvent(WiFiEvent_t event) {
 }
 
 /* -------------------------------------------------------------------------- */
-CAtHandler::CAtHandler(HardwareSerial *s)  : serverWiFi(80) {
+CAtHandler::CAtHandler(HardwareSerial *s)  {
 /* -------------------------------------------------------------------------- */   
    
   for(int i = 0; i < MAX_CLIENT_AVAILABLE; i++) {
     clients[i] = nullptr;
   }
 
+  for(int i = 0; i < MAX_SERVER_AVAILABLE; i++) {
+    serverWiFi[i] = nullptr;
+  }
 
   /* Set up wifi event */
   WiFi.onEvent(onWiFiEvent);

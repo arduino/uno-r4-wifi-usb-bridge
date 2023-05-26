@@ -139,6 +139,22 @@ void CAtHandler::add_cmds_esp_generic() {
       switch (parser.cmd_mode) {
          case chAT::CommandMode::Run: {
             for (int i = 0; i < MAX_CLIENT_AVAILABLE; i++) {
+               if (serverClients[i].connected()) {
+                  serverClients[i].stop();
+               }
+            }
+            
+            for (int i = 0; i < MAX_SERVER_AVAILABLE; i++) {
+               if (serverWiFi[i] != nullptr) {
+                  serverWiFi[i]->end();
+                  delete serverWiFi[i];
+                  serverWiFi[i] = nullptr;
+               }
+            }
+
+            servers_num = 0;
+
+            for (int i = 0; i < MAX_CLIENT_AVAILABLE; i++) {
                if (clients[i] != nullptr) {
                   
                   clients[i]->stop();
