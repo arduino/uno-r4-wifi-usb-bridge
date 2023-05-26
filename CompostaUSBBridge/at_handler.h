@@ -12,6 +12,7 @@
 
 #define MAX_CLIENT_AVAILABLE   8
 #define MAX_SERVER_AVAILABLE   4
+#define MAX_UDP_AVAILABLE      4
 
 using namespace SudoMaker;
 
@@ -26,9 +27,11 @@ class CAtHandler {
 private:
    
    static void onWiFiEvent(WiFiEvent_t event);
+   WiFiUDP    * udps[MAX_UDP_AVAILABLE];
    WiFiServer * serverWiFi[MAX_SERVER_AVAILABLE];
    WiFiClient * clients[MAX_CLIENT_AVAILABLE];
    WiFiClient  serverClients[MAX_CLIENT_AVAILABLE];
+   int udps_num = 0;
    int servers_num = 0;
    int clientsToServer_num = 0;
    int clients_num = 0;
@@ -43,6 +46,7 @@ private:
    void add_cmds_wifi_softAP(); 
    void add_cmds_wifi_SSL();
    void add_cmds_wifi_netif();
+   void add_cmds_wifi_udp(); 
 public:
    CAtHandler(HardwareSerial *s);
    void run();

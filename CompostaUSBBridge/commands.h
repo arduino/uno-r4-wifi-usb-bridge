@@ -71,6 +71,26 @@ enum {
 #define _SERVERAVAILABLE   "+SERVERAVAILABLE"
 #define _SERVEREND         "+SERVEREND"
 
+#define _UDPBEGIN             "+UDPBEGIN"
+#define _UDPBEGINMULTI        "+UDPBEGINMULTI"
+#define _UDPBEGINPACKET       "+UDPBEGINPACKET"
+#define _UDPBEGINPACKETMULTI  "+BEGINPACKETMULTI"
+#define _UDPBEGINPACKETNAME   "+UDPBEGINPACKETADD"
+#define _UDPBEGINPACKETIP     "+UDPBEGINPACKETIP"
+#define _UDPENDPACKET         "+UDPENDPACKET"
+#define _UDPWRITE             "+UDPWRITE"
+#define _UDPPARSE             "+UDPPARSE"
+#define _UDPAVAILABLE         "+UDPAVAILABLE"
+#define _UDPREAD              "+UDPREAD"
+#define _UDPPEEK              "+UDPPEEK"
+#define _UDPFLUSH             "+UDPFLUSH"
+#define _UDPREMOTEIP          "+UDPREMOTEIP"
+#define _UDPREMOTEPORT        "+UDPREMOTEPORT"
+#define _UDPSTOP              "+UDPSTOP"
+
+
+
+
 #define CMD(x)             _AT x _ENDL
 #define PROMPT(x)          x ":"
 #define CMD_WRITE(x)       _AT x "="

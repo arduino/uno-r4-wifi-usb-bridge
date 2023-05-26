@@ -7,6 +7,7 @@
 #include "cmds_wifi_softAP.h"
 #include "cmds_wifi_netif.h"
 #include "cmds_wifi_SSL.h"
+#include "cmds_wifi_udp.h"
 
 using namespace SudoMaker;
 
@@ -141,4 +142,5 @@ CAtHandler::CAtHandler(HardwareSerial *s)  {
   add_cmds_wifi_softAP(); 
   add_cmds_wifi_SSL();
   add_cmds_wifi_netif();
+  add_cmds_wifi_udp();
 }

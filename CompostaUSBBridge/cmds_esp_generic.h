@@ -232,6 +232,16 @@ void CAtHandler::add_cmds_esp_generic() {
 
             servers_num = 0;
 
+            for (int i = 0; i < MAX_UDP_AVAILABLE; i++) {
+               if (udps[i] != nullptr) {
+                  udps[i]->stop();
+                  delete udps[i];
+                  udps[i] = nullptr;
+               }
+            }
+
+            udps_num = 0;
+
             for (int i = 0; i < MAX_CLIENT_AVAILABLE; i++) {
                if (clients[i] != nullptr) {
 
@@ -240,6 +250,7 @@ void CAtHandler::add_cmds_esp_generic() {
                   clients[i] = nullptr;
                }
             }
+            
             clients_num = 0;
 
             WiFi.disconnect();
