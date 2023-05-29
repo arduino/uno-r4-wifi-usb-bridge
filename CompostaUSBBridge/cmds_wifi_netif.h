@@ -295,7 +295,6 @@ void CAtHandler::add_cmds_wifi_netif() {
             CClientWrapper the_client = getClient(sock);
    
             if (the_client.client == nullptr) {
-               
             }
             else {
                the_client.client->stop();
