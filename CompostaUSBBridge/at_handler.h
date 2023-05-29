@@ -18,6 +18,7 @@ using namespace SudoMaker;
 class CClientWrapper {
 public:
    WiFiClient *client;
+   WiFiClientSecure *sslclient;
    int can_delete = -1;
 };
 

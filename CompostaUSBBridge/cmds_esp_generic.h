@@ -257,13 +257,21 @@ void CAtHandler::add_cmds_esp_generic() {
 
             for (int i = 0; i < MAX_CLIENT_AVAILABLE; i++) {
                if (clients[i] != nullptr) {
-
                   clients[i]->stop();
                   delete clients[i];
                   clients[i] = nullptr;
                }
             }
             clients_num = 0;
+
+            for (int i = 0; i < MAX_CLIENT_AVAILABLE; i++) {
+               if (sslclients[i] != nullptr) {
+                  sslclients[i]->stop();
+                  delete sslclients[i];
+                  sslclients[i] = nullptr;
+               }
+            }
+            sslclients_num = 0;
 
             WiFi.disconnect();
             WiFi.softAPdisconnect();

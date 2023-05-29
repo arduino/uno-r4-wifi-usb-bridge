@@ -19,7 +19,7 @@ void CAtHandler::add_cmds_wifi_SSL() {
                      }
                      sslclients_num++;
                      srv.write_response_prompt();
-                     srv.write_str((const char *) String(i).c_str());
+                     srv.write_str((const char *) String(i + START_SSL_CLIENT_SOCK).c_str());
                      srv.write_line_end();
                      return chAT::CommandStatus::OK;
                   }
@@ -51,14 +51,13 @@ void CAtHandler::add_cmds_wifi_SSL() {
             }
 
             int sock = atoi(sock_num.c_str());
-            if (sslclients[sock] == nullptr) {
-               srv.write_response_prompt();
-               srv.write_str("null pointer");
-               srv.write_line_end();
+            CClientWrapper the_client = getClient(sock);
+
+            if (the_client.sslclient == nullptr) {
                return chAT::CommandStatus::ERROR;
             }
-            WiFiClientSecure* tmp_clt = (WiFiClientSecure*) sslclients[sock];
-            tmp_clt->setInsecure();
+
+            the_client.sslclient->setInsecure();
             srv.write_response_prompt();
             srv.write_str("setted insecure");
             srv.write_line_end();
@@ -84,9 +83,13 @@ void CAtHandler::add_cmds_wifi_SSL() {
             }
 
             int sock = atoi(sock_num.c_str());
-            if (sslclients[sock] == nullptr) {
+
+            CClientWrapper the_client = getClient(sock);
+
+            if (the_client.sslclient == nullptr) {
                return chAT::CommandStatus::ERROR;
             }
+
             bool ca_root_custom = false;
             int ca_root_size = 0;
             if (parser.args.size() >= 2){
@@ -111,8 +114,7 @@ void CAtHandler::add_cmds_wifi_SSL() {
                      offset += serial->read(data_received.data() + offset, ca_root_size - offset);
                   } while (offset < ca_root_size);
                }
-               WiFiClientSecure* tmp_clt = (WiFiClientSecure*) sslclients[sock];
-               tmp_clt->setCACert((const char *)data_received.data());
+               the_client.sslclient->setCACert((const char *)data_received.data());
                srv.continue_read();
             } else {
                SPIFFS.begin(true); //useless here
@@ -132,8 +134,7 @@ void CAtHandler::add_cmds_wifi_SSL() {
                file.read(buf.data(), length);
                file.close();
 
-               WiFiClientSecure* tmp_clt = (WiFiClientSecure*) sslclients[sock];
-               tmp_clt->setCACert((const char *)buf.data());
+               the_client.sslclient->setCACert((const char *)buf.data());
             }
 
             return chAT::CommandStatus::OK;
@@ -157,12 +158,15 @@ void CAtHandler::add_cmds_wifi_SSL() {
             }
 
             int sock = atoi(sock_num.c_str());
-            if (sslclients[sock] == nullptr) {
+
+            CClientWrapper the_client = getClient(sock);
+
+            if (the_client.sslclient == nullptr) {
                return chAT::CommandStatus::ERROR;
             }
-            WiFiClientSecure* tmp_clt = (WiFiClientSecure*) sslclients[sock];
-            if (tmp_clt->connected()) {
-               String client_status = tmp_clt->remoteIP().toString() + "," + String(tmp_clt->remotePort()) + "," + String(tmp_clt->localPort()) + "\r\n";
+
+            if (the_client.sslclient->connected()) {
+               String client_status = the_client.sslclient->remoteIP().toString() + "," + String(the_client.sslclient->remotePort()) + "," + String(the_client.sslclient->localPort()) + "\r\n";
                srv.write_response_prompt();
                srv.write_str((const char *)(client_status.c_str()));
                srv.write_line_end();
@@ -189,7 +193,9 @@ void CAtHandler::add_cmds_wifi_SSL() {
             }
 
             int sock = atoi(sock_num.c_str());
-            if (sslclients[sock] == nullptr) {
+            CClientWrapper the_client = getClient(sock);
+
+            if (the_client.sslclient == nullptr) {
                return chAT::CommandStatus::ERROR;
             }
 
@@ -203,8 +209,7 @@ void CAtHandler::add_cmds_wifi_SSL() {
                return chAT::CommandStatus::ERROR;
             }
 
-            WiFiClientSecure* tmp_clt = (WiFiClientSecure*) sslclients[sock];
-            if (!tmp_clt->connect(host.c_str(), atoi(port.c_str()))) {
+            if (!the_client.sslclient->connect(host.c_str(), atoi(port.c_str()))) {
                return chAT::CommandStatus::ERROR;
             }
             srv.write_response_prompt();
@@ -232,11 +237,9 @@ void CAtHandler::add_cmds_wifi_SSL() {
 
             int sock = atoi(sock_num.c_str());
 
-            if(sock < 0 || sock >= MAX_CLIENT_AVAILABLE) {
-               return chAT::CommandStatus::ERROR;
-            }
-            
-            if (sslclients[sock] == nullptr) {
+            CClientWrapper the_client = getClient(sock);
+
+            if (the_client.sslclient == nullptr) {
                return chAT::CommandStatus::ERROR;
             }
 
@@ -255,12 +258,7 @@ void CAtHandler::add_cmds_wifi_SSL() {
                return chAT::CommandStatus::ERROR;
             }
 
-            if(sslclients[sock] == nullptr) {
-               return chAT::CommandStatus::ERROR;
-            }
-
-            WiFiClientSecure* tmp_clt = (WiFiClientSecure*) sslclients[sock];
-            if (!tmp_clt->connect(address, atoi(hostport.c_str()))) {
+            if (!the_client.sslclient->connect(address, atoi(hostport.c_str()))) {
                return chAT::CommandStatus::ERROR;
             }
             srv.write_response_prompt();
@@ -293,12 +291,9 @@ void CAtHandler::add_cmds_wifi_SSL() {
             }
 
             int sock = atoi(sock_num.c_str());
-            if(sock < 0 || sock >= MAX_CLIENT_AVAILABLE) {
-               
-               return chAT::CommandStatus::ERROR;
-            }
-            if (sslclients[sock] == nullptr) {
-               
+            CClientWrapper the_client = getClient(sock);
+
+            if (the_client.sslclient == nullptr) {
                return chAT::CommandStatus::ERROR;
             }
 
@@ -339,8 +334,7 @@ void CAtHandler::add_cmds_wifi_SSL() {
                } while (offset < data_size);
             }
 
-            WiFiClientSecure* tmp_clt = (WiFiClientSecure*) sslclients[sock];
-            auto ok = tmp_clt->write(data_received.data(), data_received.size());
+            auto ok = the_client.sslclient->write(data_received.data(), data_received.size());
 
             srv.continue_read();
             if (!ok) {
@@ -368,21 +362,18 @@ void CAtHandler::add_cmds_wifi_SSL() {
             }
             int sock = atoi(sock_num.c_str());
 
-            if(sock < 0 || sock >= MAX_CLIENT_AVAILABLE) {
-               return chAT::CommandStatus::ERROR;
-            }
-            
+            CClientWrapper the_client = getClient(sock);
 
-            if (sslclients[sock] == nullptr) {
-               
+            if (the_client.sslclient == nullptr) {
             }
             else {
-               WiFiClientSecure* tmp_clt = (WiFiClientSecure*) sslclients[sock];
-               tmp_clt->stop();
-               sslclients_num--;
-
-               delete sslclients[sock];
-               sslclients[sock] = nullptr;
+               the_client.sslclient->stop();
+               
+               if(the_client.can_delete >= 0) {
+                  delete sslclients[the_client.can_delete];
+                  sslclients[the_client.can_delete] = nullptr;
+                  sslclients_num--;
+               }
             }
             srv.write_response_prompt();
             srv.write_line_end();
@@ -392,6 +383,7 @@ void CAtHandler::add_cmds_wifi_SSL() {
             return chAT::CommandStatus::ERROR;
       }
    };
+
 
    /* ....................................................................... */
    command_table[_SSLIPCLIENT] = [this](auto & srv, auto & parser) {
@@ -406,11 +398,17 @@ void CAtHandler::add_cmds_wifi_SSL() {
               return chAT::CommandStatus::ERROR;
             }
             int sock = atoi(sock_num.c_str());
-            WiFiClientSecure* tmp_clt = (WiFiClientSecure*) sslclients[sock];
-            if (tmp_clt != nullptr && tmp_clt->connected()) {
-              String client_status = tmp_clt->localIP().toString() + "\r\n";
-              srv.write_response_prompt();
-              srv.write_str((const char *)(client_status.c_str()));
+            CClientWrapper the_client = getClient(sock);
+
+            if (the_client.sslclient == nullptr) {
+               return chAT::CommandStatus::ERROR;
+            }
+
+            if (the_client.sslclient->connected()) {
+               String client_status = the_client.sslclient->localIP().toString() + "\r\n";
+               srv.write_response_prompt();
+               srv.write_str((const char *)(client_status.c_str()));
+               srv.write_line_end();
             }
             return chAT::CommandStatus::OK;
          }
@@ -434,18 +432,14 @@ void CAtHandler::add_cmds_wifi_SSL() {
             }
 
             int sock = atoi(socket_num.c_str());
-            
-            if(sock < 0 || sock >= MAX_CLIENT_AVAILABLE) {
+            CClientWrapper the_client = getClient(sock);
+
+            if (the_client.sslclient == nullptr) {
                return chAT::CommandStatus::ERROR;
             }
 
-            if (sslclients[sock] == nullptr) {
-              return chAT::CommandStatus::ERROR;
-            }
-
-            WiFiClientSecure* tmp_clt = (WiFiClientSecure*) sslclients[sock];
             srv.write_response_prompt();
-            String con(tmp_clt->connected());
+            String con(the_client.sslclient->connected());
             srv.write_str((const char *)(con.c_str()));
             srv.write_line_end();
             return chAT::CommandStatus::OK;
@@ -469,7 +463,9 @@ void CAtHandler::add_cmds_wifi_SSL() {
               return chAT::CommandStatus::ERROR;
             }
             int sock = atoi(socket_num.c_str());
-            if (sslclients[sock] == nullptr) {
+            CClientWrapper the_client = getClient(sock);
+
+            if (the_client.sslclient == nullptr) {
                return chAT::CommandStatus::ERROR;
             }
 
@@ -481,14 +477,14 @@ void CAtHandler::add_cmds_wifi_SSL() {
             if(data_wanted <= 0) {
                return chAT::CommandStatus::ERROR;
             } 
-            WiFiClientSecure* tmp_clt = (WiFiClientSecure*) sslclients[sock];
-            int data_available = tmp_clt->available();
+
+            int data_available = the_client.sslclient->available();
             data_wanted = (data_wanted < data_available) ? data_wanted : data_available;
 
             std::vector<uint8_t> data_received;
             data_received.resize(data_wanted);
 
-            int res = tmp_clt->read(data_received.data(), data_wanted);
+            int res = the_client.sslclient->read(data_received.data(), data_wanted);
             String results = String(data_received.size()) + "|";
             
             srv.write_response_prompt();
@@ -517,12 +513,14 @@ void CAtHandler::add_cmds_wifi_SSL() {
               return chAT::CommandStatus::ERROR;
             }
             int sock = atoi(socket_num.c_str());
-            if (sslclients[sock] == nullptr) {
+            CClientWrapper the_client = getClient(sock);
+
+            if (the_client.sslclient == nullptr) {
                return chAT::CommandStatus::ERROR;
             }
-            WiFiClientSecure* tmp_clt = (WiFiClientSecure*) sslclients[sock];
+
             srv.write_response_prompt();
-            String av(tmp_clt->available());
+            String av(the_client.sslclient->available());
             srv.write_str((const char *)(av.c_str()));
             srv.write_line_end();
             return chAT::CommandStatus::OK;
@@ -546,7 +544,9 @@ void CAtHandler::add_cmds_wifi_SSL() {
               return chAT::CommandStatus::ERROR;
             }
             int sock = atoi(socket_num.c_str());
-            if (sslclients[sock] == nullptr) {
+            CClientWrapper the_client = getClient(sock);
+
+            if (the_client.sslclient == nullptr) {
                return chAT::CommandStatus::ERROR;
             }
             
@@ -575,11 +575,13 @@ void CAtHandler::add_cmds_wifi_SSL() {
               return chAT::CommandStatus::ERROR;
             }
             int sock = atoi(socket_num.c_str());
-            if (sslclients[sock] == nullptr) {
+            CClientWrapper the_client = getClient(sock);
+
+            if (the_client.sslclient == nullptr) {
                return chAT::CommandStatus::ERROR;
             }
-            WiFiClientSecure* tmp_clt = (WiFiClientSecure*) sslclients[sock];
-            tmp_clt->flush();
+
+            the_client.sslclient->flush();
             srv.write_response_prompt();
             srv.write_line_end();
             return chAT::CommandStatus::OK;
@@ -603,11 +605,14 @@ void CAtHandler::add_cmds_wifi_SSL() {
               return chAT::CommandStatus::ERROR;
             }
             int sock = atoi(socket_num.c_str());
-            if (sslclients[sock] == nullptr) {
+            CClientWrapper the_client = getClient(sock);
+
+            if (the_client.sslclient == nullptr) {
                return chAT::CommandStatus::ERROR;
             }
-            WiFiClientSecure* tmp_clt = (WiFiClientSecure*) sslclients[sock];
-            IPAddress ip = tmp_clt->remoteIP();
+
+
+            IPAddress ip = the_client.sslclient->remoteIP();
             srv.write_response_prompt();
             srv.write_str((const char *)(ip.toString().c_str()));
             srv.write_line_end();
@@ -632,11 +637,13 @@ void CAtHandler::add_cmds_wifi_SSL() {
               return chAT::CommandStatus::ERROR;
             }
             int sock = atoi(socket_num.c_str());
-            if (sslclients[sock] == nullptr) {
+            CClientWrapper the_client = getClient(sock);
+
+            if (the_client.sslclient == nullptr) {
                return chAT::CommandStatus::ERROR;
             }
-            WiFiClientSecure* tmp_clt = (WiFiClientSecure*) sslclients[sock];
-            String port(tmp_clt->remotePort());
+
+            String port(the_client.sslclient->remotePort());
             srv.write_response_prompt();
             srv.write_str((const char *)(port.c_str()));
             srv.write_line_end();
@@ -662,12 +669,14 @@ void CAtHandler::add_cmds_wifi_SSL() {
               return chAT::CommandStatus::ERROR;
             }
             int sock = atoi(socket_num.c_str());
-            if (sslclients[sock] == nullptr) {
+            CClientWrapper the_client = getClient(sock);
+
+            if (the_client.sslclient == nullptr) {
                return chAT::CommandStatus::ERROR;
             }
-            WiFiClientSecure* tmp_clt = (WiFiClientSecure*) sslclients[sock];
+
             srv.write_response_prompt();
-            String p(tmp_clt->peek());
+            String p(the_client.sslclient->peek());
             srv.write_str((const char *)(p.c_str()));
             srv.write_line_end();
             return chAT::CommandStatus::OK;

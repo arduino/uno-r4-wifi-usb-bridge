@@ -16,8 +16,14 @@ CClientWrapper CAtHandler::getClient(int sock) {
    CClientWrapper rv;
    
    bool is_server = false;
+   bool is_sslclienet = false;
+
    int internal_sock = -1;
 
+   if(sock >= START_SSL_CLIENT_SOCK) {
+      internal_sock = sock - START_SSL_CLIENT_SOCK;
+      is_sslclienet = true;
+   } else
    if(sock >= START_CLIENT_SERVER_SOCK) {
       internal_sock = sock - START_CLIENT_SERVER_SOCK;
       is_server = true;
@@ -28,11 +34,16 @@ CClientWrapper CAtHandler::getClient(int sock) {
 
    if(internal_sock < 0 || internal_sock >= MAX_CLIENT_AVAILABLE) {
       rv.client = nullptr;
+      rv.sslclient = nullptr;
       rv.can_delete = -1;
       return rv;
    }
 
-   if(is_server) {
+   if (is_sslclienet) {
+    rv.sslclient = sslclients[internal_sock];
+    rv.can_delete = internal_sock;
+   }
+   else if(is_server) {
       rv.client = &serverClients[internal_sock];
       rv.can_delete = -1;
    }
