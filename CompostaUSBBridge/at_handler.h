@@ -29,9 +29,11 @@ private:
    WiFiServer * serverWiFi[MAX_SERVER_AVAILABLE];
    WiFiClient * clients[MAX_CLIENT_AVAILABLE];
    WiFiClient  serverClients[MAX_CLIENT_AVAILABLE];
+   WiFiClientSecure * sslclients[MAX_CLIENT_AVAILABLE];
    int servers_num = 0;
    int clientsToServer_num = 0;
    int clients_num = 0;
+   int sslclients_num = 0;
    std::unordered_map<std::string, std::function<chAT::CommandStatus(chAT::Server&, chAT::ATParser&)>> command_table;
    chAT::Server at_srv;
    HardwareSerial *serial;

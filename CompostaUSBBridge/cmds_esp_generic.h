@@ -72,30 +72,38 @@ void CAtHandler::add_cmds_esp_generic() {
                      return chAT::CommandStatus::ERROR;
                   }
                   case WIFI_FILE_WRITE: {
-                     const char * _data;
+                     uint8_t size = 0;
                      if (parser.args.size() >= 3) {
-                        auto &data = parser.args[3];
-                        if (data.empty()) {
+                        auto &size_str = parser.args[3];
+                        if (size_str.empty()) {
                            return chAT::CommandStatus::ERROR;
                         }
-                        _data = data.c_str();
-                     } else {
-                        return chAT::CommandStatus::ERROR;
+                        size = atoi(size_str.c_str());
+                     }
+
+                     std::vector<uint8_t> data_received;
+                     data_received = srv.inhibit_read(size);
+                     size_t offset = data_received.size();
+                     
+                     if(offset < size) {
+
+                        data_received.resize(size);
+                        do {
+                           offset += serial->read(data_received.data() + offset, size - offset);
+                        } while (offset < size);
                      }
 
                      File file = SPIFFS.open(filename.c_str(), FILE_WRITE);
                      if(!file){
                         return chAT::CommandStatus::ERROR;
                      }
-                     int res = file.print(_data);
+                     int res = file.write(data_received.data(), data_received.size());
                      if(res == 0){
                        return chAT::CommandStatus::ERROR;
                      }
-                     file.close();
 
-                     srv.write_response_prompt();
-                     srv.write_str((const char*)String(res).c_str());
-                     srv.write_line_end();
+                     file.close();
+                     srv.continue_read();
                      return chAT::CommandStatus::OK;
                   }
                   case WIFI_FILE_READ: {
@@ -143,27 +151,42 @@ void CAtHandler::add_cmds_esp_generic() {
                      return chAT::CommandStatus::OK;
                   }
                   case WIFI_FILE_APPEND: {
-                    const char * _data;
+                      uint8_t size = 0;
                      if (parser.args.size() >= 3) {
-                        auto &data = parser.args[3];
-                        if (data.empty()) {
+                        auto &size_str = parser.args[3];
+                        if (size_str.empty()) {
                            return chAT::CommandStatus::ERROR;
                         }
-                        _data = data.c_str();
+                        size = atoi(size_str.c_str());
+                     } else {
+                        return chAT::CommandStatus::ERROR;
                      }
+
+                     std::vector<uint8_t> data_received;
+                     data_received = srv.inhibit_read(size);
+                     size_t offset = data_received.size();
+                     
+                     if(offset < size) {
+
+                        data_received.resize(size);
+                        do {
+                           offset += serial->read(data_received.data() + offset, size - offset);
+                        } while (offset < size);
+                     }
+
                      File file = SPIFFS.open(filename.c_str(), FILE_APPEND);
                      if(!file){
                         return chAT::CommandStatus::ERROR;
                      }
 
-                     if(!file.print(_data)){
+                     int res = file.write(data_received.data(), data_received.size());
+                     if(res == 0){
                        return chAT::CommandStatus::ERROR;
                      }
+
                      file.close();
-                     int res = true;
-                     srv.write_response_prompt();
-                     srv.write_str((const char*)String(res).c_str());
-                     srv.write_line_end();
+                     srv.continue_read();
+                     
                      return chAT::CommandStatus::OK;
                   }
                   default:
@@ -195,7 +218,7 @@ void CAtHandler::add_cmds_esp_generic() {
                return chAT::CommandStatus::ERROR;
             }
             srv.write_response_prompt();
-            srv.write_cstr("FS Mounted");
+            srv.write_cstr("FS Mounted\r\n");
             srv.write_line_end();
             return chAT::CommandStatus::OK;
          }
