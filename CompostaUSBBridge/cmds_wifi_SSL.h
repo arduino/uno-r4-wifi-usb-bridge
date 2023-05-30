@@ -334,10 +334,18 @@ void CAtHandler::add_cmds_wifi_SSL() {
                } while (offset < data_size);
             }
 
-            auto ok = the_client.sslclient->write(data_received.data(), data_received.size());
-
             srv.continue_read();
-            if (!ok) {
+
+            unsigned long start_time = millis();
+            int sent = 0;
+            while(millis() - start_time < 5000 && sent < data_received.size()){
+               sent += the_client.sslclient->write(data_received.data() + sent, data_received.size() - sent);
+               if(sent < data_received.size())
+                  delay(100);
+            }
+
+            
+            if (sent < data_received.size()) {
               return chAT::CommandStatus::ERROR;
             }
             

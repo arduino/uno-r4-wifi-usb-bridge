@@ -13,7 +13,7 @@ void CAtHandler::add_cmds_wifi_udp() {
       switch (parser.cmd_mode) {
          case chAT::CommandMode::Write: {
             if (parser.args.size() < 1 || parser.args.size() > 2) {
-               srv.write_str("A");
+               
                return chAT::CommandStatus::ERROR;
             }
 
@@ -21,7 +21,7 @@ void CAtHandler::add_cmds_wifi_udp() {
 
             auto &port_num = parser.args[0];
             if (port_num.empty()) {
-               srv.write_str("B");
+               
               return chAT::CommandStatus::ERROR;
             }
             int port = atoi(port_num.c_str());
@@ -29,12 +29,12 @@ void CAtHandler::add_cmds_wifi_udp() {
             if(arg_num == 2) {
                auto &ip = parser.args[1];
                if (ip.empty()) {
-                  srv.write_str("C");
+                  
                   return chAT::CommandStatus::ERROR;
                }
 
                if(!address.fromString(ip.c_str())) {
-                  srv.write_str("D");
+                  
                   return chAT::CommandStatus::ERROR;
                }
             }
@@ -45,7 +45,7 @@ void CAtHandler::add_cmds_wifi_udp() {
                   if (udps[i] == nullptr) {
                      udps[i] = new WiFiUDP();
                      if(udps[i] == nullptr) {
-                        srv.write_str("E");
+                        
                         return chAT::CommandStatus::ERROR;
                      }
 
@@ -55,7 +55,7 @@ void CAtHandler::add_cmds_wifi_udp() {
                         }
                         else {
                            delete udps[i];
-                           srv.write_str("E");
+                           
                            chAT::CommandStatus::ERROR;
                         }
                      }
@@ -65,7 +65,7 @@ void CAtHandler::add_cmds_wifi_udp() {
                         }
                         else {
                            delete udps[i];
-                           srv.write_str("F");
+                           
                            chAT::CommandStatus::ERROR;
                         }
                      }
@@ -77,15 +77,15 @@ void CAtHandler::add_cmds_wifi_udp() {
                   }
                }
             }
-            srv.write_str("G");
+            
             return chAT::CommandStatus::ERROR;
          }
          case chAT::CommandMode::Run: 
-            srv.write_str("H");
+            
             return chAT::CommandStatus::ERROR;
          
          default:
-            srv.write_str("I");
+            
             return chAT::CommandStatus::ERROR;
       }
    };
@@ -231,13 +231,11 @@ void CAtHandler::add_cmds_wifi_udp() {
       switch (parser.cmd_mode) {
          case chAT::CommandMode::Write: {
             if (parser.args.size() != 3) {
-               srv.write_str("AA");
                return chAT::CommandStatus::ERROR;
             }
 
             auto &sock_num = parser.args[0];
             if (sock_num.empty()) {
-               srv.write_str("BB");
                return chAT::CommandStatus::ERROR;
             }
 
@@ -248,13 +246,11 @@ void CAtHandler::add_cmds_wifi_udp() {
             }
 
             if(udps[sock] == nullptr) {
-               srv.write_str("CC");
                return chAT::CommandStatus::ERROR;
             }
 
             auto &port_num = parser.args[1];
             if (port_num.empty()) {
-               srv.write_str("DD");
               return chAT::CommandStatus::ERROR;
             }
             int port = atoi(port_num.c_str());
@@ -263,12 +259,10 @@ void CAtHandler::add_cmds_wifi_udp() {
             
             auto &ip = parser.args[2];
             if (ip.empty()) {
-               srv.write_str("EE");
                return chAT::CommandStatus::ERROR;
             }
 
             if(!address.fromString(ip.c_str())) {
-               srv.write_str("FF");
                return chAT::CommandStatus::ERROR;
             }
 
@@ -277,11 +271,9 @@ void CAtHandler::add_cmds_wifi_udp() {
                srv.write_line_end();
                return chAT::CommandStatus::OK;
             }
-            srv.write_str("GG");
             return chAT::CommandStatus::ERROR;
          }
          default:
-            srv.write_str("HH");
             return chAT::CommandStatus::ERROR;
       }
    };
@@ -472,11 +464,14 @@ void CAtHandler::add_cmds_wifi_udp() {
                return chAT::CommandStatus::ERROR;
             }
             
-            if(udps[sock]->parsePacket()) {
-               srv.write_response_prompt();
-               srv.write_line_end();
-               return chAT::CommandStatus::OK;
-            }
+            int res = udps[sock]->parsePacket();
+            String results = String(res);
+         
+            srv.write_response_prompt();
+            srv.write_str((const char *)results.c_str());
+            srv.write_line_end();
+            return chAT::CommandStatus::OK;
+            
 
             return chAT::CommandStatus::ERROR;
          }
