@@ -307,7 +307,7 @@ void CAtHandler::add_cmds_wifi_SSL() {
             int data_size = atoi(size_p.c_str());
 
             if(data_size <= 0) {
-               srv.write_str("F");
+               
                return chAT::CommandStatus::ERROR;
             }
 

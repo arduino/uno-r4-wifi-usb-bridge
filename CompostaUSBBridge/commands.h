@@ -100,6 +100,7 @@ enum {
 #define _UDPREMOTEPORT        "+UDPREMOTEPORT"
 #define _UDPSTOP              "+UDPSTOP"
 
+#define _FWVERSION            "+FWVERSION"
 
 
 

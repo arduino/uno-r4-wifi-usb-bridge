@@ -14,6 +14,8 @@
 #define MAX_SERVER_AVAILABLE   4
 #define MAX_UDP_AVAILABLE      4
 
+#define ESP_FW_VERSION "0.1.0"
+
 using namespace SudoMaker;
 
 class CClientWrapper {

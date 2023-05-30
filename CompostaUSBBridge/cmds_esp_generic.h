@@ -36,6 +36,21 @@ void CAtHandler::add_cmds_esp_generic() {
       }
    };
 
+    /* ....................................................................... */
+   command_table[_FWVERSION] = [this](auto & srv, auto & parser) {
+   /* ....................................................................... */
+      switch (parser.cmd_mode) {
+         case chAT::CommandMode::Read: {
+            srv.write_response_prompt();
+            srv.write_cstr(ESP_FW_VERSION);    
+            srv.write_line_end();
+            return chAT::CommandStatus::OK;
+         }
+         default:
+             return chAT::CommandStatus::ERROR;
+      }
+   };
+
    /* ....................................................................... */
    command_table[_FILESYSTEM] = [this](auto & srv, auto & parser) {
    /* ....................................................................... */
