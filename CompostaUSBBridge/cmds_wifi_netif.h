@@ -258,13 +258,13 @@ void CAtHandler::add_cmds_wifi_netif() {
 
             srv.continue_read();
 
-            unsigned long start_time = millis();
+            //unsigned long start_time = millis();
             int sent = 0;
-            while(millis() - start_time < 5000 && sent < data_received.size()){
+            //while(millis() - start_time < 5000 && sent < data_received.size()){
                sent += the_client.client->write(data_received.data() + sent, data_received.size() - sent);
-               if(sent < data_received.size())
-                  delay(100);
-            }
+               //if(sent < data_received.size())
+                  //delay(100);
+            //}
 
             
             if (sent < data_received.size()) {

@@ -102,6 +102,8 @@ enum {
 
 #define _FWVERSION            "+FWVERSION"
 
+#define _SOFTAPCONFIG         "+SOFTAPCONFIG"
+
 
 
 #define CMD(x)             _AT x _ENDL

@@ -130,7 +130,7 @@ void CAtHandler::add_cmds_wifi_softAP() {
       }
    };
 
-      /* ....................................................................... */
+   /* ....................................................................... */
    command_table[_GETSOFTAPSSID] = [this](auto & srv, auto & parser) {
    /* ....................................................................... */
       switch (parser.cmd_mode) {
@@ -138,6 +138,60 @@ void CAtHandler::add_cmds_wifi_softAP() {
             String ip_v6 = WiFi.softAPSSID() + "\r\n";
             srv.write_response_prompt();
             srv.write_str((const char *)(ip_v6.c_str()));
+            return chAT::CommandStatus::OK;
+         }
+         default:
+            return chAT::CommandStatus::ERROR;
+      }
+   };
+
+   /* ....................................................................... */
+   command_table[_SOFTAPCONFIG] = [this](auto & srv, auto & parser) {
+   /* ....................................................................... */     
+      switch (parser.cmd_mode) {
+         case chAT::CommandMode::Write: {
+            if (parser.args.size() != 3){
+               return chAT::CommandStatus::ERROR;
+            }
+
+            /* reading ips */
+
+            auto &ip = parser.args[0];
+            if(ip.empty()) {
+               return chAT::CommandStatus::ERROR;
+            }
+            IPAddress _ip;
+            if(!_ip.fromString(ip.c_str())) {
+               return chAT::CommandStatus::ERROR;
+            }
+
+
+            auto &gw = parser.args[1];
+            if(gw.empty()) {
+               return chAT::CommandStatus::ERROR;
+            }
+            IPAddress _gw;
+            if(!_gw.fromString(gw.c_str())) {
+               return chAT::CommandStatus::ERROR;
+            }
+
+            auto &nm = parser.args[2];
+            if(nm.empty()) {
+               return chAT::CommandStatus::ERROR;
+            }
+            IPAddress _nm;
+            if(!_nm.fromString(nm.c_str())) {
+               return chAT::CommandStatus::ERROR;
+            }
+
+            
+            if(!WiFi.softAPConfig(_ip,_gw,_nm)) {
+               return chAT::CommandStatus::ERROR;
+            }
+            
+
+            srv.write_response_prompt();
+            srv.write_line_end();
             return chAT::CommandStatus::OK;
          }
          default:

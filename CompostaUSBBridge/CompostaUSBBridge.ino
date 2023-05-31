@@ -38,7 +38,63 @@ USBCDC USBSerial(0);
 bool enableSTA(bool enable);
 bool enableAP(bool enable);
 
+/* -------------------------------------------------------------------------- */
+void CAtHandler::onWiFiEvent(WiFiEvent_t event) {
+/* -------------------------------------------------------------------------- */   
+   switch (event) {
+      case ARDUINO_EVENT_WIFI_READY:
 
+        break;
+      case ARDUINO_EVENT_WIFI_SCAN_DONE:
+
+        break;
+      case ARDUINO_EVENT_WIFI_STA_START:
+
+        break;
+      case ARDUINO_EVENT_WIFI_STA_STOP:
+
+        break;
+      case ARDUINO_EVENT_WIFI_STA_CONNECTED:
+
+        break;
+      case ARDUINO_EVENT_WIFI_STA_DISCONNECTED:
+
+        break;
+      case ARDUINO_EVENT_WIFI_STA_AUTHMODE_CHANGE:
+
+        break;
+      //case ARDUINO_EVENT_WIFI_STA_GOT_IP,
+      //case ARDUINO_EVENT_WIFI_STA_GOT_IP6,
+      //case ARDUINO_EVENT_WIFI_STA_LOST_IP,
+      case ARDUINO_EVENT_WIFI_AP_START:
+        USBSerial.println("AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAa");
+        break;
+      case ARDUINO_EVENT_WIFI_AP_STOP:
+        USBSerial.println("BBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB");
+
+        break;
+      case ARDUINO_EVENT_WIFI_AP_STACONNECTED:
+        USBSerial.println("CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC");
+
+        break;
+      case ARDUINO_EVENT_WIFI_AP_STADISCONNECTED:
+        USBSerial.println("DDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDD");
+
+        break;
+      case ARDUINO_EVENT_WIFI_AP_STAIPASSIGNED:
+        break;
+      //case ARDUINO_EVENT_WIFI_AP_PROBEREQRECVED,
+      //case ARDUINO_EVENT_WIFI_AP_GOT_IP6,
+      //case ARDUINO_EVENT_WIFI_FTM_REPORT,
+
+
+
+
+    default:
+      break;
+  }
+
+}
 
 /* -------------------------------------------------------------------------- */
 void setup() {
@@ -69,6 +125,8 @@ void setup() {
   SERIAL_AT.setTxBufferSize(8192);
   SERIAL_AT.begin(115200, SERIAL_8N1, 6, 5);
 #endif
+  /* Set up wifi event */
+  WiFi.onEvent(CAtHandler::onWiFiEvent);
   
 
 }

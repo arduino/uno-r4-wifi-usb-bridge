@@ -253,25 +253,43 @@ void CAtHandler::add_cmds_wifi_station() {
    /* ....................................................................... */
       switch (parser.cmd_mode) {
          case chAT::CommandMode::Write: {
-            if (parser.args.size() != 2) {
-              return chAT::CommandStatus::ERROR;
+            if(parser.args.size() == 1) {
+               auto &ssid = parser.args[0];
+               if (ssid.empty()) {
+                 return chAT::CommandStatus::ERROR;
+               }
+
+               int res = WiFi.begin(ssid.c_str());
+
+               String status = String(res);
+               srv.write_response_prompt();
+               srv.write_str((const char *)status.c_str());
+               srv.write_line_end();
+               return chAT::CommandStatus::OK;
+
             }
-            auto &ssid = parser.args[0];
-            if (ssid.empty()) {
-              return chAT::CommandStatus::ERROR;
+            else if (parser.args.size() == 2) {
+               auto &ssid = parser.args[0];
+               if (ssid.empty()) {
+                 return chAT::CommandStatus::ERROR;
+               }
+               auto &password = parser.args[1];
+               if (password.empty()) {
+                 return chAT::CommandStatus::ERROR;
+               }
+
+               int res = WiFi.begin(ssid.c_str(), password.c_str());
+
+               String status = String(res);
+               srv.write_response_prompt();
+               srv.write_str((const char *)status.c_str());
+               srv.write_line_end();
+               return chAT::CommandStatus::OK;
             }
-            auto &password = parser.args[1];
-            if (password.empty()) {
-              return chAT::CommandStatus::ERROR;
+            else {
+               return chAT::CommandStatus::ERROR;
             }
 
-            int res = WiFi.begin(ssid.c_str(), password.c_str());
-
-            String status = String(res);
-            srv.write_response_prompt();
-            srv.write_str((const char *)status.c_str());
-            srv.write_line_end();
-            return chAT::CommandStatus::OK;
 
          }
          default:
@@ -439,6 +457,7 @@ void CAtHandler::add_cmds_wifi_station() {
          case chAT::CommandMode::Read: {
             srv.write_response_prompt();
             srv.write_str(WiFi.getHostname());
+            srv.write_line_end();
             return chAT::CommandStatus::OK;
          }
          case chAT::CommandMode::Write: {
@@ -450,7 +469,12 @@ void CAtHandler::add_cmds_wifi_station() {
             if (host_name.empty()) {
                return chAT::CommandStatus::ERROR;
             }
-            WiFi.setHostname(host_name.c_str());
+
+            if(!WiFi.setHostname(host_name.c_str())) {
+               return chAT::CommandStatus::ERROR;
+            }
+            srv.write_response_prompt();
+            srv.write_line_end();
             return chAT::CommandStatus::OK;
          }
          default:

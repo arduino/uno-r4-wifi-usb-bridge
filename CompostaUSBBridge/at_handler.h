@@ -29,7 +29,7 @@ public:
 class CAtHandler {
 private:
    
-   static void onWiFiEvent(WiFiEvent_t event);
+   
    WiFiUDP    * udps[MAX_UDP_AVAILABLE];
    WiFiServer * serverWiFi[MAX_SERVER_AVAILABLE];
    WiFiClient * clients[MAX_CLIENT_AVAILABLE];
@@ -54,6 +54,7 @@ private:
    void add_cmds_wifi_udp(); 
 public:
    CAtHandler(HardwareSerial *s);
+   static void onWiFiEvent(WiFiEvent_t event);
    void run();
 };
 
