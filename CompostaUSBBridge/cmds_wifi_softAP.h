@@ -61,6 +61,9 @@ void CAtHandler::add_cmds_wifi_softAP() {
          }
 
          int res = WiFi.softAP(ssid, passphrase, ch, ssid_hidden, max_connection);
+         if(!res) {
+            wifi_status = WIFI_ST_AP_FAILED;
+         }
          String status = String(res);
          srv.write_response_prompt();
          srv.write_str((const char *)status.c_str());

@@ -13,6 +13,8 @@
 
 using namespace SudoMaker;
 
+uint8_t CAtHandler::wifi_status = WIFI_ST_IDLE_STATUS;
+
 /* -------------------------------------------------------------------------- */
 CClientWrapper CAtHandler::getClient(int sock) {
 /* -------------------------------------------------------------------------- */

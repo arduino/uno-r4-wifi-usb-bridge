@@ -79,11 +79,11 @@ void CAtHandler::add_cmds_wifi_station() {
       switch (parser.cmd_mode) {
          case chAT::CommandMode::Read: {
             srv.write_response_prompt();
-            int stato = WiFiClass::status();
-            if(stato == WL_NO_SHIELD) {
-               stato = WL_IDLE_STATUS;
-            }
-            String st(stato);
+            //int stato = WiFiClass::status();
+            //if(stato == WL_NO_SHIELD) {
+               //stato = WL_IDLE_STATUS;
+            //}
+            String st(wifi_status);
             srv.write_str((const char *)(st.c_str()));
             srv.write_line_end();
             return chAT::CommandStatus::OK;

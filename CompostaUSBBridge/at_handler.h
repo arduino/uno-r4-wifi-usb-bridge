@@ -18,6 +18,20 @@
 
 using namespace SudoMaker;
 
+#define WIFI_ST_NO_SHIELD            255
+#define WIFI_ST_NO_MODULE            255
+#define WIFI_ST_IDLE_STATUS           0
+#define WIFI_ST_NO_SSID_AVAIL         1
+#define WIFI_ST_SCAN_COMPLETED        2
+#define WIFI_ST_CONNECTED             3
+#define WIFI_ST_CONNECT_FAILED        4
+#define WIFI_ST_CONNECTION_LOST       5
+#define WIFI_ST_DISCONNECTED          6
+#define WIFI_ST_AP_LISTENING          7
+#define WIFI_ST_AP_CONNECTED          8
+#define WIFI_ST_AP_FAILED             9
+
+
 class CClientWrapper {
 public:
    WiFiClient *client;
@@ -28,7 +42,7 @@ public:
 
 class CAtHandler {
 private:
-   
+   static uint8_t wifi_status; 
    
    WiFiUDP    * udps[MAX_UDP_AVAILABLE];
    WiFiServer * serverWiFi[MAX_SERVER_AVAILABLE];
