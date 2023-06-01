@@ -299,6 +299,10 @@ void CAtHandler::add_cmds_esp_generic() {
             }
             sslclients_num = 0;
 
+            #define IP0 IPAddress(0,0,0,0)
+
+            WiFi.config(IP0,IP0,IP0);
+
             WiFi.disconnect();
             WiFi.softAPdisconnect();
                   
