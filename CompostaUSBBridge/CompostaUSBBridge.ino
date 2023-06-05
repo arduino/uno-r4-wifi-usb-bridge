@@ -39,7 +39,54 @@ USBCDC USBSerial(0);
 bool enableSTA(bool enable);
 bool enableAP(bool enable);
 
+/* -------------------------------------------------------------------------- */
+void CAtHandler::onWiFiEvent(WiFiEvent_t event) {
+/* -------------------------------------------------------------------------- */   
+   switch (event) {
+      case ARDUINO_EVENT_WIFI_READY:
+        wifi_status = WIFI_ST_IDLE_STATUS;
+        break;
+      case ARDUINO_EVENT_WIFI_SCAN_DONE:
+        wifi_status = WIFI_ST_SCAN_COMPLETED;
+        break;
+      case ARDUINO_EVENT_WIFI_STA_START:
+        wifi_status = WIFI_ST_IDLE_STATUS;
+        break;
+      case ARDUINO_EVENT_WIFI_STA_STOP:
+        wifi_status = WIFI_ST_NO_MODULE;
+        break;
+      case ARDUINO_EVENT_WIFI_STA_CONNECTED:
+        wifi_status = WIFI_ST_CONNECTED;
+        break;
+      case ARDUINO_EVENT_WIFI_STA_DISCONNECTED:
+        wifi_status = WIFI_ST_IDLE_STATUS;
+        break;
+      case ARDUINO_EVENT_WIFI_AP_START:  
+        wifi_status = WIFI_ST_AP_LISTENING;
+        break;
+      case ARDUINO_EVENT_WIFI_AP_STOP:
+        wifi_status = WIFI_ST_IDLE_STATUS;
+        break;
+      case ARDUINO_EVENT_WIFI_AP_STACONNECTED:
+        wifi_status = WIFI_ST_AP_CONNECTED;
+        break;
+      case ARDUINO_EVENT_WIFI_AP_STADISCONNECTED:
+        
 
+        break;
+      case ARDUINO_EVENT_WIFI_AP_STAIPASSIGNED:
+      case ARDUINO_EVENT_WIFI_STA_AUTHMODE_CHANGE:
+      case ARDUINO_EVENT_WIFI_STA_GOT_IP:
+      case ARDUINO_EVENT_WIFI_STA_GOT_IP6:
+      case ARDUINO_EVENT_WIFI_STA_LOST_IP:
+      case ARDUINO_EVENT_WIFI_AP_PROBEREQRECVED:
+      case ARDUINO_EVENT_WIFI_AP_GOT_IP6:
+      case ARDUINO_EVENT_WIFI_FTM_REPORT:
+      default:
+        break;
+  }
+
+}
 
 /* -------------------------------------------------------------------------- */
 void setup() {
@@ -73,6 +120,8 @@ void setup() {
   SERIAL_AT.begin(115200, SERIAL_8N1, 6, 5);
   USB.begin();
 #endif
+  /* Set up wifi event */
+  WiFi.onEvent(CAtHandler::onWiFiEvent);
   
 
 }
