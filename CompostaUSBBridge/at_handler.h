@@ -39,6 +39,11 @@ public:
    int can_delete = -1;
 };
 
+class CServerClient {
+public:
+   WiFiClient client;
+   int server = -1;
+};
 
 class CAtHandler {
 private:
@@ -47,7 +52,7 @@ private:
    WiFiUDP    * udps[MAX_UDP_AVAILABLE];
    WiFiServer * serverWiFi[MAX_SERVER_AVAILABLE];
    WiFiClient * clients[MAX_CLIENT_AVAILABLE];
-   WiFiClient  serverClients[MAX_CLIENT_AVAILABLE];
+   CServerClient  serverClients[MAX_CLIENT_AVAILABLE];
    WiFiClientSecure * sslclients[MAX_CLIENT_AVAILABLE];
    int udps_num = 0;
    int servers_num = 0;

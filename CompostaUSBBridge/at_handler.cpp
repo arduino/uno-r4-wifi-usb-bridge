@@ -49,7 +49,7 @@ CClientWrapper CAtHandler::getClient(int sock) {
     rv.can_delete = internal_sock;
    }
    else if(is_server) {
-      rv.client = &serverClients[internal_sock];
+      rv.client = &serverClients[internal_sock].client;
       rv.can_delete = -1;
    }
    else {

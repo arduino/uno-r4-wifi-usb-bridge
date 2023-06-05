@@ -342,6 +342,88 @@ void CAtHandler::add_cmds_wifi_netif() {
            return chAT::CommandStatus::ERROR;
       }
    };
+   
+   /* ....................................................................... */
+   command_table[_SERVERWRITE] = [this](auto & srv, auto & parser) {
+   /* ....................................................................... */     
+      switch (parser.cmd_mode) {
+         case chAT::CommandMode::Write: {
+            /* the command receive 2 data: the socket and the length of data 
+               to be transmitted */
+
+            if (parser.args.size() != 2) {
+               return chAT::CommandStatus::ERROR;
+            }
+
+            /* socket */
+            auto &sock_num = parser.args[0];
+            if (sock_num.empty()) {
+               return chAT::CommandStatus::ERROR;
+            }
+
+            int sock = atoi(sock_num.c_str());
+
+            if(sock < 0 || sock >= MAX_SERVER_AVAILABLE) {
+               return chAT::CommandStatus::ERROR;
+            }
+
+            if(serverWiFi[sock] == nullptr) {
+               return chAT::CommandStatus::ERROR;
+            }
+
+            /* data len */
+            auto &size_p = parser.args[1];
+            if (size_p.empty()) {
+               return chAT::CommandStatus::ERROR;
+            }
+
+            int data_size = atoi(size_p.c_str());
+
+            if(data_size <= 0) {
+               return chAT::CommandStatus::ERROR;
+            }
+
+            /* socket and data received 
+               answer back _CLIENTDATA: DATA\r\n 
+               so that data transmission can begin */
+            
+            
+            /* -----------------------------------
+             * BEGIN TRANSPARENT DATA TRANSMISSION
+             * ----------------------------------- */
+            std::vector<uint8_t> data_received;
+            data_received = srv.inhibit_read(data_size);
+            size_t offset = data_received.size();
+            
+            if(offset < data_size) {
+
+               data_received.resize(data_size);
+               do {
+                  offset += serial->read(data_received.data() + offset, data_size - offset);
+               } while (offset < data_size);
+            }
+
+            srv.continue_read();
+
+            for(int i = 0;i<MAX_CLIENT_AVAILABLE;i++) {
+               if(serverClients[i].server == sock) {
+                  if(serverClients[i].client) {
+                     int sent = 0;
+                     serverClients[i].client.write(data_received.data() + sent, data_received.size() - sent);
+                  }
+               }
+            }
+
+            return chAT::CommandStatus::OK;
+         }
+         default:
+            return chAT::CommandStatus::ERROR;
+      }
+   };
+
+   
+
+
 
    /* ....................................................................... */
    command_table[_BEGINSERVER] = [this](auto & srv, auto & parser) {
@@ -408,30 +490,33 @@ void CAtHandler::add_cmds_wifi_netif() {
                return chAT::CommandStatus::ERROR;
             }
 
+            /* accept */
+
             int i = 0;
             for(;i<MAX_CLIENT_AVAILABLE;i++) {
-               if(!serverClients[i]) {
+               if(!serverClients[i].client) {
                   break;
                }
             }
             if(i < MAX_CLIENT_AVAILABLE) {
-               serverClients[i] = serverWiFi[sock]->available();
-               if(serverClients[i].connected()) {
-
+               serverClients[i].client = serverWiFi[sock]->available();
+               serverClients[i].server = sock;
+            }
+               
+            i = 0;
+            for(;i<MAX_CLIENT_AVAILABLE;i++) {
+               if(serverClients[i].client) {
                   srv.write_response_prompt();
                   srv.write_str((const char *) String(START_CLIENT_SERVER_SOCK + i).c_str());
                   srv.write_line_end();
                   return chAT::CommandStatus::OK;
                }
-               else {
-                  srv.write_response_prompt();
-                  srv.write_str((const char *) String(-1).c_str());
-                  srv.write_line_end();
-                  return chAT::CommandStatus::OK;
-               }
-               
             }
-            return chAT::CommandStatus::ERROR;
+            
+            srv.write_response_prompt();
+            srv.write_str((const char *) String(-1).c_str());
+            srv.write_line_end();
+            return chAT::CommandStatus::OK;
          }
          case chAT::CommandMode::Run: {
             return chAT::CommandStatus::ERROR;

@@ -103,6 +103,7 @@ enum {
 #define _FWVERSION            "+FWVERSION"
 
 #define _SOFTAPCONFIG         "+SOFTAPCONFIG"
+#define _SERVERWRITE          "+SERVERWRITE"
 
 
 

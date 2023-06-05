@@ -255,8 +255,8 @@ void CAtHandler::add_cmds_esp_generic() {
       switch (parser.cmd_mode) {
          case chAT::CommandMode::Run: {
             for (int i = 0; i < MAX_CLIENT_AVAILABLE; i++) {
-               if (serverClients[i].connected()) {
-                  serverClients[i].stop();
+               if (serverClients[i].client.connected()) {
+                  serverClients[i].client.stop();
                }
             }
             
