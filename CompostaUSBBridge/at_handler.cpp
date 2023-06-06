@@ -81,8 +81,14 @@ CAtHandler::CAtHandler(HardwareSerial *s)  {
     serverWiFi[i] = nullptr;
   }
 
-  
-   
+  for(int i = 0; i < MAX_UDP_AVAILABLE; i++) {
+    udps[i] = nullptr;
+  }
+
+  for(int i = 0; i < MAX_CLIENT_AVAILABLE; i++) {
+    sslclients[i] = nullptr;
+  }
+
   /* set up serial */
   serial = s;
 
