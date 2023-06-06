@@ -3,6 +3,8 @@
 
 #include "at_handler.h"
 
+#define INCREMENT_MOD(x,MOD)  x = (++x) % MOD
+
 /* -------------------------------------------------------------------------- */
 void CAtHandler::add_cmds_wifi_netif() {
 /* -------------------------------------------------------------------------- */   
@@ -258,14 +260,8 @@ void CAtHandler::add_cmds_wifi_netif() {
 
             srv.continue_read();
 
-            //unsigned long start_time = millis();
             int sent = 0;
-            //while(millis() - start_time < 5000 && sent < data_received.size()){
-               sent += the_client.client->write(data_received.data() + sent, data_received.size() - sent);
-               //if(sent < data_received.size())
-                  //delay(100);
-            //}
-
+            sent += the_client.client->write(data_received.data() + sent, data_received.size() - sent);
             
             if (sent < data_received.size()) {
               return chAT::CommandStatus::ERROR;
@@ -408,8 +404,7 @@ void CAtHandler::add_cmds_wifi_netif() {
             for(int i = 0;i<MAX_CLIENT_AVAILABLE;i++) {
                if(serverClients[i].server == sock) {
                   if(serverClients[i].client) {
-                     int sent = 0;
-                     serverClients[i].client.write(data_received.data() + sent, data_received.size() - sent);
+                     serverClients[i].client.write(data_received.data(), data_received.size());
                   }
                }
             }
@@ -489,32 +484,40 @@ void CAtHandler::add_cmds_wifi_netif() {
             if(serverWiFi[sock] == nullptr) {
                return chAT::CommandStatus::ERROR;
             }
-
-            /* accept */
-
-            int i = 0;
-            for(;i<MAX_CLIENT_AVAILABLE;i++) {
+            /* accept */  
+            for(int i = 0;i<MAX_CLIENT_AVAILABLE;i++) {
                if(!serverClients[i].client) {
+                  serverClients[i].client = serverWiFi[sock]->available();
+                  serverClients[i].server = sock;
                   break;
                }
             }
-            if(i < MAX_CLIENT_AVAILABLE) {
-               serverClients[i].client = serverWiFi[sock]->available();
-               serverClients[i].server = sock;
-            }
-               
-            i = 0;
-            for(;i<MAX_CLIENT_AVAILABLE;i++) {
-               if(serverClients[i].client) {
-                  srv.write_response_prompt();
-                  srv.write_str((const char *) String(START_CLIENT_SERVER_SOCK + i).c_str());
-                  srv.write_line_end();
-                  return chAT::CommandStatus::OK;
-               }
-            }
+
+            int client_sock = -1;
             
+            int end = last_server_client_sock;
+               
+            do {
+               if(serverClients[last_server_client_sock].client) {
+                  client_sock = last_server_client_sock;
+                  break;         
+               }
+               INCREMENT_MOD(last_server_client_sock,MAX_CLIENT_AVAILABLE);
+            } while(end != last_server_client_sock);
+            
+            int sock_to_send = -1;
+            if(client_sock == -1) {
+               last_server_client_sock = 0;
+            }
+            else {
+               last_server_client_sock = client_sock;
+               sock_to_send = START_CLIENT_SERVER_SOCK + client_sock;
+            }
+           
+
+
             srv.write_response_prompt();
-            srv.write_str((const char *) String(-1).c_str());
+            srv.write_str((const char *) String(sock_to_send).c_str());
             srv.write_line_end();
             return chAT::CommandStatus::OK;
          }
@@ -642,7 +645,7 @@ void CAtHandler::add_cmds_wifi_netif() {
             srv.write_response_prompt();
             srv.write_str((const char *)(results.c_str()));
             srv.write_vec8(data_received);
-            srv.write_line_end();
+            
 
             return chAT::CommandStatus::OK;
          }

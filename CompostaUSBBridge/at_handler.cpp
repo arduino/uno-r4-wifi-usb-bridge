@@ -70,7 +70,7 @@ void CAtHandler::run() {
 
 
 /* -------------------------------------------------------------------------- */
-CAtHandler::CAtHandler(HardwareSerial *s)  {
+CAtHandler::CAtHandler(HardwareSerial *s) : last_server_client_sock(0) {
 /* -------------------------------------------------------------------------- */   
    
   for(int i = 0; i < MAX_CLIENT_AVAILABLE; i++) {

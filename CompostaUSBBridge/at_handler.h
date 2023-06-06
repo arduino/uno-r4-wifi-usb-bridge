@@ -51,6 +51,8 @@ public:
 class CAtHandler {
 private:
    static uint8_t wifi_status; 
+
+   int last_server_client_sock;
    
    WiFiUDP    * udps[MAX_UDP_AVAILABLE];
    WiFiServer * serverWiFi[MAX_SERVER_AVAILABLE];
@@ -76,6 +78,7 @@ private:
    void add_cmds_wifi_udp(); 
 public:
    CAtHandler(HardwareSerial *s);
+   CAtHandler() = delete ;
    static void onWiFiEvent(WiFiEvent_t event);
    void run();
 };
