@@ -29,7 +29,7 @@
 static void usbEventCallback(void* arg, esp_event_base_t event_base, int32_t event_id, void* event_data);
 
 
-static uint32_t baud = 0;
+static uint32_t _baud = 0;
 static CAtHandler atHandler(&SERIAL_AT);
 USBCDC USBSerial(0);
 
@@ -134,14 +134,13 @@ void setup() {
 void loop() {
 /* -------------------------------------------------------------------------- */  
 
-#ifndef DEBUG_AT
-  if (SERIAL_USER.baudRate() != baud) {
-    baud = SERIAL_USER.baudRate();
+  if (SERIAL_USER && SERIAL_USER.baudRate() != _baud) {
+    _baud = SERIAL_USER.baudRate();
   }
 
   uint8_t buf[2048];
   int i = 0;
-  while (SERIAL_USER.available() && i < sizeof(buf)) {
+  while (SERIAL_USER && SERIAL_USER.available() && i < sizeof(buf)) {
     buf[i++] = SERIAL_USER.read();
   }
   if (i > 0) {
@@ -151,12 +150,13 @@ void loop() {
   while (SERIAL_USER_INTERNAL.available() && i < sizeof(buf)) {
     buf[i++] = SERIAL_USER_INTERNAL.read();
   }
-  if (i > 0) {
+  if (i > 0 && SERIAL_USER) {
     SERIAL_USER.write(buf, i);
   }
-#endif
 
-  atHandler.run();
+  if (_baud != 1200 && _baud != 2400) {
+    atHandler.run();
+  }
   
   yield();
 }
