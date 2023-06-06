@@ -6,9 +6,7 @@ extern "C" {
     #include "freedap.h"
 }
 
-#define FIRMWARE_MAYOR    0
-#define FIRMWARE_MINOR    0
-#define FIRMWARE_PATCH    1
+#include "at_handler.h"
 
 extern USBHID HID;
 
