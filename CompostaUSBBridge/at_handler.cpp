@@ -99,7 +99,7 @@ CAtHandler::CAtHandler(HardwareSerial *s) : last_server_client_sock(0) {
         yield();
         return (unsigned int)0;
       }
-      return serial->read(buf, len);
+      return serial->read(buf, min((unsigned int)serial->available(), len));
     },
     .callback_io_write = [this](auto buf, auto len) {
       return serial->write(buf, len);

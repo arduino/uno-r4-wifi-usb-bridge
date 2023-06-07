@@ -132,7 +132,6 @@ void setup() {
 #endif
   /* Set up wifi event */
   WiFi.onEvent(CAtHandler::onWiFiEvent);
-  
 
   xTaskCreatePinnedToCore(
       atLoop, /* Function to implement the task */
@@ -148,37 +147,38 @@ void setup() {
    arduino-builder -compile -fqbn=espressif:esp32:esp32s3:JTAGAdapter=default,PSRAM=disabled,FlashMode=qio,FlashSize=4M,LoopCore=1,EventsCore=1,USBMode=default,CDCOnBoot=cdc,MSCOnBoot=default,DFUOnBoot=default,UploadMode=default,PartitionScheme=huge_app,CPUFreq=240,UploadSpeed=921600,DebugLevel=none,EraseFlash=none -vid-pid=303A_1001 -ide-version=10820 CompostaUSBBridge.ino
 */
 
+static uint8_t buf[2048];
+
 /* -------------------------------------------------------------------------- */
 void loop() {
 /* -------------------------------------------------------------------------- */  
 
-  if (SERIAL_USER && SERIAL_USER.baudRate() != _baud) {
+  if (SERIAL_USER.baudRate() != _baud) {
     _baud = SERIAL_USER.baudRate();
   }
 
-  uint8_t buf[2048];
   int i = 0;
-  while (SERIAL_USER && SERIAL_USER.available() && i < sizeof(buf)) {
-    buf[i++] = SERIAL_USER.read();
+
+  if (SERIAL_USER.available()) {
+    i = min((unsigned int)SERIAL_USER.available(), sizeof(buf));
+    SERIAL_USER.readBytes(buf, i);
   }
+
   if (i > 0) {
     SERIAL_USER_INTERNAL.write(buf, i);
   }
+
   i = 0;
-  while (SERIAL_USER_INTERNAL.available() && i < sizeof(buf)) {
-    buf[i++] = SERIAL_USER_INTERNAL.read();
+  if (SERIAL_USER_INTERNAL.available()) {
+    i = min((unsigned int)SERIAL_USER_INTERNAL.available(), sizeof(buf));
+    SERIAL_USER_INTERNAL.readBytes(buf, i);
   }
-  if (i > 0 && SERIAL_USER) {
+  if (i > 0) {
     SERIAL_USER.write(buf, i);
   }
 
   yield();
 }
-
-
-
-  
-
 
 void usbEventCallback(void* arg, esp_event_base_t event_base, int32_t event_id, void* event_data) {
   if (event_base == ARDUINO_USB_CDC_EVENTS) {
