@@ -64,6 +64,9 @@ void CAtHandler::add_cmds_wifi_station() {
                        scan_results += "unknown\r\n";
                   } 
                }
+               String st(scan_results.length());
+               srv.write_str((const char *)(st.c_str()));
+               srv.write_str("|");
                srv.write_str((const char *)(scan_results.c_str()));
             }
             return chAT::CommandStatus::OK;
