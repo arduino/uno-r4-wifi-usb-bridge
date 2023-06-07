@@ -88,6 +88,16 @@ void CAtHandler::onWiFiEvent(WiFiEvent_t event) {
 
 }
 
+TaskHandle_t atTask;
+void atLoop(void* param) {
+  while (1) {
+    if (_baud != 1200 && _baud != 2400) {
+      atHandler.run();
+    }
+    yield();
+  }
+}
+
 /* -------------------------------------------------------------------------- */
 void setup() {
 /* -------------------------------------------------------------------------- */  
@@ -124,6 +134,14 @@ void setup() {
   WiFi.onEvent(CAtHandler::onWiFiEvent);
   
 
+  xTaskCreatePinnedToCore(
+      atLoop, /* Function to implement the task */
+      "Task1", /* Name of the task */
+      10000,  /* Stack size in words */
+      NULL,  /* Task input parameter */
+      0,  /* Priority of the task */
+      &atTask,  /* Task handle. */
+      0); /* Core where the task should run */
 }
 
 /*
@@ -154,10 +172,6 @@ void loop() {
     SERIAL_USER.write(buf, i);
   }
 
-  if (_baud != 1200 && _baud != 2400) {
-    atHandler.run();
-  }
-  
   yield();
 }
 
