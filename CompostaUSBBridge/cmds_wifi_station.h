@@ -227,10 +227,12 @@ void CAtHandler::add_cmds_wifi_station() {
                }
             }
 
-            auto &auto_Conn = parser.args[1];
-            if (!auto_Conn.empty()) {
-               bool autoconn = atoi(auto_Conn.c_str());
-               WiFi.setAutoConnect(autoconn);
+            if (parser.args.size() == 2) {
+               auto &auto_Conn = parser.args[1];
+               if (!auto_Conn.empty()) {
+                  bool autoconn = atoi(auto_Conn.c_str());
+                  WiFi.setAutoConnect(autoconn);
+               }
             }
             srv.write_response_prompt();
             srv.write_line_end();
