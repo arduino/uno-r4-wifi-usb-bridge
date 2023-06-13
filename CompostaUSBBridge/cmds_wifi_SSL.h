@@ -1,6 +1,14 @@
 #ifndef CMDS_WIFI_SSL_H
 #define CMDS_WIFI_SSL_H
 
+#ifdef BUNDLED_CA_ROOT_CRT
+#define INCBIN_STYLE INCBIN_STYLE_SNAKE
+#define INCBIN_PREFIX
+#include "incbin.h"
+INCBIN(x509_crt_bundle, PATH_CERT_BUNDLE);
+#else
+#define ROOT_CERTIFICATES_ADDRESS   (0x200000)
+#endif
 
 #include "at_handler.h"
 
@@ -117,24 +125,15 @@ void CAtHandler::add_cmds_wifi_SSL() {
                the_client.sslclient->setCACert((const char *)data_received.data());
                srv.continue_read();
             } else {
-               SPIFFS.begin(true); //useless here
-               if(!SPIFFS.begin(true)){ //useless here call it on top because a singletone
-                  return chAT::CommandStatus::ERROR;
-               }
-
-               File file = SPIFFS.open("/root_ca_Test.txt", FILE_READ);
-               if(!file){
-                  return chAT::CommandStatus::ERROR;
-               }
-
-               std::vector<uint8_t> buf;
-               int length = file.available();
-               buf.resize(length);
-
-               file.read(buf.data(), length);
-               file.close();
-
-               the_client.sslclient->setCACert((const char *)buf.data());
+               #ifdef BUNDLED_CA_ROOT_CRT
+               the_client.sslclient->setCACertBundle((const uint8_t *)x509_crt_bundle_data);
+               #else
+               const uint8_t* cert_in_flash;
+               static spi_flash_mmap_handle_t t;
+               spi_flash_mmap(ROOT_CERTIFICATES_ADDRESS, 128*1024, SPI_FLASH_MMAP_DATA, (const void**)&cert_in_flash, &t);
+               the_client.sslclient->setCACertBundle((const uint8_t *)cert_in_flash);
+               #endif
+               srv.write_response_prompt();
             }
 
             return chAT::CommandStatus::OK;
