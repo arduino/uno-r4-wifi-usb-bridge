@@ -1,6 +1,14 @@
 #ifndef CMDS_WIFI_SSL_H
 #define CMDS_WIFI_SSL_H
 
+#ifdef BUNDLED_CA_ROOT_CRT
+#define INCBIN_STYLE INCBIN_STYLE_SNAKE
+#define INCBIN_PREFIX
+#include "incbin.h"
+INCBIN(x509_crt_bundle, PATH_CERT_BUNDLE);
+#else
+#define ROOT_CERTIFICATES_ADDRESS   (0x3C0000)
+#endif
 
 #include "at_handler.h"
 
@@ -26,42 +34,6 @@ void CAtHandler::add_cmds_wifi_SSL() {
                }
             }
             return chAT::CommandStatus::ERROR;
-         }
-         default:
-            return chAT::CommandStatus::ERROR;
-      }
-   };
-   
-
-   /* ....................................................................... */
-   command_table[_SSLSETINSERCURE] = [this](auto & srv, auto & parser) {
-   /* ....................................................................... */     
-      switch (parser.cmd_mode) {
-         case chAT::CommandMode::Write: {
-            if (parser.args.size() != 1) {
-               return chAT::CommandStatus::ERROR;
-            }
-
-            auto &sock_num = parser.args[0];
-            if (sock_num.empty()) {
-               srv.write_response_prompt();
-               srv.write_str("sock num empty");
-               srv.write_line_end();
-               return chAT::CommandStatus::ERROR;
-            }
-
-            int sock = atoi(sock_num.c_str());
-            CClientWrapper the_client = getClient(sock);
-
-            if (the_client.sslclient == nullptr) {
-               return chAT::CommandStatus::ERROR;
-            }
-
-            the_client.sslclient->setInsecure();
-            srv.write_response_prompt();
-            srv.write_str("setted insecure");
-            srv.write_line_end();
-            return chAT::CommandStatus::OK;
          }
          default:
             return chAT::CommandStatus::ERROR;
@@ -103,38 +75,29 @@ void CAtHandler::add_cmds_wifi_SSL() {
 
             if(ca_root_custom) {
 
-               std::vector<uint8_t> data_received;
-               data_received = srv.inhibit_read(ca_root_size);
-               size_t offset = data_received.size();
+
+               cert_buf = srv.inhibit_read(ca_root_size);
+               size_t offset = cert_buf.size();
                
                if(offset < ca_root_size) {
 
-                  data_received.resize(ca_root_size);
+                  cert_buf.resize(ca_root_size);
                   do {
-                     offset += serial->read(data_received.data() + offset, ca_root_size - offset);
+                     offset += serial->read(cert_buf.data() + offset, ca_root_size - offset);
                   } while (offset < ca_root_size);
                }
-               the_client.sslclient->setCACert((const char *)data_received.data());
+               the_client.sslclient->setCACert((const char *)cert_buf.data());
                srv.continue_read();
             } else {
-               SPIFFS.begin(true); //useless here
-               if(!SPIFFS.begin(true)){ //useless here call it on top because a singletone
-                  return chAT::CommandStatus::ERROR;
-               }
-
-               File file = SPIFFS.open("/root_ca_Test.txt", FILE_READ);
-               if(!file){
-                  return chAT::CommandStatus::ERROR;
-               }
-
-               std::vector<uint8_t> buf;
-               int length = file.available();
-               buf.resize(length);
-
-               file.read(buf.data(), length);
-               file.close();
-
-               the_client.sslclient->setCACert((const char *)buf.data());
+               #ifdef BUNDLED_CA_ROOT_CRT
+               the_client.sslclient->setCACertBundle((const uint8_t *)x509_crt_bundle_data);
+               #else
+               const uint8_t* cert_in_flash;
+               static spi_flash_mmap_handle_t t;
+               spi_flash_mmap(ROOT_CERTIFICATES_ADDRESS, 128*1024, SPI_FLASH_MMAP_DATA, (const void**)&cert_in_flash, &t);
+               the_client.sslclient->setCACertBundle((const uint8_t *)cert_in_flash);
+               #endif
+               srv.write_response_prompt();
             }
 
             return chAT::CommandStatus::OK;
@@ -336,13 +299,8 @@ void CAtHandler::add_cmds_wifi_SSL() {
 
             srv.continue_read();
 
-            unsigned long start_time = millis();
             int sent = 0;
-            while(millis() - start_time < 5000 && sent < data_received.size()){
-               sent += the_client.sslclient->write(data_received.data() + sent, data_received.size() - sent);
-               if(sent < data_received.size())
-                  delay(100);
-            }
+            sent += the_client.sslclient->write(data_received.data() + sent, data_received.size() - sent);
 
             
             if (sent < data_received.size()) {
@@ -498,7 +456,6 @@ void CAtHandler::add_cmds_wifi_SSL() {
             srv.write_response_prompt();
             srv.write_str((const char *)(results.c_str()));
             srv.write_vec8(data_received);
-            srv.write_line_end();
 
             return chAT::CommandStatus::OK;
          }
