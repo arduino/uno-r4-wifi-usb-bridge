@@ -77,6 +77,7 @@ private:
    void add_cmds_wifi_netif();
    void add_cmds_wifi_udp(); 
 public:
+   std::vector<std::uint8_t> cert_buf;
    CAtHandler(HardwareSerial *s);
    CAtHandler() = delete ;
    static void onWiFiEvent(WiFiEvent_t event);

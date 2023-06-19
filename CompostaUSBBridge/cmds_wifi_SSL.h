@@ -7,7 +7,7 @@
 #include "incbin.h"
 INCBIN(x509_crt_bundle, PATH_CERT_BUNDLE);
 #else
-#define ROOT_CERTIFICATES_ADDRESS   (0x200000)
+#define ROOT_CERTIFICATES_ADDRESS   (0x3C0000)
 #endif
 
 #include "at_handler.h"
@@ -34,42 +34,6 @@ void CAtHandler::add_cmds_wifi_SSL() {
                }
             }
             return chAT::CommandStatus::ERROR;
-         }
-         default:
-            return chAT::CommandStatus::ERROR;
-      }
-   };
-   
-
-   /* ....................................................................... */
-   command_table[_SSLSETINSERCURE] = [this](auto & srv, auto & parser) {
-   /* ....................................................................... */     
-      switch (parser.cmd_mode) {
-         case chAT::CommandMode::Write: {
-            if (parser.args.size() != 1) {
-               return chAT::CommandStatus::ERROR;
-            }
-
-            auto &sock_num = parser.args[0];
-            if (sock_num.empty()) {
-               srv.write_response_prompt();
-               srv.write_str("sock num empty");
-               srv.write_line_end();
-               return chAT::CommandStatus::ERROR;
-            }
-
-            int sock = atoi(sock_num.c_str());
-            CClientWrapper the_client = getClient(sock);
-
-            if (the_client.sslclient == nullptr) {
-               return chAT::CommandStatus::ERROR;
-            }
-
-            the_client.sslclient->setInsecure();
-            srv.write_response_prompt();
-            srv.write_str("setted insecure");
-            srv.write_line_end();
-            return chAT::CommandStatus::OK;
          }
          default:
             return chAT::CommandStatus::ERROR;
@@ -111,18 +75,18 @@ void CAtHandler::add_cmds_wifi_SSL() {
 
             if(ca_root_custom) {
 
-               std::vector<uint8_t> data_received;
-               data_received = srv.inhibit_read(ca_root_size);
-               size_t offset = data_received.size();
+
+               cert_buf = srv.inhibit_read(ca_root_size);
+               size_t offset = cert_buf.size();
                
                if(offset < ca_root_size) {
 
-                  data_received.resize(ca_root_size);
+                  cert_buf.resize(ca_root_size);
                   do {
-                     offset += serial->read(data_received.data() + offset, ca_root_size - offset);
+                     offset += serial->read(cert_buf.data() + offset, ca_root_size - offset);
                   } while (offset < ca_root_size);
                }
-               the_client.sslclient->setCACert((const char *)data_received.data());
+               the_client.sslclient->setCACert((const char *)cert_buf.data());
                srv.continue_read();
             } else {
                #ifdef BUNDLED_CA_ROOT_CRT
