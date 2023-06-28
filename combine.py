@@ -30,7 +30,7 @@ for i in range(0, len(partitionData)):
 	outputData[0x8000 + i] = partitionData[i]
 
 for i in range(0, len(bootApp)):
-        outputData[0xE0000 + i] = bootApp[i]
+        outputData[0xE000 + i] = bootApp[i]
 
 for i in range(0, len(appData)):
         outputData[0x10000 + i] = appData[i]
