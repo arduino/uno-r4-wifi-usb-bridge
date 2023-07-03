@@ -39,10 +39,16 @@ func reboot_unor4() error {
 	// Open the device using the VID and PID.
 	info := hid.Enumerate(0x2341, 0x1002)
 
+	var d *hid.Device
+	var err error
+
 	if len(info) == 0 {
-		return errors.New("No board connected")
+		d, err = hid.Open(0x2341, 0x1002)
+		if err != nil {
+			return errors.New("No board connected")
+		}
 	}
-	d, _ := info[0].Open()
+	d, _ = info[0].Open()
 
 	// get version
 	g := make([]byte, 65)
@@ -58,7 +64,7 @@ func reboot_unor4() error {
 		return err
 	}
 
-	err := d.Close()
+	err = d.Close()
 	if err != nil {
 		return err
 	}
