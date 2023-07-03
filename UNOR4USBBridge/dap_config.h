@@ -31,7 +31,7 @@
 #define DAP_CONFIG_FAST_CLOCK          2400000 // Hz
 
 #define DAP_CONFIG_VENDOR_STR          "Arduino"
-#define DAP_CONFIG_PRODUCT_STR         "Santiago CMSIS-DAP Adapter"
+#define DAP_CONFIG_PRODUCT_STR         "UNO R4 WiFi CMSIS-DAP Adapter"
 #define DAP_CONFIG_SER_NUM_STR         "123456789101112"
 #define DAP_CONFIG_CMSIS_DAP_VER_STR   "2.0.0"
 
