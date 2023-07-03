@@ -49,8 +49,9 @@ func reboot_unor4() error {
 			fmt.Printf("No board connected\n")
 			return errors.New("No board connected")
 		}
+	} else {
+		d, _ = info[0].Open()
 	}
-	d, _ = info[0].Open()
 
 	// Reboot
 	b[0] = 0
