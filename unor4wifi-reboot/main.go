@@ -24,10 +24,11 @@
 package main
 
 import (
+	"errors"
 	"fmt"
 	"os"
 
-	"github.com/sstallion/go-hid"
+	"github.com/karalabe/hid"
 )
 
 // The following example was adapted from the HIDAPI documentation to
@@ -35,44 +36,22 @@ import (
 func reboot_unor4() error {
 	b := make([]byte, 65)
 
-	// Initialize the hid package.
-	if err := hid.Init(); err != nil {
-		return err
-	}
-
 	// Open the device using the VID and PID.
-	d, err := hid.OpenFirst(0x2341, 0x1002)
-	if err != nil {
-		return err
-	}
+	info := hid.Enumerate(0x2341, 0x1002)
 
-	// Read the Manufacturer String.
-	s, err := d.GetMfrStr()
-	if err != nil {
-		return err
-	}
-	fmt.Printf("Manufacturer String: %s\n", s)
+	var d *hid.Device
+	var err error
 
-	// Read the Product String.
-	s, err = d.GetProductStr()
-	if err != nil {
-		return err
+	if len(info) == 0 {
+		fmt.Printf("Cannot enumerate, try direct open\n")
+		d, err = hid.Open(0x2341, 0x1002)
+		if err != nil {
+			fmt.Printf("No board connected\n")
+			return errors.New("No board connected")
+		}
+	} else {
+		d, _ = info[0].Open()
 	}
-	fmt.Printf("Product String: %s\n", s)
-
-	// Read the Serial Number String.
-	s, err = d.GetSerialNbr()
-	if err != nil {
-		return err
-	}
-	fmt.Printf("Serial Number String: %s\n", s)
-
-	// get version
-	g := make([]byte, 65)
-	if _, err := d.GetFeatureReport(g); err != nil {
-		return err
-	}
-	fmt.Printf("FW version: %d.%d.%d\n", g[1], g[2], g[3])
 
 	// Reboot
 	b[0] = 0
@@ -81,10 +60,11 @@ func reboot_unor4() error {
 		return err
 	}
 
-	// Finalize the hid package.
-	if err := hid.Exit(); err != nil {
+	err = d.Close()
+	if err != nil {
 		return err
 	}
+
 	return nil
 }
 

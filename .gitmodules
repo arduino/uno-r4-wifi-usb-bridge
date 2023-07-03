@@ -1,0 +1,3 @@
+[submodule "unor4wifi-reboot/hid"]
+	path = unor4wifi-reboot/hid
+	url = https://github.com/pennam/hid.git
