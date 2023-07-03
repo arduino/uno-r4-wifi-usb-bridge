@@ -104,6 +104,13 @@ enum {
 #define _SOFTAPCONFIG         "+SOFTAPCONFIG"
 #define _SERVERWRITE          "+SERVERWRITE"
 
+#define _HCI_BEGIN            "+HCIBEGIN"
+#define _HCI_END              "+HCIEND"
+#define _HCI_WAIT             "+HCIWAIT"
+#define _HCI_READ             "+HCIREAD"
+#define _HCI_WRITE            "+HCIWRITE"
+#define _HCI_AVAILABLE        "+HCIAVAILABLE"
+
 
 
 #define CMD(x)             _AT x _ENDL
