@@ -45,6 +45,7 @@ func reboot_unor4() error {
 	if len(info) == 0 {
 		d, err = hid.Open(0x2341, 0x1002)
 		if err != nil {
+			fmt.Printf("No board connected\n")
 			return errors.New("No board connected")
 		}
 	}
