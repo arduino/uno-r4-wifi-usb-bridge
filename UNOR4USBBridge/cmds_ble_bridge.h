@@ -12,6 +12,7 @@ void CAtHandler::add_cmds_ble_bridge() {
    /* ....................................................................... */
    command_table[_HCI_BEGIN] = [this](auto & srv, auto & parser) {
    /* ....................................................................... */
+      srv.write_response_prompt();
       switch (parser.cmd_mode) {
          case chAT::CommandMode::Run: {
                auto res = HCIVirtualTransport.begin();
@@ -26,6 +27,7 @@ void CAtHandler::add_cmds_ble_bridge() {
    /* ....................................................................... */
    command_table[_HCI_END] = [this](auto & srv, auto & parser) {
    /* ....................................................................... */
+      srv.write_response_prompt();
       switch (parser.cmd_mode) {
          case chAT::CommandMode::Run: {
                HCIVirtualTransport.end();
@@ -38,6 +40,7 @@ void CAtHandler::add_cmds_ble_bridge() {
    /* ....................................................................... */
    command_table[_HCI_WAIT] = [this](auto & srv, auto & parser) {
    /* ....................................................................... */
+      srv.write_response_prompt();
       switch (parser.cmd_mode) {
          case chAT::CommandMode::Write: {
             if (parser.args.size() != 1) {
@@ -76,11 +79,15 @@ void CAtHandler::add_cmds_ble_bridge() {
    /* ....................................................................... */
       switch (parser.cmd_mode) {
          case chAT::CommandMode::Run: {
-            uint8_t data[1];
-            data[0] = HCIVirtualTransport.read();
+            uint8_t data[258];
+            int i = 0;
+            //while (HCIVirtualTransport.available()) {
+               data[i++] = HCIVirtualTransport.read();
+            //}
             srv.write_response_prompt();
-            srv.write_data(data, 1);
-            srv.write_line_end();
+            srv.write_str(String(i).c_str());
+            srv.write_str("|");
+            srv.write_data(data, i);
 
             return chAT::CommandStatus::OK;
          }
@@ -132,8 +139,6 @@ void CAtHandler::add_cmds_ble_bridge() {
             int sent = 0;
             while(millis() - start_time < 5000 && sent < data_received.size()){
                sent += HCIVirtualTransport.write(data_received.data() + sent, data_received.size() - sent);
-               if(sent < data_received.size())
-                  delay(100);
             }
 
             if (sent < data_received.size()) {
