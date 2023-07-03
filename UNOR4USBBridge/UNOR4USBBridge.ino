@@ -114,6 +114,7 @@ void setup() {
 #else
   USB.VID(0x2341);
   USB.PID(0x1002);
+  USB.manufacturerName("Arduino");
   USB.productName("UNO WiFi R4 CMSIS-DAP");
   //USB.enableDFU();
   DAP.begin();
