@@ -43,6 +43,7 @@ func reboot_unor4() error {
 	var err error
 
 	if len(info) == 0 {
+		fmt.Printf("Cannot enumerate, try direct open\n")
 		d, err = hid.Open(0x2341, 0x1002)
 		if err != nil {
 			fmt.Printf("No board connected\n")
