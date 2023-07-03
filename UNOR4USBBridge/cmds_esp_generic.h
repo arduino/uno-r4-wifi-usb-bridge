@@ -2,13 +2,25 @@
 #define CMDS_ESP_GENERIC_H
 
 #include "at_handler.h"
+extern "C" {
+    #include "esp32-hal-tinyusb.h"
+}
 
 void CAtHandler::add_cmds_esp_generic() {
-   
+
    /* ....................................................................... */
    command_table[_RESET] = [this](auto & srv, auto & parser) {
    /* ....................................................................... */
-      ESP.restart();
+      switch (parser.cmd_mode) {
+         case chAT::CommandMode::Run: {
+               ESP.restart();
+               break;
+            }
+         case chAT::CommandMode::Write: {
+               usb_persist_restart(RESTART_BOOTLOADER);
+               break;
+            }
+      }
       return chAT::CommandStatus::OK;
    };
 
