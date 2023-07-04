@@ -4,7 +4,7 @@ mkdir -p hardware/esp32-patched
 cd hardware/esp32-patched
 git clone https://github.com/espressif/arduino-esp32 -b 2.0.9 --depth=1 esp32
 cd esp32
-patch -p1 < ../../../esp32-core.patch
+patch -p1 < ../../../core_esp32.patch
 ./tools/get.py
 cd ../../../
 
