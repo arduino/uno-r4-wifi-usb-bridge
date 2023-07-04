@@ -79,15 +79,18 @@ void CAtHandler::add_cmds_ble_bridge() {
    /* ....................................................................... */
       switch (parser.cmd_mode) {
          case chAT::CommandMode::Run: {
-            uint8_t data[258];
+            std::vector<uint8_t> data;
             int i = 0;
-            //while (HCIVirtualTransport.available()) {
-               data[i++] = HCIVirtualTransport.read();
-            //}
+            auto howmany = HCIVirtualTransport.available();
+            while (i < howmany) {
+               data.push_back(HCIVirtualTransport.read());
+               i++;
+            }
+            data.resize(howmany);
             srv.write_response_prompt();
             srv.write_str(String(i).c_str());
             srv.write_str("|");
-            srv.write_data(data, i);
+            srv.write_vec8(data);
 
             return chAT::CommandStatus::OK;
          }
