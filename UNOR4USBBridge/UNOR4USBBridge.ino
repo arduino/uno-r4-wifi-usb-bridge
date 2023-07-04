@@ -206,6 +206,9 @@ void usbEventCallback(void* arg, esp_event_base_t event_base, int32_t event_id, 
         } else {
           SERIAL_USER_INTERNAL.updateBaudRate(baud);
         }
+        while (SERIAL_USER_INTERNAL.available()) {
+          SERIAL_USER_INTERNAL.read();
+        }
         break;
     }
   }
