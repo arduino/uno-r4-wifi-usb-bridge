@@ -14,14 +14,22 @@ void CAtHandler::add_cmds_esp_generic() {
       switch (parser.cmd_mode) {
          case chAT::CommandMode::Run: {
                ESP.restart();
-               break;
-            }
-         case chAT::CommandMode::Write: {
-               usb_persist_restart(RESTART_BOOTLOADER);
-               break;
+               return chAT::CommandStatus::OK;
             }
       }
-      return chAT::CommandStatus::OK;
+      return chAT::CommandStatus::ERROR;
+   };
+
+   /* ....................................................................... */
+   command_table[_RESTART_BOOTLOADER] = [this](auto & srv, auto & parser) {
+   /* ....................................................................... */
+      switch (parser.cmd_mode) {
+         case chAT::CommandMode::Run: {
+               usb_persist_restart(RESTART_BOOTLOADER);
+               return chAT::CommandStatus::OK;
+            }
+      }
+      return chAT::CommandStatus::ERROR;
    };
 
    /* ....................................................................... */

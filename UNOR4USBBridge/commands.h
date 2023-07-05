@@ -21,6 +21,7 @@ enum {
 #define _WIFISCAN                "+WIFISCAN"
 
 #define _RESET                   "+RESET"
+#define _RESTART_BOOTLOADER      "+RESTARTBOOTLOADER"
 #define _GMR                     "+GMR"
 #define _GENERIC_CMD             "+CMD"
 #define _FILESYSTEM              "+FS"
