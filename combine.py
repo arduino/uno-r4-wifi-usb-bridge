@@ -6,7 +6,7 @@ booloaderData = open("UNOR4USBBridge/build/esp32-patched.esp32.esp32s3/UNOR4USBB
 partitionData = open("UNOR4USBBridge/build/esp32-patched.esp32.esp32s3/UNOR4USBBridge.ino.partitions.bin", "rb").read()
 bootApp = open("boot/boot_app0.bin", "rb").read()
 appData = open("UNOR4USBBridge/build/esp32-patched.esp32.esp32s3/UNOR4USBBridge.ino.bin", "rb").read()
-certsData = open("x509_crt_bundle", "rb").read()
+certsData = open("UNOR4USBBridge/build/esp32-patched.esp32.esp32s3/x509_crt_bundle", "rb").read()
 
 # 0x000000 bootloader
 # 0x008000 partitions
@@ -39,7 +39,7 @@ for i in range(0, len(certsData)):
 	outputData[0x3C0000 + i] = certsData[i]
 
 
-outputFilename = "S3.bin"
+outputFilename = "UNOR4USBBridge/build/esp32-patched.esp32.esp32s3/S3.bin"
 if (len(sys.argv) > 1):
 	outputFilename = sys.argv[1]
 
