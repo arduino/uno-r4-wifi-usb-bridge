@@ -1,2 +1,2 @@
-github.com/sstallion/go-hid v0.13.3 h1:u1AIMIFz18tyU0mYN2tSqCXd6RfcV7woZ0aSZ09ePEg=
-github.com/sstallion/go-hid v0.13.3/go.mod h1:u5TnL2p4LK+neYxizE0roefazZHMN8yMy6Iurd1a+6o=
+github.com/karalabe/hid v1.0.1-0.20190806082151-9c14560f9ee8 h1:AP5krei6PpUCFOp20TSmxUS4YLoLvASBcArJqM/V+DY=
+github.com/karalabe/hid v1.0.1-0.20190806082151-9c14560f9ee8/go.mod h1:Vr51f8rUOLYrfrWDFlV12GGQgM5AT8sVh+2fY4MPeu8=
