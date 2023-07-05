@@ -10,6 +10,12 @@ cd ../../../
 
 sed  s#PWD#$PWD#g arduino-cli.yaml.orig > arduino-cli.yaml
 
+cd hardware/esp32-patched/esp32/libraries
+git clone https://github.com/facchinm/ArduinoBLE.git
+cd ArduinoBLE/
+git checkout uno_r4_wifi
+cd ../../../../../
+
 ln -s $(pwd)/hardware/esp32-patched/esp32/esptool hardware/esp32-patched/esp32/tools/esptool
 ln -s $(pwd)/hardware/esp32-patched/esp32/xtensa-esp32s3-elf hardware/esp32-patched/esp32/tools/xtensa-esp32s3-elf
 
