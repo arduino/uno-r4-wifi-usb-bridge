@@ -2,10 +2,10 @@
 
 import sys;
 
-booloaderData = open("UNOR4USBBridge/build/esp32.esp32.esp32s3/UNOR4USBBridge.ino.bootloader.bin", "rb").read()
-partitionData = open("UNOR4USBBridge/build/esp32.esp32.esp32s3/UNOR4USBBridge.ino.partitions.bin", "rb").read()
+booloaderData = open("UNOR4USBBridge/build/esp32-patched.esp32.esp32s3/UNOR4USBBridge.ino.bootloader.bin", "rb").read()
+partitionData = open("UNOR4USBBridge/build/esp32-patched.esp32.esp32s3/UNOR4USBBridge.ino.partitions.bin", "rb").read()
 bootApp = open("boot/boot_app0.bin", "rb").read()
-appData = open("UNOR4USBBridge/build/esp32.esp32.esp32s3/UNOR4USBBridge.ino.bin", "rb").read()
+appData = open("UNOR4USBBridge/build/esp32-patched.esp32.esp32s3/UNOR4USBBridge.ino.bin", "rb").read()
 certsData = open("x509_crt_bundle", "rb").read()
 
 # 0x000000 bootloader
