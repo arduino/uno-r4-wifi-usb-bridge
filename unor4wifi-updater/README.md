@@ -1,3 +1,11 @@
+# UNO R4 WiFi updater script
+
+This updater script can be used to automatically put the UNO R4 WiFi in `ESP download` mode and upload the latest firmware.
+
+The script uses [unor4wifi-reboot](unor4wifi-reboot) to put the board in `ESP download` mode through an HID message; and [espflash](https://github.com/esp-rs/espflash/releases) to flash the firmware bundle.
+
+# How to use the script
+
 ## On Windows
 * Extract the zip file
 * Disconnect all USB gadgets from your PC
@@ -45,13 +53,13 @@ Running the script from the terminal instead of double click should avoid the co
 
 ![image](https://github.com/pennam/UnoR4WiFiUpdate/assets/20436476/dd776469-ba93-4430-9b72-25a6ca75840f)
 
-## Troubleshooting
+# Troubleshooting
 * If the script report this error: `Cannot put the board in ESP mode. (via 'unor4wifi-reboot')`
 
-### Option 1
+## Option 1
 Disconnect and connect again your UNO R4 WiFi from your PC and re-run the script.
 
-### Option 2
+## Option 2
 Manually put  the UNO R4 WiFi in ESP mode
 
 1. Disconnect the UNO R4 WiFi from your PC
