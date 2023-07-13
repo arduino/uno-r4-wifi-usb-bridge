@@ -188,14 +188,17 @@ void usbEventCallback(void* arg, esp_event_base_t event_base, int32_t event_id, 
       case ARDUINO_USB_CDC_LINE_CODING_EVENT:
         auto baud = data->line_coding.bit_rate;
         if (baud == 1200) {
-          digitalWrite(GPIO_BOOT, HIGH);
-          digitalWrite(GPIO_RST, LOW);
           delay(100);
-          digitalWrite(GPIO_RST, HIGH);
-          delay(100);
-          digitalWrite(GPIO_RST, LOW);
-          delay(100);
-          digitalWrite(GPIO_RST, HIGH);
+          if (SERIAL_USER.baudRate() == 1200) {
+            digitalWrite(GPIO_BOOT, HIGH);
+            digitalWrite(GPIO_RST, LOW);
+            delay(100);
+            digitalWrite(GPIO_RST, HIGH);
+            delay(100);
+            digitalWrite(GPIO_RST, LOW);
+            delay(100);
+            digitalWrite(GPIO_RST, HIGH);
+          }
         } else if (baud == 2400) {
           digitalWrite(GPIO_BOOT, LOW);
           digitalWrite(GPIO_RST, HIGH);
