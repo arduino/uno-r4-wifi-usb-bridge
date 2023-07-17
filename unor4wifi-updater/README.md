@@ -76,4 +76,6 @@ Manually put  the UNO R4 WiFi in ESP mode
 #### Windows
 `bin\espflash write-bin -b 115200 0x0 firmware\UNOR4-WIFI-S3-0.2.0-rc1.bin`
 
-5. Disconnect and connect your UNO R4 WiFi from your PC
+5. Disconnect your UNO R4 WiFi from your PC
+6. Remove the jumper wire
+7. Connect the board again and enjoy
