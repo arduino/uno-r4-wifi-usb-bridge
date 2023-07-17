@@ -78,4 +78,4 @@ Manually put  the UNO R4 WiFi in ESP mode
 
 5. Disconnect your UNO R4 WiFi from your PC
 6. Remove the jumper wire
-7. Connect the board again and enjoy
+7. Connect the board to your PC again and enjoy
