@@ -2,11 +2,11 @@
 
 import sys;
 
-booloaderData = open("UNOR4USBBridge/build/esp32-patched.esp32.esp32s3/UNOR4USBBridge.ino.bootloader.bin", "rb").read()
-partitionData = open("UNOR4USBBridge/build/esp32-patched.esp32.esp32s3/UNOR4USBBridge.ino.partitions.bin", "rb").read()
+booloaderData = open("UNOR4USBBridge/build/esp32-patched.esp32.arduino_unor4wifi_usb_bridge/UNOR4USBBridge.ino.bootloader.bin", "rb").read()
+partitionData = open("UNOR4USBBridge/build/esp32-patched.esp32.arduino_unor4wifi_usb_bridge/UNOR4USBBridge.ino.partitions.bin", "rb").read()
 bootApp = open("boot/boot_app0.bin", "rb").read()
-appData = open("UNOR4USBBridge/build/esp32-patched.esp32.esp32s3/UNOR4USBBridge.ino.bin", "rb").read()
-certsData = open("UNOR4USBBridge/build/esp32-patched.esp32.esp32s3/x509_crt_bundle", "rb").read()
+appData = open("UNOR4USBBridge/build/esp32-patched.esp32.arduino_unor4wifi_usb_bridge/UNOR4USBBridge.ino.bin", "rb").read()
+certsData = open("UNOR4USBBridge/build/esp32-patched.esp32.arduino_unor4wifi_usb_bridge/x509_crt_bundle", "rb").read()
 
 # 0x000000 bootloader
 # 0x008000 partitions
@@ -39,7 +39,7 @@ for i in range(0, len(certsData)):
 	outputData[0x3C0000 + i] = certsData[i]
 
 
-outputFilename = "UNOR4USBBridge/build/esp32-patched.esp32.esp32s3/S3.bin"
+outputFilename = "UNOR4USBBridge/build/esp32-patched.esp32.arduino_unor4wifi_usb_bridge/S3.bin"
 if (len(sys.argv) > 1):
 	outputFilename = sys.argv[1]
 
