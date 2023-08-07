@@ -15,7 +15,17 @@ if [ ! -d hardware ]; then
     git clone https://github.com/facchinm/ArduinoBLE.git
     cd ArduinoBLE/
     git checkout uno_r4_wifi
-    cd ../../../../../
+    cd ..
+    git clone https://github.com/pennam/Arduino_ESP32_OTA.git
+    cd Arduino_ESP32_OTA/
+    git checkout spiffs
+    cd ..
+    git clone https://github.com/pennam/BOSSA.git
+    cd BOSSA
+    git checkout esp-library
+    cd ..
+    git clone https://github.com/arduino-libraries/Arduino_DebugUtils.git
+    cd ../../../../
 
     ln -s $(pwd)/hardware/esp32-patched/esp32/esptool hardware/esp32-patched/esp32/tools/esptool
     ln -s $(pwd)/hardware/esp32-patched/esp32/xtensa-esp32s3-elf hardware/esp32-patched/esp32/tools/xtensa-esp32s3-elf
