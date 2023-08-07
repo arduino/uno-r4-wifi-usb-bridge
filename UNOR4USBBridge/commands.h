@@ -112,6 +112,9 @@ enum {
 #define _HCI_WRITE            "+HCIWRITE"
 #define _HCI_AVAILABLE        "+HCIAVAILABLE"
 
+#define _OTA_SETCAROOT        "+OTASETCAROOT"
+#define _OTA_RUN              "+OTARUN"
+#define _OTA_ERROR            "+OTAERROR"
 
 
 #define CMD(x)             _AT x _ENDL

@@ -13,6 +13,7 @@
 #include "USB.h"
 #include "USBCDC.h"
 #include "DAP.h"
+#include "OTA.h"
 
 //#define DEBUG_AT
 
@@ -33,8 +34,6 @@ static uint32_t _baud = 0;
 static CAtHandler atHandler(&SERIAL_AT);
 USBCDC USBSerial(0);
 
-#define GPIO_BOOT   9
-#define GPIO_RST    4
 
 bool enableSTA(bool enable);
 bool enableAP(bool enable);
@@ -120,6 +119,16 @@ void atLoop(void* param) {
   }
 }
 
+TaskHandle_t otaTask;
+void otaLoop(void* param) {
+  while (1) {
+    if(_baud != 1200 && _baud != 2400) {
+      OtaHandler.run();
+    }
+    yield();
+  }
+}
+
 /* -------------------------------------------------------------------------- */
 void setup() {
 /* -------------------------------------------------------------------------- */  
@@ -165,7 +174,7 @@ void setup() {
   WiFi.onEvent(CAtHandler::onWiFiEvent);
 
   Debug.setDebugOutputStream(&USBSerial);
-  Debug.setDebugLevel(DEBUG_ERROR);
+  Debug.setDebugLevel(DBG_ERROR);
 
   xTaskCreatePinnedToCore(
       atLoop, /* Function to implement the task */
@@ -175,6 +184,16 @@ void setup() {
       0,  /* Priority of the task */
       &atTask,  /* Task handle. */
       0); /* Core where the task should run */
+
+  xTaskCreatePinnedToCore(
+      otaLoop, /* Function to implement the task */
+      "Task1", /* Name of the task */
+      10000,  /* Stack size in words */
+      NULL,  /* Task input parameter */
+      1,  /* Priority of the task */
+      &otaTask,  /* Task handle. */
+      0); /* Core where the task should run */
+
 }
 
 /*

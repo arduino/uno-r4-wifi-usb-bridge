@@ -11,6 +11,7 @@
 #include "cmds_wifi_SSL.h"
 #include "cmds_wifi_udp.h"
 #include "cmds_ble_bridge.h"
+#include "cmds_ota.h"
 
 using namespace SudoMaker;
 
@@ -126,4 +127,5 @@ CAtHandler::CAtHandler(HardwareSerial *s) : last_server_client_sock(0) {
   add_cmds_wifi_netif();
   add_cmds_wifi_udp();
   add_cmds_ble_bridge();
+  add_cmds_ota();
 }

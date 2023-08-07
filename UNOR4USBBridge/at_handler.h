@@ -77,6 +77,7 @@ private:
    void add_cmds_wifi_netif();
    void add_cmds_wifi_udp();
    void add_cmds_ble_bridge();
+   void add_cmds_ota();
 public:
    std::vector<std::uint8_t> cert_buf;
    CAtHandler(HardwareSerial *s);
