@@ -13,7 +13,7 @@
 #include "USB.h"
 #include "USBCDC.h"
 #include "DAP.h"
-#include "OTA.h"
+#include "Arduino_DebugUtils.h"
 
 //#define DEBUG_AT
 
@@ -42,7 +42,6 @@ ssize_t write_fn(void* cookie, const char* buf, ssize_t size)
 {
   /* redirect the bytes somewhere; writing to Serial just for an example */
   USBSerial.write((uint8_t*) buf, size);
-  //USBSerial.println();
   return size;
 }
 
@@ -119,16 +118,6 @@ void atLoop(void* param) {
   }
 }
 
-TaskHandle_t otaTask;
-void otaLoop(void* param) {
-  while (1) {
-    if(_baud != 1200 && _baud != 2400) {
-      OtaHandler.run();
-    }
-    yield();
-  }
-}
-
 /* -------------------------------------------------------------------------- */
 void setup() {
 /* -------------------------------------------------------------------------- */  
@@ -183,15 +172,6 @@ void setup() {
       NULL,  /* Task input parameter */
       0,  /* Priority of the task */
       &atTask,  /* Task handle. */
-      0); /* Core where the task should run */
-
-  xTaskCreatePinnedToCore(
-      otaLoop, /* Function to implement the task */
-      "Task1", /* Name of the task */
-      10000,  /* Stack size in words */
-      NULL,  /* Task input parameter */
-      1,  /* Priority of the task */
-      &otaTask,  /* Task handle. */
       0); /* Core where the task should run */
 
 }

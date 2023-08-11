@@ -19,6 +19,9 @@
 #define FIRMWARE_MINOR    2
 #define FIRMWARE_PATCH    1
 
+#define GPIO_BOOT   9
+#define GPIO_RST    4
+
 using namespace SudoMaker;
 
 #define WIFI_ST_NO_SHIELD            255

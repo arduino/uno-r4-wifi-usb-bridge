@@ -113,8 +113,11 @@ enum {
 #define _HCI_AVAILABLE        "+HCIAVAILABLE"
 
 #define _OTA_SETCAROOT        "+OTASETCAROOT"
-#define _OTA_RUN              "+OTARUN"
-#define _OTA_ERROR            "+OTAERROR"
+#define _OTA_BEGIN            "+OTABEGIN"
+#define _OTA_DOWNLOAD         "+OTADOWNLOAD"
+#define _OTA_VERIFY           "+OTAVERIFY"
+#define _OTA_UPDATE           "+OTAUPDATE"
+#define _OTA_RESET            "+OTARESET"
 
 
 #define CMD(x)             _AT x _ENDL
