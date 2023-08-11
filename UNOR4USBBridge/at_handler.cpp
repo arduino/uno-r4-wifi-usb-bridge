@@ -67,6 +67,7 @@ CClientWrapper CAtHandler::getClient(int sock) {
 void CAtHandler::run() {
 /* -------------------------------------------------------------------------- */   
    at_srv.run();
+   vTaskDelay(1);
 }
 
 
