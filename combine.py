@@ -6,12 +6,14 @@ booloaderData = open("UNOR4USBBridge/build/esp32-patched.esp32.arduino_unor4wifi
 partitionData = open("UNOR4USBBridge/build/esp32-patched.esp32.arduino_unor4wifi_usb_bridge/UNOR4USBBridge.ino.partitions.bin", "rb").read()
 bootApp = open("boot/boot_app0.bin", "rb").read()
 appData = open("UNOR4USBBridge/build/esp32-patched.esp32.arduino_unor4wifi_usb_bridge/UNOR4USBBridge.ino.bin", "rb").read()
+spiffsData = open("spiffs/spiffs.bin", "rb").read()
 certsData = open("UNOR4USBBridge/build/esp32-patched.esp32.arduino_unor4wifi_usb_bridge/x509_crt_bundle", "rb").read()
 
 # 0x000000 bootloader
 # 0x008000 partitions
 # 0x00E000 boot_app
 # 0x010000 app
+# 0x330000 spiffs
 # 0x3C0000 certs
 
 # calculate the output binary size, app offset 
@@ -34,6 +36,9 @@ for i in range(0, len(bootApp)):
 
 for i in range(0, len(appData)):
         outputData[0x10000 + i] = appData[i]
+
+for i in range(0, len(spiffsData)):
+        outputData[0x330000 + i] = spiffsData[i]
 
 for i in range(0, len(certsData)):
 	outputData[0x3C0000 + i] = certsData[i]
