@@ -14,15 +14,15 @@ if [ ! -d hardware ]; then
     cd hardware/esp32-patched/esp32/libraries
     git clone https://github.com/facchinm/ArduinoBLE.git
     cd ArduinoBLE/
-    git checkout uno_r4_wifi
+    git checkout 4e4a7cef7718f6787ef89c24aa3ffd0fd2a9ced3
     cd ..
     git clone https://github.com/pennam/Arduino_ESP32_OTA.git
     cd Arduino_ESP32_OTA/
-    git checkout spiffs
+    git checkout e27f822406986354197a09516edaaeea3ed18e79
     cd ..
     git clone https://github.com/pennam/BOSSA.git
     cd BOSSA
-    git checkout esp-library
+    git checkout 43a8feff9dfd07109d25cb2005279dd92e81d8fc
     cd ..
     git clone https://github.com/arduino-libraries/Arduino_DebugUtils.git
     cd ../../../../
