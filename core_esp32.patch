@@ -284,5 +284,34 @@ index f3ea5e1..fd49e06 100644
  pico32.name=ESP32 PICO-D4
  
  pico32.bootloader.tool=esptool_py
+diff --git a/boards.txt b/boards.txt
+index fd49e06..5da0f3f 100644
+--- a/boards.txt
++++ b/boards.txt
+@@ -1244,6 +1244,9 @@ arduino_unor4wifi_usb_bridge.menu.PartitionScheme.app3M_fat9M_16MB.upload.ma>
+ arduino_unor4wifi_usb_bridge.menu.PartitionScheme.rainmaker=RainMaker
+ arduino_unor4wifi_usb_bridge.menu.PartitionScheme.rainmaker.build.partitions=rainmaker
+ arduino_unor4wifi_usb_bridge.menu.PartitionScheme.rainmaker.upload.maximum_size=3145728
++arduino_unor4wifi_usb_bridge.menu.PartitionScheme.unor4wifi=UnoR4WiFi
++arduino_unor4wifi_usb_bridge.menu.PartitionScheme.unor4wifi.build.partitions=unor4wifi
++arduino_unor4wifi_usb_bridge.menu.PartitionScheme.unor4wifi.upload.maximum_size=1671168
+
+ arduino_unor4wifi_usb_bridge.menu.CPUFreq.240=240MHz (WiFi)
+ arduino_unor4wifi_usb_bridge.menu.CPUFreq.240.build.f_cpu=240000000L
+diff --git a/tools/partitions/unor4wifi.csv b/tools/partitions/unor4wifi.csv
+new file mode 100644
+index 0000000..654e5ad
+--- /dev/null
++++ b/tools/partitions/unor4wifi.csv
+@@ -0,0 +1,8 @@
++# Name,   Type, SubType,   Offset,  Size, Flags
++nvs,      data, nvs,       0x9000,  0x005000,
++otadata,  data, ota,       0xe000,  0x002000,
++app0,     app,  ota_0,     0x10000, 0x190000,
++app1,     app,  ota_1,     0x1A0000,0x190000,
++spiffs,   data, spiffs,    0x330000,0x080000,
++coredump, data, coredump,  0x3B0000,0x010000,
++cert,     data, undefined, 0x3C0000,0x040000,
+\ No newline at end of file
 -- 
 2.40.1
