@@ -13,6 +13,7 @@
 #include "USB.h"
 #include "USBCDC.h"
 #include "DAP.h"
+#include "Arduino_DebugUtils.h"
 
 //#define DEBUG_AT
 
@@ -33,11 +34,30 @@ static uint32_t _baud = 0;
 static CAtHandler atHandler(&SERIAL_AT);
 USBCDC USBSerial(0);
 
-#define GPIO_BOOT   9
-#define GPIO_RST    4
 
 bool enableSTA(bool enable);
 bool enableAP(bool enable);
+
+ssize_t write_fn(void* cookie, const char* buf, ssize_t size)
+{
+  /* redirect the bytes somewhere; writing to Serial just for an example */
+  USBSerial.write((uint8_t*) buf, size);
+  return size;
+}
+
+void ets_putc_handler(char c)
+{
+  /* this gets called from various ets_printf / esp_rom_printf calls */
+  static char buf[256];
+  static size_t buf_pos = 0;
+  buf[buf_pos] = c;
+  buf_pos++;
+  if (c == '\n' || buf_pos == sizeof(buf)) {
+    /* flush */
+    write_fn(NULL, buf, buf_pos);
+    buf_pos = 0;
+  }
+}
 
 /* -------------------------------------------------------------------------- */
 void CAtHandler::onWiFiEvent(WiFiEvent_t event) {
@@ -102,6 +122,14 @@ void atLoop(void* param) {
 void setup() {
 /* -------------------------------------------------------------------------- */  
 
+  /* redirect stdout */
+  stdout = funopen(NULL, NULL, &write_fn, NULL, NULL);
+  static char linebuf[256];
+  setvbuf(stdout, linebuf, _IOLBF, sizeof(linebuf));
+
+  /* redirect ets_printf / esp_rom_printf output */
+  ets_install_putc1(&ets_putc_handler);
+
   pinMode(GPIO_BOOT, OUTPUT);
   pinMode(GPIO_RST, OUTPUT);
   digitalWrite(GPIO_BOOT, HIGH);
@@ -134,14 +162,18 @@ void setup() {
   /* Set up wifi event */
   WiFi.onEvent(CAtHandler::onWiFiEvent);
 
+  Debug.setDebugOutputStream(&USBSerial);
+  Debug.setDebugLevel(DBG_ERROR);
+
   xTaskCreatePinnedToCore(
       atLoop, /* Function to implement the task */
       "Task1", /* Name of the task */
       10000,  /* Stack size in words */
       NULL,  /* Task input parameter */
-      0,  /* Priority of the task */
+      1,  /* Priority of the task */
       &atTask,  /* Task handle. */
       0); /* Core where the task should run */
+
 }
 
 /*
