@@ -488,8 +488,9 @@ void CAtHandler::add_cmds_wifi_netif() {
             for(int i = 0;i<MAX_CLIENT_AVAILABLE;i++) {
                if(!serverClients[i].client) {
                   serverClients[i].client = serverWiFi[sock]->available();
+                  if(!serverClients[i].client)
+                     break;
                   serverClients[i].server = sock;
-                  break;
                }
             }
 
@@ -498,7 +499,9 @@ void CAtHandler::add_cmds_wifi_netif() {
             int end = last_server_client_sock;
                
             do {
-               if(serverClients[last_server_client_sock].client) {
+               if(serverClients[last_server_client_sock].client
+                   && serverClients[last_server_client_sock].server == sock
+                   && serverClients[last_server_client_sock].client.available() > 0) {
                   client_sock = last_server_client_sock;
                   break;         
                }
