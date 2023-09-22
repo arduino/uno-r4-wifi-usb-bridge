@@ -81,6 +81,7 @@ enum {
 #define _SSLREMOTEPORT           "+SSLREMOTEPORT"
 #define _SSLPEEK                 "+SSLPEEK"
 #define _SERVERAVAILABLE         "+SERVERAVAILABLE"
+#define _SERVERACCEPT            "+SERVERACCEPT"
 #define _SERVEREND               "+SERVEREND"
 
 #define _UDPBEGIN             "+UDPBEGIN"
