@@ -2,10 +2,10 @@
 #define CMDS_OTA_H
 
 #include "at_handler.h"
-#include "Arduino_ESP32_OTA.h"
+#include "OTA.h"
 #include <BossaArduino.h>
 
-Arduino_ESP32_OTA OTA;
+Arduino_UNOWIFIR4_OTA OTA;
 
 void CAtHandler::add_cmds_ota() {
    /* ....................................................................... */
