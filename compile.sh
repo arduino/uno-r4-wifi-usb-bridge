@@ -13,9 +13,9 @@ if [ ! -d hardware ]; then
 
     cd hardware/esp32-patched/esp32/libraries
     git clone https://github.com/arduino-libraries/ArduinoBLE.git
-    git clone https://github.com/pennam/Arduino_ESP32_OTA.git
+    git clone https://github.com/arduino-libraries/Arduino_ESP32_OTA.git
     cd Arduino_ESP32_OTA/
-    git checkout e27f822406986354197a09516edaaeea3ed18e79
+    git checkout 68318d92d12f837e9184e33860bedb51a57d88b2
     cd ..
     git clone https://github.com/pennam/BOSSA.git
     cd BOSSA
