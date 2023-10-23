@@ -40,7 +40,7 @@ public:
 
   enum class UNO_WiFi_R4_Error : int
   {
-    StorageConfig = -1,
+    StorageConfig = -20,
   };
 
   using Arduino_ESP32_OTA::begin;
