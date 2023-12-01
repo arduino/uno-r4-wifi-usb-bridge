@@ -32,7 +32,6 @@ static void usbEventCallback(void* arg, esp_event_base_t event_base, int32_t eve
 
 static uint32_t _baud = 0;
 static CAtHandler atHandler(&SERIAL_AT);
-USBCDC USBSerial(0);
 
 
 bool enableSTA(bool enable);
@@ -120,12 +119,7 @@ void atLoop(void* param) {
 
 /* -------------------------------------------------------------------------- */
 void setup() {
-/* -------------------------------------------------------------------------- */  
-
-  /* redirect stdout */
-  stdout = funopen(NULL, NULL, &write_fn, NULL, NULL);
-  static char linebuf[256];
-  setvbuf(stdout, linebuf, _IOLBF, sizeof(linebuf));
+/* -------------------------------------------------------------------------- */
 
   /* redirect ets_printf / esp_rom_printf output */
   ets_install_putc1(&ets_putc_handler);
