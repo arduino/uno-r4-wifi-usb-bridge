@@ -1,3 +1,6 @@
 [submodule "unor4wifi-reboot/hid"]
 	path = unor4wifi-reboot/hid
 	url = https://github.com/pennam/hid.git
+[submodule "libraries/Arduino_DebugUtils"]
+	path = libraries/Arduino_DebugUtils
+	url = https://github.com/arduino-libraries/Arduino_DebugUtils.git
