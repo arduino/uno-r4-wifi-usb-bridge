@@ -11,6 +11,7 @@ INCBIN(x509_crt_bundle, PATH_CERT_BUNDLE);
 #endif
 
 #include "at_handler.h"
+#include "spi_flash_mmap.h"
 
 void CAtHandler::add_cmds_wifi_SSL() {
    /* ....................................................................... */

@@ -3,10 +3,10 @@
 if [ ! -d hardware ]; then
     mkdir -p hardware/esp32-patched
     cd hardware/esp32-patched
-    git clone https://github.com/espressif/arduino-esp32 -b 2.0.9 --depth=1 esp32
+    git clone https://github.com/pennam/arduino-esp32 -b unor4wifi --depth=1 esp32
     cd esp32
-    patch -p1 < ../../../core_esp32.patch
     ./tools/get.py
+    mv esp32-arduino-libs/ tools/
     cd ../../../
 
     sed  s#PWD#$PWD#g arduino-cli.yaml.orig > arduino-cli.yaml
