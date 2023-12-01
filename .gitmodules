@@ -4,3 +4,6 @@
 [submodule "libraries/Arduino_DebugUtils"]
 	path = libraries/Arduino_DebugUtils
 	url = https://github.com/arduino-libraries/Arduino_DebugUtils.git
+[submodule "libraries/ArduinoBLE"]
+	path = libraries/ArduinoBLE
+	url = https://github.com/arduino-libraries/ArduinoBLE.git
