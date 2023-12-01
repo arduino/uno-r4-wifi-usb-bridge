@@ -6,6 +6,7 @@ if [ ! -d hardware ]; then
     git clone https://github.com/pennam/arduino-esp32 -b unor4wifi --depth=1 esp32
     cd esp32
     ./tools/get.py
+    mv esp32-arduino-libs/ tools/
     cd ../../../
 
     sed  s#PWD#$PWD#g arduino-cli.yaml.orig > arduino-cli.yaml
