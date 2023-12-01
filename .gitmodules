@@ -10,3 +10,7 @@
 [submodule "libraries/Arduino_ESP32_OTA"]
 	path = libraries/Arduino_ESP32_OTA
 	url = https://github.com/arduino-libraries/Arduino_ESP32_OTA.git
+[submodule "libraries/BOSSA"]
+	path = libraries/BOSSA
+	url = https://github.com/arduino/BOSSA.git
+	branch = unor4wifi
