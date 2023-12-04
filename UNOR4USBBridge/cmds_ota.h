@@ -3,7 +3,7 @@
 
 #include "at_handler.h"
 #include "OTA.h"
-#include <BossaArduino.h>
+#include "BossaUnoR4WiFi.h"
 
 Arduino_UNOWIFIR4_OTA OTA;
 
@@ -162,7 +162,7 @@ void CAtHandler::add_cmds_ota() {
                return chAT::CommandStatus::ERROR;
             }
 
-            int flash_error = BOSSA::flashUnoR4WiFi(path.c_str(), Serial, GPIO_BOOT, GPIO_RST);
+            int flash_error = BOSSA.program(path.c_str(), Serial, GPIO_BOOT, GPIO_RST);
             String error = String(flash_error) + "\r\n";
             srv.write_response_prompt();
             srv.write_str((const char *)(error.c_str()));
