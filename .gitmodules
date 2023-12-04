@@ -14,3 +14,8 @@
 	path = libraries/BOSSA
 	url = https://github.com/arduino/BOSSA.git
 	branch = unor4wifi
+[submodule "hardware/esp32-patched/esp32"]
+	path = hardware/esp32-patched/esp32
+	url = https://github.com/arduino/arduino-esp32.git
+	branch = unor4wifi-2.0.9
+	shallow = true
