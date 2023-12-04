@@ -6,7 +6,6 @@ This firmware uses [arduino-esp32](https://github.com/espressif/arduino-esp32/)
 
 ```
 git submodule update --init --depth 1 --no-single-branch
-git submodule update --remote --depth 1
 ```
 
 ## Get the toolchain
