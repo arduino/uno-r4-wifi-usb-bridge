@@ -119,6 +119,15 @@ enum {
 #define _OTA_UPDATE           "+OTAUPDATE"
 #define _OTA_RESET            "+OTARESET"
 
+#define _PREF_BEGIN           "+PREFBEGIN"
+#define _PREF_END             "+PREFEND"
+#define _PREF_CLEAR           "+PREFCLEAR"
+#define _PREF_REMOVE          "+PREFREMOVE"
+#define _PREF_PUT             "+PREFPUT"
+#define _PREF_GET             "+PREFGET"
+#define _PREF_LEN             "+PREFLEN"
+#define _PREF_STAT            "+PREFSTAT"
+
 
 #define CMD(x)             _AT x _ENDL
 #define PROMPT(x)          x ":"
