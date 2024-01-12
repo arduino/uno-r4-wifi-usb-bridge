@@ -271,6 +271,7 @@ void CAtHandler::add_cmds_preferences() {
                   sscanf(parser.args[2].c_str(), "%lld", &value);
                   error = String(pref.getLong64(key.c_str(), value)) + "\r\n";
                }
+               break;
                case PreferenceType::PT_U64: {
                   uint64_t value;
                   sscanf(parser.args[2].c_str(), "%llu", &value);
