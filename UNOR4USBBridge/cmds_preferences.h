@@ -7,11 +7,9 @@
 Preferences pref;
 
 void CAtHandler::add_cmds_preferences() {
-   log_e("add_cmds_preferences");
    /* ....................................................................... */
    command_table[_PREF_BEGIN] = [this](auto & srv, auto & parser) {
    /* ....................................................................... */
-   log_e("_PREF_BEGIN");
       switch (parser.cmd_mode) {
          case chAT::CommandMode::Write: {
             if (parser.args.size() != 3) {
@@ -28,10 +26,8 @@ void CAtHandler::add_cmds_preferences() {
             String error = String();
             if (partition.empty()) {
                error = String(pref.begin(name.c_str(), readOnly)) + "\r\n";
-               log_e("pref.begin: %s", error.c_str());
             } else {
                error = String(pref.begin(name.c_str(), readOnly, partition.c_str())) + "\r\n";
-               log_e("pref.begin: %s", error.c_str());
             }
 
             srv.write_response_prompt();
@@ -106,7 +102,6 @@ void CAtHandler::add_cmds_preferences() {
    /* ....................................................................... */
    command_table[_PREF_PUT] = [this](auto & srv, auto & parser) {
    /* ....................................................................... */
-      log_e("_PREF_PUT: %d", parser.args.size());
       switch (parser.cmd_mode) {
          case chAT::CommandMode::Write: {
             if (parser.args.size() != 3) {
@@ -155,8 +150,6 @@ void CAtHandler::add_cmds_preferences() {
                   uint32_t value;
                   sscanf(parser.args[2].c_str(), "%u", &value);
                   error = String(pref.putUInt(key.c_str(), value)) + "\r\n";
-                  log_v("pref.putUInt v : %u", value);
-                  log_v("pref.putUInt e : %s", error.c_str());
                }
                break;
                case PreferenceType::PT_I64: {
@@ -174,8 +167,6 @@ void CAtHandler::add_cmds_preferences() {
                case PreferenceType::PT_STR: {
                   auto value = parser.args[2];
                   error = String(pref.putString(key.c_str(), value.c_str())) + "\r\n";
-                  log_v("pref.putUInt v : %s", value.c_str());
-                  log_v("pref.putUInt e : %s", error.c_str());
                }
                break;
                case PreferenceType::PT_BLOB: {
@@ -189,9 +180,7 @@ void CAtHandler::add_cmds_preferences() {
                      } while (offset < value);
                   }
                   srv.continue_read();
-                  log_v("pref.putBytes start");
                   error = String(pref.putBytes(key.c_str(), cert_buf.data(), value)) + "\r\n";
-                  log_v("pref.putBytes end");
                }
                break;
                default:
@@ -214,10 +203,8 @@ void CAtHandler::add_cmds_preferences() {
    /* ....................................................................... */
    command_table[_PREF_GET] = [this](auto & srv, auto & parser) {
    /* ....................................................................... */
-   log_e("_PREF_GET: %d", parser.args.size());
       switch (parser.cmd_mode) {
          case chAT::CommandMode::Write: {
-            log_e("_PREF_GET Write: %d", parser.args.size());
             if (parser.args.size() < 2) {
                return chAT::CommandStatus::ERROR;
             }
@@ -281,20 +268,13 @@ void CAtHandler::add_cmds_preferences() {
                case PreferenceType::PT_STR: {
                   auto value = parser.args[2];
                   error = String(pref.getString(key.c_str(), value.c_str())) + "\r\n";
-                  log_v("pref.getString v : %s", value.c_str());
-                  log_v("pref.getString e : %s", error.c_str());
                }
                break;
                case PreferenceType::PT_BLOB: {
                   std::vector<uint8_t> data;
                   int len = pref.getBytesLength(key.c_str());
                   data.resize(len);
-                  log_v("pref.getBytes start");
                   pref.getBytes(key.c_str(), data.data(), len) + "\r\n";
-                  log_v("pref.getBytes end");
-
-                  for (int x=0; x<len; x++) log_v("%d",data.data()[x]);
-
                   srv.write_response_prompt();
                   srv.write_str(String(len).c_str());
                   srv.write_str("|");
@@ -326,10 +306,8 @@ void CAtHandler::add_cmds_preferences() {
    /* ....................................................................... */
    command_table[_PREF_LEN] = [this](auto & srv, auto & parser) {
    /* ....................................................................... */
-      log_e("_PREF_LEN: %d", parser.args.size());
       switch (parser.cmd_mode) {
          case chAT::CommandMode::Write: {
-      log_e("_PREF_LEN Write: %d", parser.args.size());
             if (parser.args.size() != 1) {
                return chAT::CommandStatus::ERROR;
             }
@@ -338,9 +316,7 @@ void CAtHandler::add_cmds_preferences() {
             if (key.empty()) {
                return chAT::CommandStatus::ERROR;
             }
-            log_v("pref.getBytesLength start");
             String error = String(pref.getBytesLength(key.c_str())) + "\r\n";
-            log_v("pref.getBytesLength end");
             srv.write_response_prompt();
             srv.write_str((const char *)(error.c_str()));
             srv.write_line_end();
