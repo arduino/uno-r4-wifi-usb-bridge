@@ -128,6 +128,20 @@ enum {
 #define _PREF_LEN             "+PREFLEN"
 #define _PREF_STAT            "+PREFSTAT"
 
+#define _SOFTSE_BEGIN         "+SOFTSEBEGIN"
+#define _SOFTSE_END           "+SOFTSEEND"
+#define _SOFTSE_SERIAL        "+SOFTSE_SERIAL"
+#define _SOFTSE_RND           "+SOFTSE_RND"
+#define _SOFTSE_PRI_KEY       "+SOFTSE_PRI_KEY"
+#define _SOFTSE_PUB_KEY       "+SOFTSE_PUB_KEY"
+#define _SOFTSE_WRITE_SLOT    "+SOFTSE_WRITE_SLOT"
+#define _SOFTSE_READ_SLOT     "+SOFTSE_READ_SLOT"
+#define _SOFTSE_S_V_BUF_SET   "+SOFTSE_S_V_BUF_SET"
+#define _SOFTSE_SIGN_GET      "+SOFTSE_SIGN_GET"
+#define _SOFTSE_VERIFY_GET    "+SOFTSE_VERIFY_GET"
+#define _SOFTSE_SHA256_GET    "+SOFTSE_SHA256_GET"
+
+
 
 #define CMD(x)             _AT x _ENDL
 #define PROMPT(x)          x ":"

@@ -82,8 +82,10 @@ private:
    void add_cmds_ble_bridge();
    void add_cmds_ota();
    void add_cmds_preferences();
+   void add_cmds_se();
 public:
    std::vector<std::uint8_t> cert_buf;
+   std::vector<std::uint8_t> se_buf;
    CAtHandler(HardwareSerial *s);
    CAtHandler() = delete ;
    static void onWiFiEvent(WiFiEvent_t event);
