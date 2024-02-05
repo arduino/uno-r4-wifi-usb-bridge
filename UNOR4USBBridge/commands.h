@@ -1,20 +1,20 @@
 #ifndef WIFI_COMMANDS_H
 #define WIFI_COMMANDS_H
 
-enum {
+enum ip_type {
    IP_ADDR = 0,
    GATEWAY_ADDR,
    NETMASK_ADDR,
    DNS1_ADDR,
    DNS2_ADDR
-} ip_type;
+};
 
-enum {
+enum file_op {
    WIFI_FILE_DELETE = 0,
    WIFI_FILE_WRITE,
    WIFI_FILE_READ,
    WIFI_FILE_APPEND
-} file_op;
+};
 
 #define _AT                      "AT"
 #define _ENDL                    "\r\n" 
