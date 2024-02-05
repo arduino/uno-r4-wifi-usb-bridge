@@ -11,6 +11,8 @@ INCBIN(x509_crt_bundle, PATH_CERT_BUNDLE);
 #endif
 
 #include "at_handler.h"
+#include "mbedtls/pem.h"
+#include "SSE.h"
 
 #ifndef WIFI_CLIENT_DEF_CONN_TIMEOUT_MS
 #define WIFI_CLIENT_DEF_CONN_TIMEOUT_MS  (3000)
@@ -110,6 +112,105 @@ void CAtHandler::add_cmds_wifi_SSL() {
             return chAT::CommandStatus::ERROR;
       }
    };
+
+   /* ....................................................................... */
+   command_table[_SETECCSLOT] = [this](auto & srv, auto & parser) {
+   /* ....................................................................... */
+      switch (parser.cmd_mode) {
+         case chAT::CommandMode::Write: {
+            if (parser.args.size() != 3) {
+               return chAT::CommandStatus::ERROR;
+            }
+
+            auto &sock_num = parser.args[0];
+            auto &slot_num = parser.args[1];
+            auto &cert_len = parser.args[2];
+            if (sock_num.empty() || slot_num.empty() || cert_len.empty()) {
+               return chAT::CommandStatus::ERROR;
+            }
+
+            int sock = atoi(sock_num.c_str());
+            int size = atoi(cert_len.c_str());
+
+            CClientWrapper the_client = getClient(sock);
+            if (the_client.sslclient == nullptr) {
+               return chAT::CommandStatus::ERROR;
+            }
+
+            std::vector<unsigned char> client_cert_der;
+            client_cert_der = srv.inhibit_read(size);
+            size_t offset = client_cert_der.size();
+
+            if(offset < size) {
+               client_cert_der.resize(size);
+               do {
+                  offset += serial->read(client_cert_der.data() + offset, size - offset);
+               } while (offset < size);
+            }
+            srv.continue_read();
+
+#if ECC_DEBUG_ENABLED
+            log_v("_SETECCSLOT: input cert");
+            log_buf_v((const uint8_t *)client_cert_der.data(), size);
+#endif
+
+            /* Convert client certificate DER buffer into PEM */
+            client_cert_pem.resize(1024);
+            size_t olen;
+            mbedtls_pem_write_buffer("-----BEGIN CERTIFICATE-----\n",
+                                     "-----END CERTIFICATE-----\n",
+                                     client_cert_der.data(), size,
+                                     client_cert_pem.data(), 1024,
+                                     &olen);
+            client_cert_pem.resize(olen);
+
+#if ECC_DEBUG_ENABLED
+            log_v("_SETECCSLOT: output cert");
+            log_v("\n%s", client_cert_pem.data());
+#endif
+
+            /* Set client certificate */
+            the_client.sslclient->setCertificate((const char *)client_cert_pem.data());
+
+            /* Read private key from non volatile storage in DER format */
+            std::vector<unsigned char> client_key_der;
+            int len = sse.getBytesLength(slot_num.c_str());
+            int ret = -1;
+            client_key_der.resize(len);
+            if ((ret = sse.getBytes(slot_num.c_str(), client_key_der.data(), len)) < len) {
+               log_e(" failed\n  !  sse.getBytes returned -0x%04x", (unsigned int) -ret);
+               return chAT::CommandStatus::ERROR;
+            }
+
+#if ECC_DEBUG_ENABLED
+            log_v("_SETECCSLOT: input key");
+            log_buf_v((const uint8_t *)client_key_der.data(), ret);
+#endif
+
+            /* Convert private key in PEM format */
+            client_key_pem.resize(1024);
+            mbedtls_pem_write_buffer("-----BEGIN EC PRIVATE KEY-----\n",
+                                     "-----END EC PRIVATE KEY-----\n",
+                                     client_key_der.data(), len,
+                                     client_key_pem.data(), 1024,
+                                     &olen);
+            client_key_pem.resize(olen);
+
+#if ECC_DEBUG_ENABLED
+            log_v("_SETECCSLOT: output key");
+            log_v("\n%s", client_key_pem.data());
+#endif
+
+            /* Set client key */
+            the_client.sslclient->setPrivateKey((const char *)client_key_pem.data());
+
+            return chAT::CommandStatus::OK;
+         }
+         default:
+            return chAT::CommandStatus::ERROR;
+      }
+   };
+
    /* ....................................................................... */
    command_table[_SSLCLIENTSTATE] = [this](auto & srv, auto & parser) {
    /* ....................................................................... */     

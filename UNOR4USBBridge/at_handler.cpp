@@ -8,11 +8,11 @@
 #include "cmds_wifi_station.h"
 #include "cmds_wifi_softAP.h"
 #include "cmds_wifi_netif.h"
+#include "cmds_preferences.h"
 #include "cmds_wifi_SSL.h"
 #include "cmds_wifi_udp.h"
 #include "cmds_ble_bridge.h"
 #include "cmds_ota.h"
-#include "cmds_preferences.h"
 #include "cmds_se.h"
 
 using namespace SudoMaker;

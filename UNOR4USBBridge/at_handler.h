@@ -87,6 +87,8 @@ private:
 public:
    std::vector<std::uint8_t> cert_buf;
    std::vector<std::uint8_t> se_buf;
+   std::vector<std::uint8_t> client_cert_pem;
+   std::vector<std::uint8_t> client_key_pem;
    CAtHandler(HardwareSerial *s);
    CAtHandler() = delete ;
    static void onWiFiEvent(WiFiEvent_t event);
