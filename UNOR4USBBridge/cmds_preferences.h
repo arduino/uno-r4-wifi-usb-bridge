@@ -274,7 +274,7 @@ void CAtHandler::add_cmds_preferences() {
                   std::vector<uint8_t> data;
                   int len = pref.getBytesLength(key.c_str());
                   data.resize(len);
-                  pref.getBytes(key.c_str(), data.data(), len) + "\r\n";
+                  pref.getBytes(key.c_str(), data.data(), len);
                   srv.write_response_prompt();
                   srv.write_str(String(len).c_str());
                   srv.write_str("|");
