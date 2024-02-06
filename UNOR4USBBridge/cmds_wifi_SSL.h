@@ -12,6 +12,10 @@ INCBIN(x509_crt_bundle, PATH_CERT_BUNDLE);
 
 #include "at_handler.h"
 
+#ifndef WIFI_CLIENT_DEF_CONN_TIMEOUT_MS
+#define WIFI_CLIENT_DEF_CONN_TIMEOUT_MS  (3000)
+#endif
+
 void CAtHandler::add_cmds_wifi_SSL() {
    /* ....................................................................... */
    command_table[_SSLBEGINCLIENT] = [this](auto & srv, auto & parser) {
@@ -222,6 +226,61 @@ void CAtHandler::add_cmds_wifi_SSL() {
             }
 
             if (!the_client.sslclient->connect(address, atoi(hostport.c_str()))) {
+               return chAT::CommandStatus::ERROR;
+            }
+            srv.write_response_prompt();
+            srv.write_line_end();
+            return chAT::CommandStatus::OK;
+         }
+         default:
+            return chAT::CommandStatus::ERROR;
+      }
+   };
+
+   /* ....................................................................... */
+   command_table[_SSLCLIENTCONNECT] = [this](auto & srv, auto & parser) {
+   /* ....................................................................... */
+      switch (parser.cmd_mode) {
+         case chAT::CommandMode::Write: {
+            if (parser.args.size() < 3) {
+               return chAT::CommandStatus::ERROR;
+            }
+
+            auto &sock_num = parser.args[0];
+            if (sock_num.empty()) {
+               return chAT::CommandStatus::ERROR;
+            }
+
+            int sock = atoi(sock_num.c_str());
+            CClientWrapper the_client = getClient(sock);
+
+            if (the_client.sslclient == nullptr) {
+               return chAT::CommandStatus::ERROR;
+            }
+
+            auto &host = parser.args[1];
+            if (host.empty()) {
+               return chAT::CommandStatus::ERROR;
+            }
+
+            auto &port = parser.args[2];
+            if (port.empty()) {
+               return chAT::CommandStatus::ERROR;
+            }
+
+            int timeout = WIFI_CLIENT_DEF_CONN_TIMEOUT_MS;
+            if (parser.args.size() > 3) {
+              auto &tmp = parser.args[3];
+              if (tmp.empty()) {
+                 return chAT::CommandStatus::ERROR;
+              }
+              int t = atoi(tmp.c_str());
+              if (t > 0) {
+                timeout = t;
+              }
+            }
+
+            if (!the_client.sslclient->connect(host.c_str(), atoi(port.c_str()), timeout)) {
                return chAT::CommandStatus::ERROR;
             }
             srv.write_response_prompt();
