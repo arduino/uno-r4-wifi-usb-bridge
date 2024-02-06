@@ -49,6 +49,7 @@ class CServerClient {
 public:
    WiFiClient client;
    int server = -1;
+   bool accepted = false;
 };
 
 class CAtHandler {

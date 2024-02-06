@@ -403,7 +403,7 @@ void CAtHandler::add_cmds_wifi_netif() {
 
             for(int i = 0;i<MAX_CLIENT_AVAILABLE;i++) {
                if(serverClients[i].server == sock) {
-                  if(serverClients[i].client) {
+                  if(serverClients[i].client && !serverClients[i].accepted) {
                      serverClients[i].client.write(data_received.data(), data_received.size());
                   }
                }
@@ -491,6 +491,7 @@ void CAtHandler::add_cmds_wifi_netif() {
                   if(!serverClients[i].client)
                      break;
                   serverClients[i].server = sock;
+                  serverClients[i].accepted = false;
                }
             }
 
@@ -501,6 +502,7 @@ void CAtHandler::add_cmds_wifi_netif() {
             do {
                if(serverClients[last_server_client_sock].client
                    && serverClients[last_server_client_sock].server == sock
+                   && !serverClients[last_server_client_sock].accepted
                    && serverClients[last_server_client_sock].client.available() > 0) {
                   client_sock = last_server_client_sock;
                   break;         
@@ -518,6 +520,62 @@ void CAtHandler::add_cmds_wifi_netif() {
             }
            
 
+
+            srv.write_response_prompt();
+            srv.write_str((const char *) String(sock_to_send).c_str());
+            srv.write_line_end();
+            return chAT::CommandStatus::OK;
+         }
+         case chAT::CommandMode::Run: {
+            return chAT::CommandStatus::ERROR;
+         }
+         default:
+           return chAT::CommandStatus::ERROR;
+      }
+   };
+
+   /* ....................................................................... */
+   command_table[_SERVERACCEPT] = [this](auto & srv, auto & parser) {
+   /* ....................................................................... */
+      switch (parser.cmd_mode) {
+         case chAT::CommandMode::Write: {
+            if (parser.args.size() != 1) {
+               return chAT::CommandStatus::ERROR;
+            }
+
+            auto &socket = parser.args[0];
+            if (socket.empty()) {
+               return chAT::CommandStatus::ERROR;
+            }
+            int sock = atoi(socket.c_str());
+
+            if(sock < 0 || sock >= MAX_SERVER_AVAILABLE) {
+               return chAT::CommandStatus::ERROR;
+            }
+
+            if(serverWiFi[sock] == nullptr) {
+               return chAT::CommandStatus::ERROR;
+            }
+
+            int client_sock = -1;
+
+            /* accept */
+            for(int i = 0;i<MAX_CLIENT_AVAILABLE;i++) {
+               if(!serverClients[i].client) {
+                  serverClients[i].client = serverWiFi[sock]->available();
+                  if (serverClients[i].client) {
+                    serverClients[i].server = sock;
+                    serverClients[i].accepted = true;
+                    client_sock = i;
+                  }
+                  break;
+               }
+            }
+
+            int sock_to_send = -1;
+            if(client_sock != -1) {
+               sock_to_send = START_CLIENT_SERVER_SOCK + client_sock;
+            }
 
             srv.write_response_prompt();
             srv.write_str((const char *) String(sock_to_send).c_str());
