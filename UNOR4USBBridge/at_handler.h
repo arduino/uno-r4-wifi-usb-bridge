@@ -63,6 +63,9 @@ private:
    WiFiClient * clients[MAX_CLIENT_AVAILABLE];
    CServerClient  serverClients[MAX_CLIENT_AVAILABLE];
    WiFiClientSecure * sslclients[MAX_CLIENT_AVAILABLE];
+   std::vector<std::uint8_t> clients_ca[MAX_CLIENT_AVAILABLE];
+   std::vector<std::uint8_t> clients_cert_pem[MAX_CLIENT_AVAILABLE];
+   std::vector<std::uint8_t> clients_key_pem[MAX_CLIENT_AVAILABLE];
    int udps_num = 0;
    int servers_num = 0;
    int clientsToServer_num = 0;
@@ -85,10 +88,8 @@ private:
    void add_cmds_preferences();
    void add_cmds_se();
 public:
-   std::vector<std::uint8_t> cert_buf;
+   /* Used by cmds_se */
    std::vector<std::uint8_t> se_buf;
-   std::vector<std::uint8_t> client_cert_pem;
-   std::vector<std::uint8_t> client_key_pem;
 
    /* Used by cmds_ota */
    std::vector<std::uint8_t> ota_cert_buf;

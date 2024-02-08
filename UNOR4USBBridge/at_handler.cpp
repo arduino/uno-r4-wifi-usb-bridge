@@ -92,6 +92,9 @@ CAtHandler::CAtHandler(HardwareSerial *s) : last_server_client_sock(0) {
 
   for(int i = 0; i < MAX_CLIENT_AVAILABLE; i++) {
     sslclients[i] = nullptr;
+    clients_ca[i].clear();
+    clients_cert_pem[i].clear();
+    clients_key_pem[i].clear();
   }
 
   /* set up serial */
