@@ -27,15 +27,15 @@ void CAtHandler::add_cmds_ota() {
                return chAT::CommandStatus::ERROR;
             }
                
-            cert_buf = srv.inhibit_read(ca_root_size);
-            size_t offset = cert_buf.size();
+            ota_cert_buf = srv.inhibit_read(ca_root_size);
+            size_t offset = ota_cert_buf.size();
             if(offset < ca_root_size) {
-               cert_buf.resize(ca_root_size);
+               ota_cert_buf.resize(ca_root_size);
                do {
-                  offset += serial->read(cert_buf.data() + offset, ca_root_size - offset);
+                  offset += serial->read(ota_cert_buf.data() + offset, ca_root_size - offset);
                } while (offset < ca_root_size);
             }
-            OTA.setCACert((const char *)cert_buf.data());
+            OTA.setCACert((const char *)ota_cert_buf.data());
             srv.continue_read();
             return chAT::CommandStatus::OK;
          }

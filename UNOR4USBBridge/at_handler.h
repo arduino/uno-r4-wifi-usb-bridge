@@ -90,6 +90,9 @@ public:
    std::vector<std::uint8_t> client_cert_pem;
    std::vector<std::uint8_t> client_key_pem;
 
+   /* Used by cmds_ota */
+   std::vector<std::uint8_t> ota_cert_buf;
+
    /* Used by cmds_preferences */
    std::vector<std::uint8_t> pref_buf;
 
