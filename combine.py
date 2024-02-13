@@ -11,9 +11,8 @@ certsData = open("UNOR4USBBridge/build/esp32-patched.esp32.arduino_unor4wifi_usb
 
 # 0x000000 bootloader
 # 0x008000 partitions
-# 0x009000 fws
-# 0x00E000 boot_app/otadata
-# 0x010000 certs
+# 0x009000 boot_app/otadata
+# 0x00B000 certs
 # 0x050000 app0
 # 0x1E0000 app1
 # 0x370000 spiffs
@@ -34,10 +33,10 @@ for i in range(0, len(partitionData)):
 	outputData[0x8000 + i] = partitionData[i]
 
 for i in range(0, len(bootApp)):
-    outputData[0xE000 + i] = bootApp[i]
+    outputData[0x9000 + i] = bootApp[i]
 
 for i in range(0, len(certsData)):
-    outputData[0x10000 + i] = certsData[i]
+    outputData[0xB000 + i] = certsData[i]
 
 for i in range(0, len(appData)):
     outputData[0x50000 + i] = appData[i]

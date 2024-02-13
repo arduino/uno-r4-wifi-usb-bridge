@@ -7,7 +7,7 @@
 #include "incbin.h"
 INCBIN(x509_crt_bundle, PATH_CERT_BUNDLE);
 #else
-#define ROOT_CERTIFICATES_ADDRESS   (0x3C0000)
+#define ROOT_CERTIFICATES_ADDRESS   (0xB000)
 #endif
 
 #include "at_handler.h"

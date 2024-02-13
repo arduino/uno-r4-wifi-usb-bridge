@@ -1,6 +1,5 @@
 # modify esp32 platform.txt from g++11 to gcc+17
-rm -f UNOR4USBBridge/build/esp32-patched.esp32.arduino_unor4wifi_usb_bridge/S3.bin
-rm -f UNOR4USBBridge/build/esp32-patched.esp32.arduino_unor4wifi_usb_bridge/x509_crt_bundle
+rm -rf UNOR4USBBridge/build
 echo "Build Sketch"
 ./compile.sh
 echo "Build certificates bundle"
