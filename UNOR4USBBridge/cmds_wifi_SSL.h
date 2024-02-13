@@ -165,11 +165,17 @@ void CAtHandler::add_cmds_wifi_SSL() {
             /* Convert client certificate DER buffer into PEM */
             clients_cert_pem[internal_sock].resize(1024);
             size_t olen;
-            mbedtls_pem_write_buffer("-----BEGIN CERTIFICATE-----\n",
-                                     "-----END CERTIFICATE-----\n",
-                                     client_cert_der.data(), size,
-                                     clients_cert_pem[internal_sock].data(), 1024,
-                                     &olen);
+            int ret = -1;
+            if ((ret = mbedtls_pem_write_buffer("-----BEGIN CERTIFICATE-----\n",
+                                                "-----END CERTIFICATE-----\n",
+                                                client_cert_der.data(), size,
+                                                clients_cert_pem[internal_sock].data(), 1024,
+                                                &olen)) != 0)
+            {
+               log_e(" failed\n  !  mbedtls_pem_write_buffer returned -0x%04x", (unsigned int) -ret);
+               clients_cert_pem[internal_sock].clear();
+               return chAT::CommandStatus::ERROR;
+            }
             clients_cert_pem[internal_sock].resize(olen);
 
 #if ECC_DEBUG_ENABLED
@@ -183,7 +189,6 @@ void CAtHandler::add_cmds_wifi_SSL() {
             /* Read private key from non volatile storage in DER format */
             std::vector<unsigned char> client_key_der;
             int len = sse.getBytesLength(slot_num.c_str());
-            int ret = -1;
             client_key_der.resize(len);
             if ((ret = sse.getBytes(slot_num.c_str(), client_key_der.data(), len)) < len) {
                log_e(" failed\n  !  sse.getBytes returned -0x%04x", (unsigned int) -ret);
@@ -197,11 +202,16 @@ void CAtHandler::add_cmds_wifi_SSL() {
 
             /* Convert private key in PEM format */
             clients_key_pem[internal_sock].resize(1024);
-            mbedtls_pem_write_buffer("-----BEGIN EC PRIVATE KEY-----\n",
-                                     "-----END EC PRIVATE KEY-----\n",
-                                     client_key_der.data(), len,
-                                     clients_key_pem[internal_sock].data(), 1024,
-                                     &olen);
+            if ((ret = mbedtls_pem_write_buffer("-----BEGIN EC PRIVATE KEY-----\n",
+                                                "-----END EC PRIVATE KEY-----\n",
+                                                client_key_der.data(), len,
+                                                clients_key_pem[internal_sock].data(), 1024,
+                                                &olen)) != 0)
+            {
+               log_e(" failed\n  !  mbedtls_pem_write_buffer returned -0x%04x", (unsigned int) -ret);
+               clients_cert_pem[internal_sock].clear();
+               return chAT::CommandStatus::ERROR;
+            }
             clients_key_pem[internal_sock].resize(olen);
 
 #if ECC_DEBUG_ENABLED
