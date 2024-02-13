@@ -14,9 +14,9 @@
 #define MAX_SERVER_AVAILABLE   4
 #define MAX_UDP_AVAILABLE      4
 
-#define ESP_FW_VERSION    "0.3.0"
+#define ESP_FW_VERSION    "0.4.0"
 #define FIRMWARE_MAYOR    0
-#define FIRMWARE_MINOR    3
+#define FIRMWARE_MINOR    4
 #define FIRMWARE_PATCH    0
 
 #define GPIO_BOOT   9
