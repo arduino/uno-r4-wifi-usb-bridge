@@ -8,11 +8,11 @@
 #include "cmds_wifi_station.h"
 #include "cmds_wifi_softAP.h"
 #include "cmds_wifi_netif.h"
+#include "cmds_preferences.h"
 #include "cmds_wifi_SSL.h"
 #include "cmds_wifi_udp.h"
 #include "cmds_ble_bridge.h"
 #include "cmds_ota.h"
-#include "cmds_preferences.h"
 #include "cmds_se.h"
 
 using namespace SudoMaker;
@@ -92,6 +92,9 @@ CAtHandler::CAtHandler(HardwareSerial *s) : last_server_client_sock(0) {
 
   for(int i = 0; i < MAX_CLIENT_AVAILABLE; i++) {
     sslclients[i] = nullptr;
+    clients_ca[i].clear();
+    clients_cert_pem[i].clear();
+    clients_key_pem[i].clear();
   }
 
   /* set up serial */

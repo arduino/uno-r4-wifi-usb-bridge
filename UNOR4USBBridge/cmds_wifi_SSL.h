@@ -11,6 +11,8 @@ INCBIN(x509_crt_bundle, PATH_CERT_BUNDLE);
 #endif
 
 #include "at_handler.h"
+#include "mbedtls/pem.h"
+#include "SSE.h"
 
 #ifndef WIFI_CLIENT_DEF_CONN_TIMEOUT_MS
 #define WIFI_CLIENT_DEF_CONN_TIMEOUT_MS  (3000)
@@ -66,6 +68,11 @@ void CAtHandler::add_cmds_wifi_SSL() {
                return chAT::CommandStatus::ERROR;
             }
 
+            const int internal_sock = the_client.can_delete;
+            if (internal_sock == -1) {
+               return chAT::CommandStatus::ERROR;
+            }
+
             bool ca_root_custom = false;
             int ca_root_size = 0;
             if (parser.args.size() >= 2){
@@ -78,19 +85,17 @@ void CAtHandler::add_cmds_wifi_SSL() {
             }
 
             if(ca_root_custom) {
-
-
-               cert_buf = srv.inhibit_read(ca_root_size);
-               size_t offset = cert_buf.size();
+               clients_ca[internal_sock] = srv.inhibit_read(ca_root_size);
+               size_t offset = clients_ca[internal_sock].size();
                
                if(offset < ca_root_size) {
 
-                  cert_buf.resize(ca_root_size);
+                  clients_ca[internal_sock].resize(ca_root_size);
                   do {
-                     offset += serial->read(cert_buf.data() + offset, ca_root_size - offset);
+                     offset += serial->read(clients_ca[internal_sock].data() + offset, ca_root_size - offset);
                   } while (offset < ca_root_size);
                }
-               the_client.sslclient->setCACert((const char *)cert_buf.data());
+               the_client.sslclient->setCACert((const char *)clients_ca[internal_sock].data());
                srv.continue_read();
             } else {
                #ifdef BUNDLED_CA_ROOT_CRT
@@ -110,6 +115,120 @@ void CAtHandler::add_cmds_wifi_SSL() {
             return chAT::CommandStatus::ERROR;
       }
    };
+
+   /* ....................................................................... */
+   command_table[_SETECCSLOT] = [this](auto & srv, auto & parser) {
+   /* ....................................................................... */
+      switch (parser.cmd_mode) {
+         case chAT::CommandMode::Write: {
+            if (parser.args.size() != 3) {
+               return chAT::CommandStatus::ERROR;
+            }
+
+            auto &sock_num = parser.args[0];
+            auto &slot_num = parser.args[1];
+            auto &cert_len = parser.args[2];
+            if (sock_num.empty() || slot_num.empty() || cert_len.empty()) {
+               return chAT::CommandStatus::ERROR;
+            }
+
+            int sock = atoi(sock_num.c_str());
+            int size = atoi(cert_len.c_str());
+
+            CClientWrapper the_client = getClient(sock);
+            if (the_client.sslclient == nullptr) {
+               return chAT::CommandStatus::ERROR;
+            }
+
+            const int internal_sock = the_client.can_delete;
+            if (internal_sock == -1) {
+               return chAT::CommandStatus::ERROR;
+            }
+
+            std::vector<unsigned char> client_cert_der;
+            client_cert_der = srv.inhibit_read(size);
+            size_t offset = client_cert_der.size();
+
+            if(offset < size) {
+               client_cert_der.resize(size);
+               do {
+                  offset += serial->read(client_cert_der.data() + offset, size - offset);
+               } while (offset < size);
+            }
+            srv.continue_read();
+
+#if ECC_DEBUG_ENABLED
+            log_v("_SETECCSLOT: input cert");
+            log_buf_v((const uint8_t *)client_cert_der.data(), size);
+#endif
+
+            /* Convert client certificate DER buffer into PEM */
+            clients_cert_pem[internal_sock].resize(1024);
+            size_t olen;
+            int ret = -1;
+            if ((ret = mbedtls_pem_write_buffer("-----BEGIN CERTIFICATE-----\n",
+                                                "-----END CERTIFICATE-----\n",
+                                                client_cert_der.data(), size,
+                                                clients_cert_pem[internal_sock].data(), 1024,
+                                                &olen)) != 0)
+            {
+               log_e(" failed\n  !  mbedtls_pem_write_buffer returned -0x%04x", (unsigned int) -ret);
+               clients_cert_pem[internal_sock].clear();
+               return chAT::CommandStatus::ERROR;
+            }
+            clients_cert_pem[internal_sock].resize(olen);
+
+#if ECC_DEBUG_ENABLED
+            log_v("_SETECCSLOT: output cert");
+            log_v("\n%s", clients_cert_pem[internal_sock].data());
+#endif
+
+            /* Set client certificate */
+            the_client.sslclient->setCertificate((const char *)clients_cert_pem[internal_sock].data());
+
+            /* Read private key from non volatile storage in DER format */
+            std::vector<unsigned char> client_key_der;
+            int len = sse.getBytesLength(slot_num.c_str());
+            client_key_der.resize(len);
+            if ((ret = sse.getBytes(slot_num.c_str(), client_key_der.data(), len)) < len) {
+               log_e(" failed\n  !  sse.getBytes returned -0x%04x", (unsigned int) -ret);
+               return chAT::CommandStatus::ERROR;
+            }
+
+#if ECC_DEBUG_ENABLED
+            log_v("_SETECCSLOT: input key");
+            log_buf_v((const uint8_t *)client_key_der.data(), ret);
+#endif
+
+            /* Convert private key in PEM format */
+            clients_key_pem[internal_sock].resize(1024);
+            if ((ret = mbedtls_pem_write_buffer("-----BEGIN EC PRIVATE KEY-----\n",
+                                                "-----END EC PRIVATE KEY-----\n",
+                                                client_key_der.data(), len,
+                                                clients_key_pem[internal_sock].data(), 1024,
+                                                &olen)) != 0)
+            {
+               log_e(" failed\n  !  mbedtls_pem_write_buffer returned -0x%04x", (unsigned int) -ret);
+               clients_cert_pem[internal_sock].clear();
+               return chAT::CommandStatus::ERROR;
+            }
+            clients_key_pem[internal_sock].resize(olen);
+
+#if ECC_DEBUG_ENABLED
+            log_v("_SETECCSLOT: output key");
+            log_v("\n%s", clients_key_pem[internal_sock].data());
+#endif
+
+            /* Set client key */
+            the_client.sslclient->setPrivateKey((const char *)clients_key_pem[internal_sock].data());
+
+            return chAT::CommandStatus::OK;
+         }
+         default:
+            return chAT::CommandStatus::ERROR;
+      }
+   };
+
    /* ....................................................................... */
    command_table[_SSLCLIENTSTATE] = [this](auto & srv, auto & parser) {
    /* ....................................................................... */     
@@ -166,6 +285,11 @@ void CAtHandler::add_cmds_wifi_SSL() {
                return chAT::CommandStatus::ERROR;
             }
 
+            const int internal_sock = the_client.can_delete;
+            if (internal_sock == -1) {
+               return chAT::CommandStatus::ERROR;
+            }
+
             auto &host = parser.args[1];
             if (host.empty()) {
                return chAT::CommandStatus::ERROR;
@@ -174,6 +298,21 @@ void CAtHandler::add_cmds_wifi_SSL() {
             auto &port = parser.args[2];
             if (port.empty()) {
                return chAT::CommandStatus::ERROR;
+            }
+
+            /* Set custom root ca */
+            if (clients_ca[internal_sock].size()) {
+               the_client.sslclient->setCACert((const char *)clients_ca[internal_sock].data());
+            }
+            /* Default ca bundle is configured automatically on connect by the WiFiSSLClient */
+
+            if (clients_cert_pem[internal_sock].size()) {
+              /* Set client certificate */
+              the_client.sslclient->setCertificate((const char *)clients_cert_pem[internal_sock].data());
+            }
+            if (clients_key_pem[internal_sock].size()) {
+              /* Set client key */
+              the_client.sslclient->setPrivateKey((const char *)clients_key_pem[internal_sock].data());
             }
 
             if (!the_client.sslclient->connect(host.c_str(), atoi(port.c_str()))) {
@@ -210,6 +349,11 @@ void CAtHandler::add_cmds_wifi_SSL() {
                return chAT::CommandStatus::ERROR;
             }
 
+            const int internal_sock = the_client.can_delete;
+            if (internal_sock == -1) {
+               return chAT::CommandStatus::ERROR;
+            }
+
             auto &hostip = parser.args[1];
             if (hostip.empty()) {
                return chAT::CommandStatus::ERROR;
@@ -223,6 +367,21 @@ void CAtHandler::add_cmds_wifi_SSL() {
             IPAddress address;
             if(!address.fromString(hostip.c_str())) {
                return chAT::CommandStatus::ERROR;
+            }
+
+            /* Set custom root ca */
+            if (clients_ca[internal_sock].size()) {
+               the_client.sslclient->setCACert((const char *)clients_ca[internal_sock].data());
+            }
+            /* Default ca bundle is configured automatically on connect by the WiFiSSLClient */
+
+            if (clients_cert_pem[internal_sock].size()) {
+              /* Set client certificate */
+              the_client.sslclient->setCertificate((const char *)clients_cert_pem[internal_sock].data());
+            }
+            if (clients_key_pem[internal_sock].size()) {
+              /* Set client key */
+              the_client.sslclient->setPrivateKey((const char *)clients_key_pem[internal_sock].data());
             }
 
             if (!the_client.sslclient->connect(address, atoi(hostport.c_str()))) {
@@ -258,6 +417,11 @@ void CAtHandler::add_cmds_wifi_SSL() {
                return chAT::CommandStatus::ERROR;
             }
 
+            const int internal_sock = the_client.can_delete;
+            if (internal_sock == -1) {
+               return chAT::CommandStatus::ERROR;
+            }
+
             auto &host = parser.args[1];
             if (host.empty()) {
                return chAT::CommandStatus::ERROR;
@@ -278,6 +442,21 @@ void CAtHandler::add_cmds_wifi_SSL() {
               if (t > 0) {
                 timeout = t;
               }
+            }
+
+            /* Set custom root ca */
+            if (clients_ca[internal_sock].size()) {
+               the_client.sslclient->setCACert((const char *)clients_ca[internal_sock].data());
+            }
+            /* Default ca bundle is configured automatically on connect by the WiFiSSLClient */
+
+            if (clients_cert_pem[internal_sock].size()) {
+              /* Set client certificate */
+              the_client.sslclient->setCertificate((const char *)clients_cert_pem[internal_sock].data());
+            }
+            if (clients_key_pem[internal_sock].size()) {
+              /* Set client key */
+              the_client.sslclient->setPrivateKey((const char *)clients_key_pem[internal_sock].data());
             }
 
             if (!the_client.sslclient->connect(host.c_str(), atoi(port.c_str()), timeout)) {
@@ -397,6 +576,9 @@ void CAtHandler::add_cmds_wifi_SSL() {
                if(the_client.can_delete >= 0) {
                   delete sslclients[the_client.can_delete];
                   sslclients[the_client.can_delete] = nullptr;
+                  clients_ca[the_client.can_delete].clear();
+                  clients_cert_pem[the_client.can_delete].clear();
+                  clients_key_pem[the_client.can_delete].clear();
                   sslclients_num--;
                }
             }

@@ -171,16 +171,16 @@ void CAtHandler::add_cmds_preferences() {
                break;
                case PreferenceType::PT_BLOB: {
                   int value = atoi(parser.args[2].c_str());
-                  cert_buf = srv.inhibit_read(value);
-                  size_t offset = cert_buf.size();
+                  pref_buf = srv.inhibit_read(value);
+                  size_t offset = pref_buf.size();
                   if(offset < value) {
-                     cert_buf.resize(value);
+                     pref_buf.resize(value);
                      do {
-                        offset += serial->read(cert_buf.data() + offset, value - offset);
+                        offset += serial->read(pref_buf.data() + offset, value - offset);
                      } while (offset < value);
                   }
                   srv.continue_read();
-                  error = String(pref.putBytes(key.c_str(), cert_buf.data(), value)) + "\r\n";
+                  error = String(pref.putBytes(key.c_str(), pref_buf.data(), value)) + "\r\n";
                }
                break;
                default:
