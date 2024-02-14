@@ -17,8 +17,11 @@ enum file_op {
 };
 
 #define _AT                      "AT"
-#define _ENDL                    "\r\n" 
+#define _ENDL                    "\r\n"
 #define _WIFISCAN                "+WIFISCAN"
+
+#define _PINGIP                  "+PINGIP"
+#define _PINGNAME                "+PINGNAME"
 
 #define _RESET                   "+RESET"
 #define _RESTART_BOOTLOADER      "+RESTARTBOOTLOADER"
@@ -34,7 +37,7 @@ enum file_op {
 #define _DISCONNECT              "+DISCONNECT"
 #define _BEGINSOFTAP             "+BEGINSOFTAP"
 #define _MACSTA                  "+MACSTA"
-#define _MACSOFTAP               "+MACSOFTAP" 
+#define _MACSOFTAP               "+MACSOFTAP"
 #define _DISCONNECTSOFTAP        "+DISCONNECTSOFTAP"
 #define _AUTOCONNECT             "+AUTOCONNECT"
 #define _IPSTA                   "+IPSTA"

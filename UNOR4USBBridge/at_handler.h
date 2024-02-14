@@ -14,9 +14,9 @@
 #define MAX_SERVER_AVAILABLE   4
 #define MAX_UDP_AVAILABLE      4
 
-#define ESP_FW_VERSION    "0.4.0"
+#define ESP_FW_VERSION    "0.5.0"
 #define FIRMWARE_MAYOR    0
-#define FIRMWARE_MINOR    4
+#define FIRMWARE_MINOR    5
 #define FIRMWARE_PATCH    0
 
 #define GPIO_BOOT   9
@@ -54,10 +54,10 @@ public:
 
 class CAtHandler {
 private:
-   static uint8_t wifi_status; 
+   static uint8_t wifi_status;
 
    int last_server_client_sock;
-   
+
    WiFiUDP    * udps[MAX_UDP_AVAILABLE];
    WiFiServer * serverWiFi[MAX_SERVER_AVAILABLE];
    WiFiClient * clients[MAX_CLIENT_AVAILABLE];
@@ -78,8 +78,8 @@ private:
    CClientWrapper getClient(int sock);
 
    void add_cmds_esp_generic();
-   void add_cmds_wifi_station(); 
-   void add_cmds_wifi_softAP(); 
+   void add_cmds_wifi_station();
+   void add_cmds_wifi_softAP();
    void add_cmds_wifi_SSL();
    void add_cmds_wifi_netif();
    void add_cmds_wifi_udp();
