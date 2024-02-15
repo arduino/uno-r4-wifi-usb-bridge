@@ -9,18 +9,18 @@ appData = open("UNOR4USBBridge/build/esp32-patched.esp32.arduino_unor4wifi_usb_b
 spiffsData = open("spiffs/spiffs.bin", "rb").read()
 certsData = open("UNOR4USBBridge/build/esp32-patched.esp32.arduino_unor4wifi_usb_bridge/x509_crt_bundle", "rb").read()
 
-# 0x000000 bootloader
-# 0x008000 partitions
-# 0x009000 boot_app/otadata
-# 0x00B000 certs
-# 0x050000 app0
-# 0x1E0000 app1
-# 0x370000 spiffs
-# 0x3F0000 nvs
-# 0x3F5000 coredump
+# Offset   Size     Name
+# 0x000000 0x008000 bootloader
+# 0x008000 0x001000 partitions
+# 0x009000 0x002000 boot_app/otadata
+# 0x00B000 0x045000 certs
+# 0x050000 0x190000 app0
+# 0x1E0000 0x190000 app1
+# 0x370000 0x080000 spiffs
+# 0x3F0000 0x010000 nvs
 
 # calculate the output binary size included nvs
-outputSize = 0x3F5000
+outputSize = 0x400000
 
 # allocate and init to 0xff
 outputData = bytearray(b'\xff') * outputSize
