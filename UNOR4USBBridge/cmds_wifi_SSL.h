@@ -101,10 +101,16 @@ void CAtHandler::add_cmds_wifi_SSL() {
                #ifdef BUNDLED_CA_ROOT_CRT
                the_client.sslclient->setCACertBundle((const uint8_t *)x509_crt_bundle_data);
                #else
-               const uint8_t* cert_in_flash;
-               static spi_flash_mmap_handle_t t;
-               spi_flash_mmap(ROOT_CERTIFICATES_ADDRESS, 128*1024, SPI_FLASH_MMAP_DATA, (const void**)&cert_in_flash, &t);
-               the_client.sslclient->setCACertBundle((const uint8_t *)cert_in_flash);
+               if(cert_in_flash_ptr == nullptr) {
+                  const esp_partition_t *partition = esp_partition_find_first(ESP_PARTITION_TYPE_DATA, ESP_PARTITION_SUBTYPE_ANY, "cert");
+                  if(partition != nullptr) {
+                     esp_partition_mmap(partition, 0, partition->size, SPI_FLASH_MMAP_DATA, (const void**)&cert_in_flash_ptr, &cert_in_flash_handle);
+                  }
+               }
+
+               if(cert_in_flash_ptr != nullptr) {
+                 the_client.sslclient->setCACertBundle(cert_in_flash_ptr);
+               }
                #endif
                srv.write_response_prompt();
             }

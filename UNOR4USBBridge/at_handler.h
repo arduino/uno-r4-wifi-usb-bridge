@@ -74,6 +74,8 @@ private:
    std::unordered_map<std::string, std::function<chAT::CommandStatus(chAT::Server&, chAT::ATParser&)>> command_table;
    chAT::Server at_srv;
    HardwareSerial *serial;
+   uint8_t* cert_in_flash_ptr = nullptr;
+   spi_flash_mmap_handle_t cert_in_flash_handle;
 
    CClientWrapper getClient(int sock);
 
