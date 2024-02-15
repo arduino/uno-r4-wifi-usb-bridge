@@ -5,6 +5,9 @@
 #include "ESPping.h"
 char rsl[5];                // ping time
 
+char SecTime[80];           // gettime
+struct tm timeinfo;
+
 extern "C" {
     #include "esp32-hal-tinyusb.h"
 }
@@ -419,6 +422,49 @@ void CAtHandler::add_cmds_esp_generic() {
           return chAT::CommandStatus::ERROR;
          }
        default:
+          return chAT::CommandStatus::ERROR;
+      }
+   };
+
+/* ....................................................................... */
+   command_table[_GETTIME] = [this](auto & srv, auto & parser) {
+/* ....................................................................... */
+
+    switch (parser.cmd_mode) {
+      case chAT::CommandMode::Write: {
+
+          if (parser.args.size() != 3) {
+            return chAT::CommandStatus::ERROR;
+          }
+
+          // get TimeZone info
+          auto &tz = parser.args[1];
+          if (tz.empty()) {
+            return chAT::CommandStatus::ERROR;
+          }
+
+          // get format
+          auto &format = parser.args[2];
+          if (format.empty()) {
+            return chAT::CommandStatus::ERROR;
+          }
+
+          configTime(0, 0, "pool.ntp.org");   // 0, 0 because we will use TZ from tzset()
+          setenv("TZ", tz.c_str(), 1);        // Set environment variable with your time zone
+          tzset();
+
+          while (! getLocalTime(&timeinfo) ) {
+            delay(100);
+          }
+
+          //See http://www.cplusplus.com/reference/ctime/strftime/
+          strftime(SecTime, 80, format.c_str(), &timeinfo);
+          srv.write_response_prompt();
+          srv.write_cstr((const char *) SecTime);
+          srv.write_line_end();
+          return chAT::CommandStatus::OK;
+         }
+      default:
           return chAT::CommandStatus::ERROR;
       }
    };
