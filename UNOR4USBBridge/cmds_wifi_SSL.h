@@ -28,6 +28,9 @@ void CAtHandler::add_cmds_wifi_SSL() {
                for (int i = 0; i < MAX_CLIENT_AVAILABLE; i++) {
                   if (sslclients[i] == nullptr) {
                      sslclients[i] = new WiFiClientSecure();
+                     clients_ca[i].clear();
+                     clients_cert_pem[i].clear();
+                     clients_key_pem[i].clear();
                      if(sslclients[i] == nullptr) {
                         return chAT::CommandStatus::ERROR;
                      }
