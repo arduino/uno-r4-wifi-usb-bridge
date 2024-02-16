@@ -2,6 +2,10 @@
 #define CMDS_ESP_GENERIC_H
 
 #include "at_handler.h"
+
+char epoch[12];                     // gettime
+#define SECS_YR_2000  (946684800UL) // the time at the start of y2k
+
 extern "C" {
    #include "esp32-hal-tinyusb.h"
 }
@@ -359,6 +363,33 @@ void CAtHandler::add_cmds_esp_generic() {
             return chAT::CommandStatus::ERROR;
       }
    };
+   
+/* ....................................................................... */
+   command_table[_GETTIME] = [this](auto & srv, auto & parser) {
+/* ....................................................................... */
+
+    switch (parser.cmd_mode) {
+      case chAT::CommandMode::Write: {
+            
+        configTime(0, 0, "pool.ntp.org");
+        time_t now = time(nullptr);
+
+        while (now < SECS_YR_2000) {
+          delay(100);
+          now = time(nullptr);
+        }
+  
+        srv.write_response_prompt();
+        sprintf(epoch,"%d", (unsigned long) now);
+        srv.write_cstr((const char *) epoch);
+        srv.write_line_end();
+  
+        return chAT::CommandStatus::OK;
+      }
+      default:
+        return chAT::CommandStatus::ERROR;
+    }
+  };
 }
 
 #endif
