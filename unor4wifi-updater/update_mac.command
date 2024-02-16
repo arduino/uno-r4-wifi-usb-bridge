@@ -13,4 +13,4 @@ fi
 
 echo "Start flashing firmware"
 sleep 1
-./bin/espflash write-bin -b 115200 0x0 firmware/UNOR4-WIFI-S3-0.2.0-rc1.bin
+./bin/espflash write-bin -b 115200 0x0 firmware/UNOR4-WIFI-S3-VVERSION.bin
