@@ -20,7 +20,6 @@ enum file_op {
 #define _ENDL                    "\r\n" 
 #define _WIFISCAN                "+WIFISCAN"
 
-#define _PINGIP                  "+PINGIP"
 #define _PINGNAME                "+PINGNAME"
 
 #define _RESET                   "+RESET"
