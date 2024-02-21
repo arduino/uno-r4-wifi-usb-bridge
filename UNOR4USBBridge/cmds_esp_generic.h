@@ -3,8 +3,8 @@
 
 #include "at_handler.h"
 
-char SecTime[80];           // gettime
-struct tm timeinfo;
+char epoch[12];                     // gettime
+#define SECS_YR_2000  (946684800UL) // the time at the start of y2k
 
 extern "C" {
     #include "esp32-hal-tinyusb.h"
@@ -343,42 +343,26 @@ void CAtHandler::add_cmds_esp_generic() {
 
     switch (parser.cmd_mode) {
       case chAT::CommandMode::Write: {
+            
+        configTime(0, 0, "pool.ntp.org");
+        time_t now = time(nullptr);
 
-          if (parser.args.size() != 3) {
-            return chAT::CommandStatus::ERROR;
-          }
-
-          // get TimeZone info
-          auto &tz = parser.args[1];
-          if (tz.empty()) {
-            return chAT::CommandStatus::ERROR;
-          }
-
-          // get format
-          auto &format = parser.args[2];
-          if (format.empty()) {
-            return chAT::CommandStatus::ERROR;
-          }
-
-          configTime(0, 0, "pool.ntp.org");   // 0, 0 because we will use TZ from tzset()
-          setenv("TZ", tz.c_str(), 1);        // Set environment variable with your time zone
-          tzset();
-
-          while (! getLocalTime(&timeinfo) ) {
-            delay(100);
-          }
-
-          //See http://www.cplusplus.com/reference/ctime/strftime/
-          strftime(SecTime, 80, format.c_str(), &timeinfo);
-          srv.write_response_prompt();
-          srv.write_cstr((const char *) SecTime);
-          srv.write_line_end();
-          return chAT::CommandStatus::OK;
-         }
-      default:
-          return chAT::CommandStatus::ERROR;
+        while (now < SECS_YR_2000) {
+          delay(100);
+          now = time(nullptr);
+        }
+  
+        srv.write_response_prompt();
+        sprintf(epoch,"%d", (unsigned long) now);
+        srv.write_cstr((const char *) epoch);
+        srv.write_line_end();
+  
+        return chAT::CommandStatus::OK;
       }
-   };
+      default:
+        return chAT::CommandStatus::ERROR;
+    }
+  };
 }
 
 #endif
