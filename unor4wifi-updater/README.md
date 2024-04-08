@@ -60,22 +60,7 @@ Running the script from the terminal instead of double click should avoid the co
 Disconnect and connect again your UNO R4 WiFi from your PC and re-run the script.
 
 ## Option 2
-Manually put  the UNO R4 WiFi in ESP mode
 
-1. Disconnect the UNO R4 WiFi from your PC
-2. Short the pins highlighted in the image using a jumper wire
+Follow the "**Run espflash directly**" instructions provided in this Arduino Help Center article:
 
-![image](https://github.com/pennam/UnoR4WiFiUpdate/assets/20436476/b271759e-5d7b-44f5-954e-15bc0f7feae9)
-
-3. Connect the UNO R4 WiFi to your PC
-4. From the root folder of the downloaded .zip file run
-
-#### Linux and MacOS
-`./bin/espflash write-bin -b 115200 0x0 firmware/UNOR4-WIFI-S3-0.2.0-rc1.bin`
-
-#### Windows
-`bin\espflash write-bin -b 115200 0x0 firmware\UNOR4-WIFI-S3-0.2.0-rc1.bin`
-
-5. Disconnect your UNO R4 WiFi from your PC
-6. Remove the jumper wire
-7. Connect the board to your PC again and enjoy
+https://support.arduino.cc/hc/en-us/articles/9670986058780-Update-the-connectivity-module-firmware-on-UNO-R4-WiFi#espflash
