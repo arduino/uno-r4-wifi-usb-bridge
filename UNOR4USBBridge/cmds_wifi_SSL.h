@@ -21,7 +21,7 @@ INCBIN(x509_crt_bundle, PATH_CERT_BUNDLE);
 void CAtHandler::add_cmds_wifi_SSL() {
    /* ....................................................................... */
    command_table[_SSLBEGINCLIENT] = [this](auto & srv, auto & parser) {
-   /* ....................................................................... */     
+   /* ....................................................................... */
       switch (parser.cmd_mode) {
          case chAT::CommandMode::Run: {
             if (sslclients_num < MAX_CLIENT_AVAILABLE) {
@@ -51,7 +51,7 @@ void CAtHandler::add_cmds_wifi_SSL() {
 
    /* ....................................................................... */
    command_table[_SETCAROOT] = [this](auto & srv, auto & parser) {
-   /* ....................................................................... */     
+   /* ....................................................................... */
       switch (parser.cmd_mode) {
          case chAT::CommandMode::Write: {
             if (parser.args.size() < 1) {
@@ -90,7 +90,7 @@ void CAtHandler::add_cmds_wifi_SSL() {
             if(ca_root_custom) {
                clients_ca[internal_sock] = srv.inhibit_read(ca_root_size);
                size_t offset = clients_ca[internal_sock].size();
-               
+
                if(offset < ca_root_size) {
 
                   clients_ca[internal_sock].resize(ca_root_size);
@@ -240,7 +240,7 @@ void CAtHandler::add_cmds_wifi_SSL() {
 
    /* ....................................................................... */
    command_table[_SSLCLIENTSTATE] = [this](auto & srv, auto & parser) {
-   /* ....................................................................... */     
+   /* ....................................................................... */
       switch (parser.cmd_mode) {
          case chAT::CommandMode::Write: {
             if (parser.args.size() != 1) {
@@ -275,7 +275,7 @@ void CAtHandler::add_cmds_wifi_SSL() {
 
    /* ....................................................................... */
    command_table[_SSLCLIENTCONNECTNAME] = [this](auto & srv, auto & parser) {
-   /* ....................................................................... */     
+   /* ....................................................................... */
       switch (parser.cmd_mode) {
          case chAT::CommandMode::Write: {
             if (parser.args.size() != 3) {
@@ -335,10 +335,10 @@ void CAtHandler::add_cmds_wifi_SSL() {
             return chAT::CommandStatus::ERROR;
       }
    };
- 
+
    /* ....................................................................... */
    command_table[_SSLCLIENTCONNECTIP] = [this](auto & srv, auto & parser) {
-   /* ....................................................................... */     
+   /* ....................................................................... */
       switch (parser.cmd_mode) {
          case chAT::CommandMode::Write: {
             if (parser.args.size() != 3) {
@@ -443,14 +443,14 @@ void CAtHandler::add_cmds_wifi_SSL() {
 
             int timeout = WIFI_CLIENT_DEF_CONN_TIMEOUT_MS;
             if (parser.args.size() > 3) {
-              auto &tmp = parser.args[3];
-              if (tmp.empty()) {
-                 return chAT::CommandStatus::ERROR;
-              }
-              int t = atoi(tmp.c_str());
-              if (t > 0) {
-                timeout = t;
-              }
+               auto &tmp = parser.args[3];
+               if (tmp.empty()) {
+                  return chAT::CommandStatus::ERROR;
+               }
+               int t = atoi(tmp.c_str());
+               if (t > 0) {
+                  timeout = t;
+               }
             }
 
             /* Set custom root ca */
@@ -482,21 +482,21 @@ void CAtHandler::add_cmds_wifi_SSL() {
 
    /* ....................................................................... */
    command_table[_SSLCLIENTSEND] = [this](auto & srv, auto & parser) {
-   /* ....................................................................... */     
+   /* ....................................................................... */
       switch (parser.cmd_mode) {
          case chAT::CommandMode::Write: {
-            /* the command receive 2 data: the socket and the length of data 
+            /* the command receive 2 data: the socket and the length of data
                to be transmitted */
 
             if (parser.args.size() != 2) {
-               
+
                return chAT::CommandStatus::ERROR;
             }
 
             /* socket */
             auto &sock_num = parser.args[0];
             if (sock_num.empty()) {
-               
+
                return chAT::CommandStatus::ERROR;
             }
 
@@ -510,32 +510,32 @@ void CAtHandler::add_cmds_wifi_SSL() {
             /* data len */
             auto &size_p = parser.args[1];
             if (size_p.empty()) {
-               
+
                return chAT::CommandStatus::ERROR;
             }
 
             int data_size = atoi(size_p.c_str());
 
             if(data_size <= 0) {
-               
+
                return chAT::CommandStatus::ERROR;
             }
 
-            /* socket and data received 
-               answer back _CLIENTDATA: DATA\r\n 
+            /* socket and data received
+               answer back _CLIENTDATA: DATA\r\n
                so that data transmission can begin */
             //srv.write_response_prompt();
             //srv.write_str(" DATA");
             //srv.write_line_end();
             //return chAT::CommandStatus::OK;
-            
+
             /* -----------------------------------
              * BEGIN TRANSPARENT DATA TRANSMISSION
              * ----------------------------------- */
             std::vector<uint8_t> data_received;
             data_received = srv.inhibit_read(data_size);
             size_t offset = data_received.size();
-            
+
             if(offset < data_size) {
 
                data_received.resize(data_size);
@@ -549,11 +549,11 @@ void CAtHandler::add_cmds_wifi_SSL() {
             int sent = 0;
             sent += the_client.sslclient->write(data_received.data() + sent, data_received.size() - sent);
 
-            
+
             if (sent < data_received.size()) {
-              return chAT::CommandStatus::ERROR;
+               return chAT::CommandStatus::ERROR;
             }
-            
+
             return chAT::CommandStatus::OK;
          }
          default:
@@ -563,15 +563,15 @@ void CAtHandler::add_cmds_wifi_SSL() {
 
    /* ....................................................................... */
    command_table[_SSLCLIENTCLOSE] = [this](auto & srv, auto & parser) {
-   /* ....................................................................... */     
+   /* ....................................................................... */
       switch (parser.cmd_mode) {
          case chAT::CommandMode::Write: {
             if (parser.args.size() != 1) {
-              return chAT::CommandStatus::ERROR;
+               return chAT::CommandStatus::ERROR;
             }
             auto &sock_num = parser.args[0];
             if (sock_num.empty()) {
-              return chAT::CommandStatus::ERROR;
+               return chAT::CommandStatus::ERROR;
             }
             int sock = atoi(sock_num.c_str());
 
@@ -581,7 +581,7 @@ void CAtHandler::add_cmds_wifi_SSL() {
             }
             else {
                the_client.sslclient->stop();
-               
+
                if(the_client.can_delete >= 0) {
                   delete sslclients[the_client.can_delete];
                   sslclients[the_client.can_delete] = nullptr;
@@ -603,15 +603,15 @@ void CAtHandler::add_cmds_wifi_SSL() {
 
    /* ....................................................................... */
    command_table[_SSLIPCLIENT] = [this](auto & srv, auto & parser) {
-   /* ....................................................................... */     
+   /* ....................................................................... */
       switch (parser.cmd_mode) {
          case chAT::CommandMode::Write: {
             if (parser.args.size() != 1) {
-              return chAT::CommandStatus::ERROR;
+               return chAT::CommandStatus::ERROR;
             }
             auto &sock_num = parser.args[0];
             if (sock_num.empty()) {
-              return chAT::CommandStatus::ERROR;
+               return chAT::CommandStatus::ERROR;
             }
             int sock = atoi(sock_num.c_str());
             CClientWrapper the_client = getClient(sock);
@@ -629,22 +629,22 @@ void CAtHandler::add_cmds_wifi_SSL() {
             return chAT::CommandStatus::OK;
          }
          default:
-           return chAT::CommandStatus::ERROR;
+            return chAT::CommandStatus::ERROR;
       }
    };
 
    /* ....................................................................... */
    command_table[_SSLCLIENTCONNECTED] = [this](auto & srv, auto & parser) {
-   /* ....................................................................... */     
+   /* ....................................................................... */
       switch (parser.cmd_mode) {
          case chAT::CommandMode::Write: {// write to do the read of a specific list
             if (parser.args.size() != 1) {
-              return chAT::CommandStatus::ERROR;
+               return chAT::CommandStatus::ERROR;
             }
 
             auto &socket_num = parser.args[0];
             if (socket_num.empty()) {
-              return chAT::CommandStatus::ERROR;
+               return chAT::CommandStatus::ERROR;
             }
 
             int sock = atoi(socket_num.c_str());
@@ -662,21 +662,21 @@ void CAtHandler::add_cmds_wifi_SSL() {
 
          }
          default:
-           return chAT::CommandStatus::ERROR;
+            return chAT::CommandStatus::ERROR;
       }
    };
 
    /* ....................................................................... */
    command_table[_SSLCLIENTRECEIVE] = [this](auto & srv, auto & parser) {
-   /* ....................................................................... */     
+   /* ....................................................................... */
       switch (parser.cmd_mode) {
          case chAT::CommandMode::Write: {
             if (parser.args.size() != 2) {
-              return chAT::CommandStatus::ERROR;
+               return chAT::CommandStatus::ERROR;
             }
             auto &socket_num = parser.args[0];
             if (socket_num.empty()) {
-              return chAT::CommandStatus::ERROR;
+               return chAT::CommandStatus::ERROR;
             }
             int sock = atoi(socket_num.c_str());
             CClientWrapper the_client = getClient(sock);
@@ -687,12 +687,12 @@ void CAtHandler::add_cmds_wifi_SSL() {
 
             auto &size = parser.args[1];
             if (size.empty()) {
-              return chAT::CommandStatus::ERROR;
+               return chAT::CommandStatus::ERROR;
             }
             int data_wanted = atoi(size.c_str());
             if(data_wanted <= 0) {
                return chAT::CommandStatus::ERROR;
-            } 
+            }
 
             int data_available = the_client.sslclient->available();
             data_wanted = (data_wanted < data_available) ? data_wanted : data_available;
@@ -702,7 +702,7 @@ void CAtHandler::add_cmds_wifi_SSL() {
 
             int res = the_client.sslclient->read(data_received.data(), data_wanted);
             String results = String(data_received.size()) + "|";
-            
+
             srv.write_response_prompt();
             srv.write_str((const char *)(results.c_str()));
             srv.write_vec8(data_received);
@@ -716,16 +716,16 @@ void CAtHandler::add_cmds_wifi_SSL() {
 
    /* ....................................................................... */
    command_table[_SSLAVAILABLE] = [this](auto & srv, auto & parser) {
-   /* ....................................................................... */     
+   /* ....................................................................... */
       switch (parser.cmd_mode) {
-        
+
          case chAT::CommandMode::Write: {
             if (parser.args.size() != 1) {
-              return chAT::CommandStatus::ERROR;
+               return chAT::CommandStatus::ERROR;
             }
             auto &socket_num = parser.args[0];
             if (socket_num.empty()) {
-              return chAT::CommandStatus::ERROR;
+               return chAT::CommandStatus::ERROR;
             }
             int sock = atoi(socket_num.c_str());
             CClientWrapper the_client = getClient(sock);
@@ -747,16 +747,16 @@ void CAtHandler::add_cmds_wifi_SSL() {
 
    /* ....................................................................... */
    command_table[_SSLCLIENTSTATUS] = [this](auto & srv, auto & parser) {
-   /* ....................................................................... */     
+   /* ....................................................................... */
       switch (parser.cmd_mode) {
-         
+
          case chAT::CommandMode::Write: {
             if (parser.args.size() != 1) {
-              return chAT::CommandStatus::ERROR;
+               return chAT::CommandStatus::ERROR;
             }
             auto &socket_num = parser.args[0];
             if (socket_num.empty()) {
-              return chAT::CommandStatus::ERROR;
+               return chAT::CommandStatus::ERROR;
             }
             int sock = atoi(socket_num.c_str());
             CClientWrapper the_client = getClient(sock);
@@ -764,7 +764,7 @@ void CAtHandler::add_cmds_wifi_SSL() {
             if (the_client.sslclient == nullptr) {
                return chAT::CommandStatus::ERROR;
             }
-            
+
             srv.write_response_prompt();
             //String st(sslclients[sock]->status());
             //srv.write_str((const char *)(st.c_str()));
@@ -778,16 +778,16 @@ void CAtHandler::add_cmds_wifi_SSL() {
 
    /* ....................................................................... */
    command_table[_SSLCLIENTFLUSH] = [this](auto & srv, auto & parser) {
-   /* ....................................................................... */     
+   /* ....................................................................... */
       switch (parser.cmd_mode) {
-        
+
          case chAT::CommandMode::Write: {
             if (parser.args.size() != 1) {
-              return chAT::CommandStatus::ERROR;
+               return chAT::CommandStatus::ERROR;
             }
             auto &socket_num = parser.args[0];
             if (socket_num.empty()) {
-              return chAT::CommandStatus::ERROR;
+               return chAT::CommandStatus::ERROR;
             }
             int sock = atoi(socket_num.c_str());
             CClientWrapper the_client = getClient(sock);
@@ -808,16 +808,16 @@ void CAtHandler::add_cmds_wifi_SSL() {
 
    /* ....................................................................... */
    command_table[_SSLREMOTEIP] = [this](auto & srv, auto & parser) {
-   /* ....................................................................... */     
+   /* ....................................................................... */
       switch (parser.cmd_mode) {
-        
+
          case chAT::CommandMode::Write: {
             if (parser.args.size() != 1) {
-              return chAT::CommandStatus::ERROR;
+               return chAT::CommandStatus::ERROR;
             }
             auto &socket_num = parser.args[0];
             if (socket_num.empty()) {
-              return chAT::CommandStatus::ERROR;
+               return chAT::CommandStatus::ERROR;
             }
             int sock = atoi(socket_num.c_str());
             CClientWrapper the_client = getClient(sock);
@@ -840,16 +840,16 @@ void CAtHandler::add_cmds_wifi_SSL() {
 
    /* ....................................................................... */
    command_table[_SSLREMOTEPORT] = [this](auto & srv, auto & parser) {
-   /* ....................................................................... */     
+   /* ....................................................................... */
       switch (parser.cmd_mode) {
-        
+
          case chAT::CommandMode::Write: {
             if (parser.args.size() != 1) {
-              return chAT::CommandStatus::ERROR;
+               return chAT::CommandStatus::ERROR;
             }
             auto &socket_num = parser.args[0];
             if (socket_num.empty()) {
-              return chAT::CommandStatus::ERROR;
+               return chAT::CommandStatus::ERROR;
             }
             int sock = atoi(socket_num.c_str());
             CClientWrapper the_client = getClient(sock);
@@ -872,16 +872,16 @@ void CAtHandler::add_cmds_wifi_SSL() {
 
    /* ....................................................................... */
    command_table[_SSLPEEK] = [this](auto & srv, auto & parser) {
-   /* ....................................................................... */     
-      
+   /* ....................................................................... */
+
       switch (parser.cmd_mode) {
          case chAT::CommandMode::Write: {
             if (parser.args.size() != 1) {
-              return chAT::CommandStatus::ERROR;
+               return chAT::CommandStatus::ERROR;
             }
             auto &socket_num = parser.args[0];
             if (socket_num.empty()) {
-              return chAT::CommandStatus::ERROR;
+               return chAT::CommandStatus::ERROR;
             }
             int sock = atoi(socket_num.c_str());
             CClientWrapper the_client = getClient(sock);

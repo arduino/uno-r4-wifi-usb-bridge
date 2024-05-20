@@ -10,7 +10,7 @@ Arduino_UNOWIFIR4_OTA OTA;
 void CAtHandler::add_cmds_ota() {
    /* ....................................................................... */
    command_table[_OTA_SETCAROOT] = [this](auto & srv, auto & parser) {
-   /* ....................................................................... */     
+   /* ....................................................................... */
       switch (parser.cmd_mode) {
          case chAT::CommandMode::Write: {
             if (parser.args.size() != 1) {
@@ -26,7 +26,7 @@ void CAtHandler::add_cmds_ota() {
             if(!ca_root_size) {
                return chAT::CommandStatus::ERROR;
             }
-               
+
             ota_cert_buf = srv.inhibit_read(ca_root_size);
             size_t offset = ota_cert_buf.size();
             if(offset < ca_root_size) {
@@ -40,7 +40,7 @@ void CAtHandler::add_cmds_ota() {
             return chAT::CommandStatus::OK;
          }
          default:
-            return chAT::CommandStatus::ERROR;            
+            return chAT::CommandStatus::ERROR;
       }
    };
 
@@ -60,7 +60,7 @@ void CAtHandler::add_cmds_ota() {
             if (parser.args.size() != 1) {
                return chAT::CommandStatus::ERROR;
             }
-               
+
             auto &path = parser.args[0];
             if (path.empty()) {
                return chAT::CommandStatus::ERROR;
@@ -89,7 +89,7 @@ void CAtHandler::add_cmds_ota() {
                if (url.empty()) {
                   return chAT::CommandStatus::ERROR;
                }
-  
+
                int ota_error = OTA.download(url.c_str());
                String error = String((int)ota_error) + "\r\n";
                srv.write_response_prompt();
@@ -156,7 +156,7 @@ void CAtHandler::add_cmds_ota() {
             if (parser.args.size() != 1) {
                return chAT::CommandStatus::ERROR;
             }
-               
+
             auto &path = parser.args[0];
             if (path.empty()) {
                return chAT::CommandStatus::ERROR;
