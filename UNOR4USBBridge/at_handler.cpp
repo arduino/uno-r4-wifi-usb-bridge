@@ -69,6 +69,20 @@ CClientWrapper CAtHandler::getClient(int sock) {
 void CAtHandler::run() {
 /* -------------------------------------------------------------------------- */
   at_srv.run();
+
+  // execute all the pending tasks
+
+  // it is intended for the tasks to add other tasks in queue after being executed,
+  // saving the current size of the queue
+  auto size = tasks.size();
+  for(int i=0; i<size; i++) {
+    auto task = tasks.front();
+    tasks.pop();
+    if(task) {
+      task();
+    }
+  }
+
   vTaskDelay(1);
 }
 
