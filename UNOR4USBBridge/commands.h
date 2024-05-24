@@ -119,6 +119,8 @@ enum file_op {
 #define _OTA_SETCAROOT           "+OTASETCAROOT"
 #define _OTA_BEGIN               "+OTABEGIN"
 #define _OTA_DOWNLOAD            "+OTADOWNLOAD"
+#define _OTA_DOWNLOAD_START      "+OTADOWNLOADSTART"
+#define _OTA_DOWNLOAD_PROGRESS   "+OTADOWNLOADPROGRESS"
 #define _OTA_VERIFY              "+OTAVERIFY"
 #define _OTA_UPDATE              "+OTAUPDATE"
 #define _OTA_RESET               "+OTARESET"
