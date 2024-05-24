@@ -50,7 +50,7 @@ void CAtHandler::add_cmds_ota() {
       switch (parser.cmd_mode) {
          case chAT::CommandMode::Run: {
             Arduino_ESP32_OTA::Error ota_error = OTA.begin();
-            String error = String((int)ota_error) + "\r\n";
+            String error = String((int)ota_error) + _ENDL;
             srv.write_response_prompt();
             srv.write_str((const char *)(error.c_str()));
             srv.write_line_end();
@@ -67,7 +67,7 @@ void CAtHandler::add_cmds_ota() {
             }
 
             Arduino_ESP32_OTA::Error ota_error = OTA.begin(path.c_str());
-            String error = String((int)ota_error) + "\r\n";
+            String error = String((int)ota_error) + _ENDL;
             srv.write_response_prompt();
             srv.write_str((const char *)(error.c_str()));
             srv.write_line_end();
@@ -91,7 +91,7 @@ void CAtHandler::add_cmds_ota() {
                }
 
                int ota_error = OTA.download(url.c_str());
-               String error = String((int)ota_error) + "\r\n";
+               String error = String((int)ota_error) + _ENDL;
                srv.write_response_prompt();
                srv.write_str((const char *)(error.c_str()));
                srv.write_line_end();
@@ -108,7 +108,7 @@ void CAtHandler::add_cmds_ota() {
                }
 
                int ota_error = OTA.download(url.c_str(), path.c_str());
-               String error = String((int)ota_error) + "\r\n";
+               String error = String((int)ota_error) + _ENDL;
                srv.write_response_prompt();
                srv.write_str((const char *)(error.c_str()));
                srv.write_line_end();
@@ -198,7 +198,7 @@ void CAtHandler::add_cmds_ota() {
       switch (parser.cmd_mode) {
          case chAT::CommandMode::Run: {
             Arduino_ESP32_OTA::Error ota_error = OTA.verify();
-            String error = String((int)ota_error) + "\r\n";
+            String error = String((int)ota_error) + _ENDL;
             srv.write_response_prompt();
             srv.write_str((const char *)(error.c_str()));
             srv.write_line_end();
@@ -215,7 +215,7 @@ void CAtHandler::add_cmds_ota() {
       switch (parser.cmd_mode) {
          case chAT::CommandMode::Run: {
             Arduino_ESP32_OTA::Error ota_error = OTA.update();
-            String error = String((int)ota_error) + "\r\n";
+            String error = String((int)ota_error) + _ENDL;
             srv.write_response_prompt();
             srv.write_str((const char *)(error.c_str()));
             srv.write_line_end();
