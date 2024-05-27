@@ -3,7 +3,7 @@
 
 #include "at_handler.h"
 extern "C" {
-    #include "esp32-hal-tinyusb.h"
+   #include "esp32-hal-tinyusb.h"
 }
 
 void CAtHandler::add_cmds_esp_generic() {
@@ -52,22 +52,22 @@ void CAtHandler::add_cmds_esp_generic() {
             return chAT::CommandStatus::OK;
          }
          default:
-             return chAT::CommandStatus::ERROR;
+               return chAT::CommandStatus::ERROR;
       }
    };
 
-    /* ....................................................................... */
+   /* ....................................................................... */
    command_table[_FWVERSION] = [this](auto & srv, auto & parser) {
    /* ....................................................................... */
       switch (parser.cmd_mode) {
          case chAT::CommandMode::Read: {
             srv.write_response_prompt();
-            srv.write_cstr(ESP_FW_VERSION);    
+            srv.write_cstr(ESP_FW_VERSION);
             srv.write_line_end();
             return chAT::CommandStatus::OK;
          }
          default:
-             return chAT::CommandStatus::ERROR;
+               return chAT::CommandStatus::ERROR;
       }
    };
 
@@ -82,19 +82,19 @@ void CAtHandler::add_cmds_esp_generic() {
 
             auto &type_str = parser.args[0];
             if (type_str.empty()) {
-              return chAT::CommandStatus::ERROR;
+               return chAT::CommandStatus::ERROR;
             }
             int _type = atoi(type_str.c_str());
 
             auto &operation_str = parser.args[1];
             if (operation_str.empty()) {
-              return chAT::CommandStatus::ERROR;
+               return chAT::CommandStatus::ERROR;
             }
             uint8_t operation = atoi(operation_str.c_str());
 
             auto &filename = parser.args[2];
             if (filename.empty()) {
-              return chAT::CommandStatus::ERROR;
+               return chAT::CommandStatus::ERROR;
             }
 
             FILE* f;
@@ -119,7 +119,7 @@ void CAtHandler::add_cmds_esp_generic() {
                      std::vector<uint8_t> data_received;
                      data_received = srv.inhibit_read(size);
                      size_t offset = data_received.size();
-                     
+
                      if(offset < size) {
 
                         data_received.resize(size);
@@ -134,7 +134,7 @@ void CAtHandler::add_cmds_esp_generic() {
                      }
                      int res = file.write(data_received.data(), data_received.size());
                      if(res == 0){
-                       return chAT::CommandStatus::ERROR;
+                        return chAT::CommandStatus::ERROR;
                      }
 
                      file.close();
@@ -186,7 +186,7 @@ void CAtHandler::add_cmds_esp_generic() {
                      return chAT::CommandStatus::OK;
                   }
                   case WIFI_FILE_APPEND: {
-                      uint8_t size = 0;
+                     uint8_t size = 0;
                      if (parser.args.size() >= 3) {
                         auto &size_str = parser.args[3];
                         if (size_str.empty()) {
@@ -200,7 +200,7 @@ void CAtHandler::add_cmds_esp_generic() {
                      std::vector<uint8_t> data_received;
                      data_received = srv.inhibit_read(size);
                      size_t offset = data_received.size();
-                     
+
                      if(offset < size) {
 
                         data_received.resize(size);
@@ -216,12 +216,12 @@ void CAtHandler::add_cmds_esp_generic() {
 
                      int res = file.write(data_received.data(), data_received.size());
                      if(res == 0){
-                       return chAT::CommandStatus::ERROR;
+                        return chAT::CommandStatus::ERROR;
                      }
 
                      file.close();
                      srv.continue_read();
-                     
+
                      return chAT::CommandStatus::OK;
                   }
                   default:
@@ -239,14 +239,14 @@ void CAtHandler::add_cmds_esp_generic() {
    command_table[_MOUNTFS] = [this](auto & srv, auto & parser) {
    /* ....................................................................... */
       switch (parser.cmd_mode) {
-        case chAT::CommandMode::Write: {
-          if (parser.args.size() != 1) {
+      case chAT::CommandMode::Write: {
+         if (parser.args.size() != 1) {
                return chAT::CommandStatus::ERROR;
             }
 
             auto &format_on_fault = parser.args[0];
             if (format_on_fault.empty()) {
-              return chAT::CommandStatus::ERROR;
+               return chAT::CommandStatus::ERROR;
             }
             int _fof = atoi(format_on_fault.c_str());
             if(!SPIFFS.begin(_fof)){
@@ -277,7 +277,7 @@ void CAtHandler::add_cmds_esp_generic() {
             for (int i = 0; i < MAX_CLIENT_AVAILABLE; i++) {
                   serverClients[i].client.stop();
             }
-            
+
             for (int i = 0; i < MAX_SERVER_AVAILABLE; i++) {
                if (serverWiFi[i] != nullptr) {
                   serverWiFi[i]->end();
@@ -305,7 +305,7 @@ void CAtHandler::add_cmds_esp_generic() {
                   clients[i] = nullptr;
                }
             }
-            
+
             clients_num = 0;
 
             for (int i = 0; i < MAX_CLIENT_AVAILABLE; i++) {
@@ -323,14 +323,14 @@ void CAtHandler::add_cmds_esp_generic() {
 
             WiFi.disconnect();
             WiFi.softAPdisconnect();
-                  
+
             srv.write_response_prompt();
             srv.write_line_end();
             return chAT::CommandStatus::OK;
          }
          default:
             return chAT::CommandStatus::ERROR;
-      } 
+      }
    };
 }
 
