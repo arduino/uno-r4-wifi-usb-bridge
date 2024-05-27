@@ -61,8 +61,8 @@ void ets_putc_handler(char c)
 
 /* -------------------------------------------------------------------------- */
 void CAtHandler::onWiFiEvent(WiFiEvent_t event) {
-/* -------------------------------------------------------------------------- */   
-   switch (event) {
+/* -------------------------------------------------------------------------- */
+  switch (event) {
       case ARDUINO_EVENT_WIFI_READY:
         wifi_status = WIFI_ST_IDLE_STATUS;
         break;
@@ -81,7 +81,7 @@ void CAtHandler::onWiFiEvent(WiFiEvent_t event) {
       case ARDUINO_EVENT_WIFI_STA_DISCONNECTED:
         wifi_status = WIFI_ST_IDLE_STATUS;
         break;
-      case ARDUINO_EVENT_WIFI_AP_START:  
+      case ARDUINO_EVENT_WIFI_AP_START:
         wifi_status = WIFI_ST_AP_LISTENING;
         break;
       case ARDUINO_EVENT_WIFI_AP_STOP:
@@ -91,7 +91,7 @@ void CAtHandler::onWiFiEvent(WiFiEvent_t event) {
         wifi_status = WIFI_ST_AP_CONNECTED;
         break;
       case ARDUINO_EVENT_WIFI_AP_STADISCONNECTED:
-        
+
 
         break;
       case ARDUINO_EVENT_WIFI_AP_STAIPASSIGNED:
@@ -120,7 +120,7 @@ void atLoop(void* param) {
 
 /* -------------------------------------------------------------------------- */
 void setup() {
-/* -------------------------------------------------------------------------- */  
+/* -------------------------------------------------------------------------- */
 
   /* redirect stdout */
   stdout = funopen(NULL, NULL, &write_fn, NULL, NULL);
@@ -184,7 +184,7 @@ static uint8_t buf[2048];
 
 /* -------------------------------------------------------------------------- */
 void loop() {
-/* -------------------------------------------------------------------------- */  
+/* -------------------------------------------------------------------------- */
 
   if (SERIAL_USER.baudRate() != _baud) {
     _baud = SERIAL_USER.baudRate();
