@@ -16,7 +16,7 @@
 #define MAX_UDP_AVAILABLE      4
 
 #define ESP_FW_VERSION    "0.4.1"
-#define FIRMWARE_MAYOR    0
+#define FIRMWARE_MAJOR    0
 #define FIRMWARE_MINOR    4
 #define FIRMWARE_PATCH    1
 
