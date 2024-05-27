@@ -45,7 +45,7 @@ public:
     }
   }
   uint16_t _onGetFeature(uint8_t report_id, uint8_t* buffer, uint16_t len) {
-    buffer[0] = FIRMWARE_MAYOR;
+    buffer[0] = FIRMWARE_MAJOR;
     buffer[1] = FIRMWARE_MINOR;
     buffer[2] = FIRMWARE_PATCH;
     return 3;
