@@ -6,6 +6,13 @@ extern "C" {
    #include "esp32-hal-tinyusb.h"
 }
 
+static const uint8_t version[4] = {
+   (FIRMWARE_MAJOR & 0xff),
+   (FIRMWARE_MINOR & 0xff),
+   (FIRMWARE_PATCH & 0xff),
+   0
+};
+
 void CAtHandler::add_cmds_esp_generic() {
 
    /* ....................................................................... */
@@ -63,6 +70,26 @@ void CAtHandler::add_cmds_esp_generic() {
          case chAT::CommandMode::Read: {
             srv.write_response_prompt();
             srv.write_cstr(ESP_FW_VERSION);
+            srv.write_line_end();
+            return chAT::CommandStatus::OK;
+         }
+         default:
+               return chAT::CommandStatus::ERROR;
+      }
+   };
+
+   /* ....................................................................... */
+   command_table[_FWVERSION_U32] = [this](auto & srv, auto & parser) {
+   /* ....................................................................... */
+      switch (parser.cmd_mode) {
+         case chAT::CommandMode::Read: {
+            srv.write_response_prompt();
+
+
+
+            log_e("version 0x%X, 0x%X", *((uint32_t*)version), &version);
+
+            srv.write_data(version, sizeof(version));
             srv.write_line_end();
             return chAT::CommandStatus::OK;
          }
