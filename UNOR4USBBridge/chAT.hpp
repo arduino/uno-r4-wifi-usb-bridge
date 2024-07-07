@@ -117,6 +117,8 @@ namespace SudoMaker::chAT {
 		void write_line_end();
 
 		RunStatus run();
+
+		int desiredBaudrate = -1; // Set this to a positive value to indicate UARD baud rate change is needed.
 	};
 
 	inline Server::RunStatus operator|(Server::RunStatus a, Server::RunStatus b) {

@@ -67,9 +67,14 @@ CClientWrapper CAtHandler::getClient(int sock) {
 
 /* -------------------------------------------------------------------------- */
 void CAtHandler::run() {
-/* -------------------------------------------------------------------------- */   
-   at_srv.run();
-   vTaskDelay(1);
+/* -------------------------------------------------------------------------- */
+  at_srv.run();
+  if (at_srv.desiredBaudrate > 0)
+  {
+    serial->begin(at_srv.desiredBaudrate, SERIAL_8N1, 6, 5);
+    at_srv.desiredBaudrate = -1;
+  }
+  vTaskDelay(1);
 }
 
 
