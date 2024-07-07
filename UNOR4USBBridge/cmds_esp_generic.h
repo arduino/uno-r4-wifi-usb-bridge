@@ -21,6 +21,13 @@ void CAtHandler::add_cmds_esp_generic() {
    };
 
    /* ....................................................................... */
+   command_table[_UART] = [this](auto & srv, auto & parser) {
+   /* ....................................................................... */
+      srv.desiredBaudrate = std::stoi(parser.args[0]);
+      return chAT::CommandStatus::OK;
+   };
+
+   /* ....................................................................... */
    command_table[_RESTART_BOOTLOADER] = [this](auto & srv, auto & parser) {
    /* ....................................................................... */
       switch (parser.cmd_mode) {
