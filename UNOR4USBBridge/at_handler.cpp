@@ -22,62 +22,99 @@ uint8_t CAtHandler::wifi_status = WIFI_ST_IDLE_STATUS;
 /* -------------------------------------------------------------------------- */
 CClientWrapper CAtHandler::getClient(int sock) {
 /* -------------------------------------------------------------------------- */
-   CClientWrapper rv;
-   
-   bool is_server = false;
-   bool is_sslclienet = false;
+  CClientWrapper rv;
 
-   int internal_sock = -1;
+  bool is_server = false;
+  bool is_sslclienet = false;
 
-   if(sock >= START_SSL_CLIENT_SOCK) {
-      internal_sock = sock - START_SSL_CLIENT_SOCK;
-      is_sslclienet = true;
-   } else
-   if(sock >= START_CLIENT_SERVER_SOCK) {
-      internal_sock = sock - START_CLIENT_SERVER_SOCK;
-      is_server = true;
-   }
-   else {
-      internal_sock = sock;
-   }
+  int internal_sock = -1;
 
-   if(internal_sock < 0 || internal_sock >= MAX_CLIENT_AVAILABLE) {
-      rv.client = nullptr;
-      rv.sslclient = nullptr;
-      rv.can_delete = -1;
-      return rv;
-   }
+  if(sock >= START_SSL_CLIENT_SOCK) {
+    internal_sock = sock - START_SSL_CLIENT_SOCK;
+    is_sslclienet = true;
+  } else
+  if(sock >= START_CLIENT_SERVER_SOCK) {
+    internal_sock = sock - START_CLIENT_SERVER_SOCK;
+    is_server = true;
+  }
+  else {
+    internal_sock = sock;
+  }
 
-   if (is_sslclienet) {
-    rv.sslclient = sslclients[internal_sock];
+  if(internal_sock < 0 || internal_sock >= MAX_CLIENT_AVAILABLE) {
+    rv.client = nullptr;
+    rv.sslclient = nullptr;
+    rv.can_delete = -1;
+    return rv;
+  }
+
+  if (is_sslclienet) {
+  rv.sslclient = sslclients[internal_sock];
+  rv.can_delete = internal_sock;
+  }
+  else if(is_server) {
+    rv.client = &serverClients[internal_sock].client;
+    rv.can_delete = -1;
+  }
+  else {
+    rv.client = clients[internal_sock];
     rv.can_delete = internal_sock;
-   }
-   else if(is_server) {
-      rv.client = &serverClients[internal_sock].client;
-      rv.can_delete = -1;
-   }
-   else {
-      rv.client = clients[internal_sock];
-      rv.can_delete = internal_sock;
-   }
-   return rv;
+  }
+  return rv;
 }
 
-
+static int baudrates[] = {
+  9600, 19200, 38400, 57600, 115200, 230400, 460800, 921600,
+  1000000, 1500000, 2000000
+};
+int i = 0;
 
 /* -------------------------------------------------------------------------- */
 void CAtHandler::run() {
-/* -------------------------------------------------------------------------- */   
-   at_srv.run();
-   vTaskDelay(1);
+/* -------------------------------------------------------------------------- */
+  switch(state) {
+  case Running:
+    at_srv.run();
+    break;
+  case BaudRateDetection:
+    if(serial->available()) {
+      log_e("1available %d", serial->available());
+      uint8_t a = serial->read();
+      log_e("read 0x%X", a);
+
+      serial->end();
+
+      while(serial->available() > 0) {
+        log_i("%02X", serial->read());
+      }
+
+      if (a == 0x55) {
+        state = Running;
+
+        log_e("Baudrate detection finished %d", baudrates[i]);
+        serial->flush();
+        serial->begin(baudrates[i], SERIAL_8N1, 6, 5);
+        serial->write(0x55); // send the confirmation the baudrate was detected
+        break;
+      }
+
+      i = (i+1) % (sizeof(baudrates)/sizeof(baudrates[0]));
+      log_e("trying %d %d", i, baudrates[i]);
+
+      serial->begin(baudrates[i], SERIAL_8N1, 6, 5);
+      serial->updateBaudRate(baudrates[i]);
+    }
+    break;
+  }
+  vTaskDelay(1);
 }
 
 
 
 /* -------------------------------------------------------------------------- */
-CAtHandler::CAtHandler(HardwareSerial *s) : last_server_client_sock(0) {
-/* -------------------------------------------------------------------------- */   
-   
+CAtHandler::CAtHandler(HardwareSerial *s) : last_server_client_sock(0), state(BaudRateDetection) {
+/* -------------------------------------------------------------------------- */
+
   for(int i = 0; i < MAX_CLIENT_AVAILABLE; i++) {
     clients[i] = nullptr;
   }
@@ -119,16 +156,16 @@ CAtHandler::CAtHandler(HardwareSerial *s) : last_server_client_sock(0) {
 
     if (it == command_table.end()) {
       return chAT::CommandStatus::ERROR;
-    } 
+    }
     else {
       return it->second(srv, srv.parser());
     }
   });
 
-  /*  SET UP COMMAND TABLE */ 
+  /*  SET UP COMMAND TABLE */
   add_cmds_esp_generic();
   add_cmds_wifi_station();
-  add_cmds_wifi_softAP(); 
+  add_cmds_wifi_softAP();
   add_cmds_wifi_SSL();
   add_cmds_wifi_netif();
   add_cmds_wifi_udp();

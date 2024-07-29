@@ -173,7 +173,6 @@ void setup() {
       1,  /* Priority of the task */
       &atTask,  /* Task handle. */
       0); /* Core where the task should run */
-
 }
 
 /*
