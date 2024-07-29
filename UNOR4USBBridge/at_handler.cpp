@@ -63,21 +63,58 @@ CClientWrapper CAtHandler::getClient(int sock) {
   return rv;
 }
 
-
+static int baudrates[] = {
+  9600, 19200, 38400, 57600, 115200, 230400, 460800, 921600,
+  1000000, 1500000, 2000000
+};
+int i = 0;
 
 /* -------------------------------------------------------------------------- */
 void CAtHandler::run() {
-/* -------------------------------------------------------------------------- */   
-   at_srv.run();
-   vTaskDelay(1);
+/* -------------------------------------------------------------------------- */
+  switch(state) {
+  case Running:
+    at_srv.run();
+    break;
+  case BaudRateDetection:
+    if(serial->available()) {
+      log_e("1available %d", serial->available());
+      uint8_t a = serial->read();
+      log_e("read 0x%X", a);
+
+      serial->end();
+
+      while(serial->available() > 0) {
+        log_i("%02X", serial->read());
+      }
+
+      if (a == 0x55) {
+        state = Running;
+
+        log_e("Baudrate detection finished %d", baudrates[i]);
+        serial->flush();
+        serial->begin(baudrates[i], SERIAL_8N1, 6, 5);
+        serial->write(0x55); // send the confirmation the baudrate was detected
+        break;
+      }
+
+      i = (i+1) % (sizeof(baudrates)/sizeof(baudrates[0]));
+      log_e("trying %d %d", i, baudrates[i]);
+
+      serial->begin(baudrates[i], SERIAL_8N1, 6, 5);
+      serial->updateBaudRate(baudrates[i]);
+    }
+    break;
+  }
+  vTaskDelay(1);
 }
 
 
 
 /* -------------------------------------------------------------------------- */
-CAtHandler::CAtHandler(HardwareSerial *s) : last_server_client_sock(0) {
-/* -------------------------------------------------------------------------- */   
-   
+CAtHandler::CAtHandler(HardwareSerial *s) : last_server_client_sock(0), state(BaudRateDetection) {
+/* -------------------------------------------------------------------------- */
+
   for(int i = 0; i < MAX_CLIENT_AVAILABLE; i++) {
     clients[i] = nullptr;
   }

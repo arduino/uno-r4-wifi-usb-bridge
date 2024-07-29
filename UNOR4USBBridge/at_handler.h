@@ -54,7 +54,10 @@ public:
 
 class CAtHandler {
 private:
-   static uint8_t wifi_status; 
+   enum state_t {
+      Running, BaudRateDetection,
+   } state;
+   static uint8_t wifi_status;
 
    int last_server_client_sock;
 
