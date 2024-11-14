@@ -23,6 +23,9 @@ void CAtHandler::add_cmds_preferences() {
             bool readOnly = strtol(parser.args[1].c_str(), NULL, 10) != 0;
             auto &partition = parser.args[2];
 
+            // calling end before begin, because the renesas mcu may have been restarted
+            pref.end();
+
             String error = String();
             if (partition.empty()) {
                error = String(pref.begin(name.c_str(), readOnly)) + "\r\n";
