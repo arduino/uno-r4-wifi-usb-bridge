@@ -201,6 +201,33 @@ void CAtHandler::add_cmds_preferences() {
    };
 
    /* ....................................................................... */
+   command_table[_PREF_TYPE] = [this](auto & srv, auto & parser) {
+   /* ....................................................................... */
+      switch (parser.cmd_mode) {
+         case chAT::CommandMode::Write: {
+            if (parser.args.size() != 1) {
+               return chAT::CommandStatus::ERROR;
+            }
+
+            auto &key = parser.args[0];
+            if (key.empty()) {
+               return chAT::CommandStatus::ERROR;
+            }
+
+            String error = String(pref.getType(key.c_str())) + "\r\n";
+
+            srv.write_response_prompt();
+            srv.write_str((const char *)(error.c_str()));
+            srv.write_line_end();
+            return chAT::CommandStatus::OK;
+
+         }
+         default:
+            return chAT::CommandStatus::ERROR;
+      }
+   };
+
+   /* ....................................................................... */
    command_table[_PREF_GET] = [this](auto & srv, auto & parser) {
    /* ....................................................................... */
       switch (parser.cmd_mode) {

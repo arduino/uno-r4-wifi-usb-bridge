@@ -130,6 +130,7 @@ enum file_op {
 #define _PREF_CLEAR              "+PREFCLEAR"
 #define _PREF_REMOVE             "+PREFREMOVE"
 #define _PREF_PUT                "+PREFPUT"
+#define _PREF_TYPE               "+PREFTYPE"
 #define _PREF_GET                "+PREFGET"
 #define _PREF_LEN                "+PREFLEN"
 #define _PREF_STAT               "+PREFSTAT"
