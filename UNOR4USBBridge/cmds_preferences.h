@@ -168,8 +168,20 @@ void CAtHandler::add_cmds_preferences() {
                }
                break;
                case PreferenceType::PT_STR: {
-                  auto value = parser.args[2];
-                  error = String(pref.putString(key.c_str(), value.c_str())) + "\r\n";
+                  int value = atoi(parser.args[2].c_str());
+                  pref_buf = srv.inhibit_read(value);
+                  size_t offset = pref_buf.size();
+                  if(offset < value) {
+                     pref_buf.resize(value);
+                     do {
+                        offset += serial->read(pref_buf.data() + offset, value - offset);
+                     } while (offset < value);
+                  }
+
+                  pref_buf.push_back('\0');
+
+                  srv.continue_read();
+                  error = String(pref.putString(key.c_str(), (char*)pref_buf.data())) + "\r\n";
                }
                break;
                case PreferenceType::PT_BLOB: {
@@ -297,7 +309,13 @@ void CAtHandler::add_cmds_preferences() {
                break;
                case PreferenceType::PT_STR: {
                   auto value = parser.args[2];
-                  error = String(pref.getString(key.c_str(), value.c_str())) + "\r\n";
+                  auto res = pref.getString(key.c_str(), value.c_str());
+
+                  srv.write_response_prompt();
+                  srv.write_str(String(res.length()).c_str());
+                  srv.write_str("|");
+                  srv.write_str(res.c_str());
+                  srv.write_line_end();
                }
                break;
                case PreferenceType::PT_BLOB: {
@@ -320,7 +338,7 @@ void CAtHandler::add_cmds_preferences() {
             }
 
 
-            if (type != PreferenceType::PT_BLOB) {
+            if (type != PreferenceType::PT_BLOB && type != PreferenceType::PT_STR) {
                srv.write_response_prompt();
                srv.write_str((const char *)(error.c_str()));
                srv.write_line_end();
