@@ -2,6 +2,7 @@
 #define CMDS_ESP_GENERIC_H
 
 #include "at_handler.h"
+
 extern "C" {
    #include "esp32-hal-tinyusb.h"
 }
@@ -353,6 +354,32 @@ void CAtHandler::add_cmds_esp_generic() {
 
             srv.write_response_prompt();
             srv.write_line_end();
+            return chAT::CommandStatus::OK;
+         }
+         default:
+            return chAT::CommandStatus::ERROR;
+      }
+   };
+   
+   /* ....................................................................... */
+   command_table[_GETTIME] = [this](auto & srv, auto & parser) {
+   /* ....................................................................... */
+
+      switch (parser.cmd_mode) {
+         case chAT::CommandMode::Write: {
+            char epoch[12];                                // gettime
+            constexpr uint32_t SECS_YR_2000 = 946684800UL; // the time at the start of y2k
+            time_t now = time(nullptr);
+
+            if (now < SECS_YR_2000) {
+               now = 0;
+            }
+
+            srv.write_response_prompt();
+            sprintf(epoch,"%d", (unsigned long) now);
+            srv.write_str((const char *) epoch);
+            srv.write_line_end();
+
             return chAT::CommandStatus::OK;
          }
          default:

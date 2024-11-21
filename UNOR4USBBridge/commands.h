@@ -20,6 +20,7 @@ enum file_op {
 #define _ENDL                    "\r\n"
 #define _WIFISCAN                "+WIFISCAN"
 
+#define _GETTIME                 "+GETTIME" 
 #define _RESET                   "+RESET"
 #define _RESTART_BOOTLOADER      "+RESTARTBOOTLOADER"
 #define _GMR                     "+GMR"
