@@ -377,7 +377,7 @@ void CAtHandler::add_cmds_esp_generic() {
 
             srv.write_response_prompt();
             sprintf(epoch,"%d", (unsigned long) now);
-            srv.write_cstr((const char *) epoch);
+            srv.write_str((const char *) epoch);
             srv.write_line_end();
 
             return chAT::CommandStatus::OK;
