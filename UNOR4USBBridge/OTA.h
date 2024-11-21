@@ -35,8 +35,10 @@
 
 class Arduino_UNOWIFIR4_OTA : public Arduino_ESP32_OTA
 {
-
 public:
+
+  Arduino_UNOWIFIR4_OTA();
+  ~Arduino_UNOWIFIR4_OTA();
 
   enum class UNO_WiFi_R4_Error : int
   {
@@ -45,16 +47,29 @@ public:
 
   using Arduino_ESP32_OTA::begin;
   Arduino_ESP32_OTA::Error begin(const char* file_path, uint32_t magic = ARDUINO_RA4M1_OTA_MAGIC);
+
   using Arduino_ESP32_OTA::download;
   int download(const char * ota_url, const char* file_path);
+
+  using Arduino_ESP32_OTA::startDownload;
+  int startDownload(const char * ota_url, const char* file_path);
+
+  int downloadPoll() override;
+  using Arduino_ESP32_OTA::downloadProgress;
+
   void write_byte_to_flash(uint8_t data);
-  Arduino_ESP32_OTA::Error verify();
-  Arduino_ESP32_OTA::Error update();
+
+  using Arduino_ESP32_OTA::verify;
+
+  using Arduino_ESP32_OTA::update;
+  int update(const char* file_path);
+
+  int initStorage(const char* file_path);
+  int closeStorage();
 
 private:
-
   FILE* _file;
-  bool _spiffs;
+  bool _updating_renesas;
 };
 
 #endif /* ARDUINO_UNOWIFIR4_OTA_H_ */
