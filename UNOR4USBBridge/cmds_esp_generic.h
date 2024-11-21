@@ -364,32 +364,31 @@ void CAtHandler::add_cmds_esp_generic() {
       }
    };
    
-/* ....................................................................... */
+   /* ....................................................................... */
    command_table[_GETTIME] = [this](auto & srv, auto & parser) {
-/* ....................................................................... */
+   /* ....................................................................... */
 
-    switch (parser.cmd_mode) {
-      case chAT::CommandMode::Write: {
-            
-        configTime(0, 0, "pool.ntp.org");
-        time_t now = time(nullptr);
+      switch (parser.cmd_mode) {
+         case chAT::CommandMode::Write: {
+            configTime(0, 0, "pool.ntp.org");
+            time_t now = time(nullptr);
 
-        while (now < SECS_YR_2000) {
-          delay(100);
-          now = time(nullptr);
-        }
-  
-        srv.write_response_prompt();
-        sprintf(epoch,"%d", (unsigned long) now);
-        srv.write_cstr((const char *) epoch);
-        srv.write_line_end();
-  
-        return chAT::CommandStatus::OK;
+            while (now < SECS_YR_2000) {
+               delay(100);
+               now = time(nullptr);
+            }
+
+            srv.write_response_prompt();
+            sprintf(epoch,"%d", (unsigned long) now);
+            srv.write_cstr((const char *) epoch);
+            srv.write_line_end();
+
+            return chAT::CommandStatus::OK;
+         }
+         default:
+            return chAT::CommandStatus::ERROR;
       }
-      default:
-        return chAT::CommandStatus::ERROR;
-    }
-  };
+   };
 }
 
 #endif
