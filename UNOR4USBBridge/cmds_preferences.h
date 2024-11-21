@@ -23,6 +23,9 @@ void CAtHandler::add_cmds_preferences() {
             bool readOnly = strtol(parser.args[1].c_str(), NULL, 10) != 0;
             auto &partition = parser.args[2];
 
+            // calling end before begin, because the renesas mcu may have been restarted
+            pref.end();
+
             String error = String();
             if (partition.empty()) {
                error = String(pref.begin(name.c_str(), readOnly)) + "\r\n";
@@ -165,8 +168,20 @@ void CAtHandler::add_cmds_preferences() {
                }
                break;
                case PreferenceType::PT_STR: {
-                  auto value = parser.args[2];
-                  error = String(pref.putString(key.c_str(), value.c_str())) + "\r\n";
+                  int value = atoi(parser.args[2].c_str());
+                  pref_buf = srv.inhibit_read(value);
+                  size_t offset = pref_buf.size();
+                  if(offset < value) {
+                     pref_buf.resize(value);
+                     do {
+                        offset += serial->read(pref_buf.data() + offset, value - offset);
+                     } while (offset < value);
+                  }
+
+                  pref_buf.push_back('\0');
+
+                  srv.continue_read();
+                  error = String(pref.putString(key.c_str(), (char*)pref_buf.data())) + "\r\n";
                }
                break;
                case PreferenceType::PT_BLOB: {
@@ -189,6 +204,33 @@ void CAtHandler::add_cmds_preferences() {
                }
                break;
             }
+            srv.write_response_prompt();
+            srv.write_str((const char *)(error.c_str()));
+            srv.write_line_end();
+            return chAT::CommandStatus::OK;
+
+         }
+         default:
+            return chAT::CommandStatus::ERROR;
+      }
+   };
+
+   /* ....................................................................... */
+   command_table[_PREF_TYPE] = [this](auto & srv, auto & parser) {
+   /* ....................................................................... */
+      switch (parser.cmd_mode) {
+         case chAT::CommandMode::Write: {
+            if (parser.args.size() != 1) {
+               return chAT::CommandStatus::ERROR;
+            }
+
+            auto &key = parser.args[0];
+            if (key.empty()) {
+               return chAT::CommandStatus::ERROR;
+            }
+
+            String error = String(pref.getType(key.c_str())) + "\r\n";
+
             srv.write_response_prompt();
             srv.write_str((const char *)(error.c_str()));
             srv.write_line_end();
@@ -267,7 +309,13 @@ void CAtHandler::add_cmds_preferences() {
                break;
                case PreferenceType::PT_STR: {
                   auto value = parser.args[2];
-                  error = String(pref.getString(key.c_str(), value.c_str())) + "\r\n";
+                  auto res = pref.getString(key.c_str(), value.c_str());
+
+                  srv.write_response_prompt();
+                  srv.write_str(String(res.length()).c_str());
+                  srv.write_str("|");
+                  srv.write_str(res.c_str());
+                  srv.write_line_end();
                }
                break;
                case PreferenceType::PT_BLOB: {
@@ -290,7 +338,7 @@ void CAtHandler::add_cmds_preferences() {
             }
 
 
-            if (type != PreferenceType::PT_BLOB) {
+            if (type != PreferenceType::PT_BLOB && type != PreferenceType::PT_STR) {
                srv.write_response_prompt();
                srv.write_str((const char *)(error.c_str()));
                srv.write_line_end();
