@@ -3,9 +3,6 @@
 
 #include "at_handler.h"
 
-char epoch[12];                     // gettime
-#define SECS_YR_2000  (946684800UL) // the time at the start of y2k
-
 extern "C" {
    #include "esp32-hal-tinyusb.h"
 }
@@ -370,6 +367,8 @@ void CAtHandler::add_cmds_esp_generic() {
 
       switch (parser.cmd_mode) {
          case chAT::CommandMode::Write: {
+            char epoch[12];                                // gettime
+            constexpr uint32_t SECS_YR_2000 = 946684800UL; // the time at the start of y2k
             configTime(0, 0, "pool.ntp.org");
             time_t now = time(nullptr);
 
