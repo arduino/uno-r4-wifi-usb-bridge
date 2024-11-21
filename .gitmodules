@@ -21,4 +21,4 @@
 	shallow = true
 [submodule "libraries/ArduinoHttpClient"]
 	path = libraries/ArduinoHttpClient
-	url = https://github.com/andreagilardoni/ArduinoHttpClient.git
+	url = https://github.com/arduino-libraries/ArduinoHttpClient.git
