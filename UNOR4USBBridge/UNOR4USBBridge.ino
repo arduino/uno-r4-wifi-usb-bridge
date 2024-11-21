@@ -162,6 +162,9 @@ void setup() {
   /* Set up wifi event */
   WiFi.onEvent(CAtHandler::onWiFiEvent);
 
+  /* Configure ntp */
+  configTime(0, 0, "pool.ntp.org");
+
   Debug.setDebugOutputStream(&USBSerial);
   Debug.setDebugLevel(DBG_ERROR);
 

@@ -369,7 +369,6 @@ void CAtHandler::add_cmds_esp_generic() {
          case chAT::CommandMode::Write: {
             char epoch[12];                                // gettime
             constexpr uint32_t SECS_YR_2000 = 946684800UL; // the time at the start of y2k
-            configTime(0, 0, "pool.ntp.org");
             time_t now = time(nullptr);
 
             if (now < SECS_YR_2000) {
