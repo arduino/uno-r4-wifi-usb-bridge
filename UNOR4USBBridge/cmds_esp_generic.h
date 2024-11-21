@@ -2,8 +2,7 @@
 #define CMDS_ESP_GENERIC_H
 
 #include "at_handler.h"
-#include "ESPping.h"
-char rsl[5];                // ping time
+#include "ping.h"
 
 extern "C" {
    #include "esp32-hal-tinyusb.h"
@@ -362,7 +361,7 @@ void CAtHandler::add_cmds_esp_generic() {
             return chAT::CommandStatus::ERROR;
       }
    };
-   
+
    /* ....................................................................... */
    command_table[_GETTIME] = [this](auto & srv, auto & parser) {
    /* ....................................................................... */
@@ -390,89 +389,51 @@ void CAtHandler::add_cmds_esp_generic() {
    };
 
 /* ....................................................................... */
-   command_table[_PINGIP] = [this](auto & srv, auto & parser) {
+   command_table[_PING] = [this](auto & srv, auto & parser) {
 /* ....................................................................... */
-     switch (parser.cmd_mode) {
-       case chAT::CommandMode::Write: {
-
-          if (parser.args.size() != 3) {
+      switch (parser.cmd_mode) {
+      case chAT::CommandMode::Write: {
+         if (parser.args.size() != 3) {
             return chAT::CommandStatus::ERROR;
-          }
-
-          // get IP
-          auto &hostip = parser.args[1];
-          if (hostip.empty()) {
-            return chAT::CommandStatus::ERROR;
-          }
-
-          IPAddress address;
-          if(!address.fromString(hostip.c_str())) {
-            return chAT::CommandStatus::ERROR;
-          }
-
-          // get count
-          auto &cnt = parser.args[2];
-          if (cnt.empty()) {
-            return chAT::CommandStatus::ERROR;
-          }
-          unsigned int count = atoi(cnt.c_str());
-
-          auto res = Ping.ping(address, count);
-          if (res) {  // ping was succesfull
-            srv.write_response_prompt();
-            sprintf(rsl,"%.2f", Ping.averageTime());
-            srv.write_cstr((const char *) rsl);
-            srv.write_line_end();
-            return chAT::CommandStatus::OK;
-          }
-          srv.write_response_prompt();
-          srv.write_error();
-          srv.write_line_end();
-          return chAT::CommandStatus::ERROR;
          }
-       default:
-          return chAT::CommandStatus::ERROR;
+
+         // get IP
+         auto &target = parser.args[1];
+         if (target.empty()) {
+            return chAT::CommandStatus::ERROR;
+         }
+
+         // IPAddress address;
+         // if(!address.fromString(hostip.c_str())) {
+         //    return chAT::CommandStatus::ERROR;
+         // }
+
+         // get count
+         auto &cnt = parser.args[2];
+         if (cnt.empty()) {
+            return chAT::CommandStatus::ERROR;
+         }
+         unsigned int count = atoi(cnt.c_str());
+
+         auto ping_res = execute_ping(target.c_str(), count);
+
+         log_e("ping result %d %d %f", ping_res.success_count, ping_res.timedout_count, ping_res.averagertt);
+
+         // auto res = Ping.ping(address, count);
+         // if (res) {  // ping was succesfull
+         //    srv.write_response_prompt();
+         //    sprintf(rsl,"%.2f", Ping.averageTime());
+         //    srv.write_cstr((const char *) rsl);
+         //    srv.write_line_end();
+         //    return chAT::CommandStatus::OK;
+         // }
+         srv.write_response_prompt();
+         srv.write_error();
+         srv.write_line_end();
+         return chAT::CommandStatus::ERROR;
       }
-   };
-
-/* ....................................................................... */
-   command_table[_PINGNAME] = [this](auto & srv, auto & parser) {
-/* ....................................................................... */
-     switch (parser.cmd_mode) {
-       case chAT::CommandMode::Write: {
-
-          if (parser.args.size() != 3) {
-            return chAT::CommandStatus::ERROR;
-          }
-
-          // get host name
-          auto &host = parser.args[1];
-          if (host.empty()) {
-            return chAT::CommandStatus::ERROR;
-          }
-
-          // get count
-          auto &cnt = parser.args[2];
-          if (cnt.empty()) {
-            return chAT::CommandStatus::ERROR;
-          }
-          unsigned int count = atoi(cnt.c_str());
-
-          auto res = Ping.ping((const char* ) host.c_str(), count);
-          if (res) {  // ping was succesfull
-            srv.write_response_prompt();
-            sprintf(rsl,"%.2f", Ping.averageTime());
-            srv.write_cstr((const char *) rsl);
-            srv.write_line_end();
-            return chAT::CommandStatus::OK;
-          }
-          srv.write_response_prompt();
-          srv.write_error();
-          srv.write_line_end();
-          return chAT::CommandStatus::ERROR;
-         }
-       default:
-          return chAT::CommandStatus::ERROR;
+      default:
+         return chAT::CommandStatus::ERROR;
       }
    };
 }
