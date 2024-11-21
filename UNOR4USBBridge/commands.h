@@ -105,6 +105,7 @@ enum file_op {
 #define _UDPSTOP                 "+UDPSTOP"
 
 #define _FWVERSION               "+FWVERSION"
+#define _FWVERSION_U32           "+FWVERSION_U32"
 
 #define _SOFTAPCONFIG            "+SOFTAPCONFIG"
 #define _SERVERWRITE             "+SERVERWRITE"
