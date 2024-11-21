@@ -373,9 +373,8 @@ void CAtHandler::add_cmds_esp_generic() {
             configTime(0, 0, "pool.ntp.org");
             time_t now = time(nullptr);
 
-            while (now < SECS_YR_2000) {
-               delay(100);
-               now = time(nullptr);
+            if (now < SECS_YR_2000) {
+               now = 0;
             }
 
             srv.write_response_prompt();
