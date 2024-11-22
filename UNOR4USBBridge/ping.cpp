@@ -25,6 +25,8 @@ static void ping_timeout(esp_ping_handle_t hdl, void *args) {
 
 static void ping_end(esp_ping_handle_t hdl, void *args) {
     _stats.status = ping_status::SUCCESS;
+    esp_ping_stop(hdl);
+    esp_ping_delete_session(hdl);
 }
 
 ping_statistics execute_ping(const char* address, uint8_t ttl, uint8_t count) {
@@ -72,6 +74,8 @@ ping_statistics execute_ping(const char* address, uint8_t ttl, uint8_t count) {
     while(_stats.status != ping_status::RUNNING) {
         delay(10);
     }
+
+    // session is deleted inside ping_end() callback
 
     return _stats;
 }
