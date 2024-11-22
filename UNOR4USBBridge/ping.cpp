@@ -12,19 +12,18 @@
 
 static ping_statistics _stats;
 
-void ping_success(esp_ping_handle_t hdl, void *args) {
+static void ping_success(esp_ping_handle_t hdl, void *args) {
     uint32_t elapsed_time;
     esp_ping_get_profile(hdl, ESP_PING_PROF_TIMEGAP, &elapsed_time, sizeof(elapsed_time));
     // streaming average on rtt
     _stats.averagertt = _stats.averagertt + ((elapsed_time-_stats.averagertt)/++_stats.success_count);
 }
 
-void ping_timeout(esp_ping_handle_t hdl, void *args) {
+static void ping_timeout(esp_ping_handle_t hdl, void *args) {
     _stats.timedout_count++;
-
 }
 
-void ping_end(esp_ping_handle_t hdl, void *args) {
+static void ping_end(esp_ping_handle_t hdl, void *args) {
     _stats.error = SUCCESS;
 }
 
