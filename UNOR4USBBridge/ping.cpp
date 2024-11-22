@@ -11,6 +11,7 @@
 // one ping session can be performed
 
 static ping_statistics _stats;
+static esp_ping_handle_t esp_ping_handle = nullptr;
 
 static void ping_success(esp_ping_handle_t hdl, void *args) {
     uint32_t elapsed_time;
@@ -69,9 +70,8 @@ ping_statistics execute_ping(const char* address, uint8_t ttl, uint8_t count) {
 
     _stats.status = ping_status::RUNNING;
 
-    esp_ping_handle_t ping; // FIXME do I need this?
-    esp_ping_new_session(&ping_config, &cbs, &ping);
-    esp_ping_start(ping);
+    esp_ping_new_session(&ping_config, &cbs, &esp_ping_handle);
+    esp_ping_start(esp_ping_handle);
 
     // wait for the end of ping session
     while(_stats.status == ping_status::RUNNING) {
