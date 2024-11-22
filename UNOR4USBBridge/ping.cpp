@@ -44,10 +44,7 @@ ping_statistics execute_ping(const char* address, uint8_t ttl, uint8_t count) {
     memset(&target_addr, 0, sizeof(target_addr));
     memset(&_stats, 0, sizeof(_stats));
 
-    log_e("resolving \"%s\"", address);
-
     if(getaddrinfo(address, NULL, &hint, &res) != 0) {
-        log_e("resolution error");
         _stats.status = ping_status::DNS_RESOLUTION_ERROR;
         return _stats;
     }
