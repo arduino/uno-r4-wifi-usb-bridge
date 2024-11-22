@@ -28,8 +28,7 @@ void ping_end(esp_ping_handle_t hdl, void *args) {
     _stats.error = SUCCESS;
 }
 
-
-ping_statistics execute_ping(const char* address, uint8_t count) { // FIXME verify that I cann pass an ip addr as string
+ping_statistics execute_ping(const char* address, uint8_t ttl, uint8_t count) {
 
     ip_addr_t target_addr;
     struct addrinfo hint;
@@ -53,6 +52,7 @@ ping_statistics execute_ping(const char* address, uint8_t count) { // FIXME veri
     //FIXME check that the address is resolved
     esp_ping_config_t ping_config = ESP_PING_DEFAULT_CONFIG();
     ping_config.target_addr = target_addr;          // target IP address
+    ping_config.ttl = ttl;
 
     // for simplification we are not pinging indefinetly
     ping_config.count = count > 0? count : 10;

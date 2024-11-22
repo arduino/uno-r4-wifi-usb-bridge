@@ -393,7 +393,7 @@ void CAtHandler::add_cmds_esp_generic() {
 /* ....................................................................... */
       switch (parser.cmd_mode) {
       case chAT::CommandMode::Write: {
-         if (parser.args.size() != 3) {
+         if (parser.args.size() != 4) {
             return chAT::CommandStatus::ERROR;
          }
 
@@ -403,34 +403,31 @@ void CAtHandler::add_cmds_esp_generic() {
             return chAT::CommandStatus::ERROR;
          }
 
-         // IPAddress address;
-         // if(!address.fromString(hostip.c_str())) {
-         //    return chAT::CommandStatus::ERROR;
-         // }
+         // get ttl
+         auto &ttl = parser.args[2];
+         if (ttl.empty()) {
+            return chAT::CommandStatus::ERROR;
+         }
 
          // get count
-         auto &cnt = parser.args[2];
+         auto &cnt = parser.args[3];
          if (cnt.empty()) {
             return chAT::CommandStatus::ERROR;
          }
-         unsigned int count = atoi(cnt.c_str());
 
-         auto ping_res = execute_ping(target.c_str(), count);
+         auto ping_res = execute_ping(target.c_str(), atoi(ttl.c_str()), atoi(cnt.c_str()));
+         char rsl[8];
+         if (ping_res.error == SUCCESS) {
+           sprintf(rsl,"%.0f", ping_res.averagertt);
+         } else {
+           sprintf(rsl,"%d", ping_res.error);
+         }
 
-         log_e("ping result %d %d %f", ping_res.success_count, ping_res.timedout_count, ping_res.averagertt);
-
-         // auto res = Ping.ping(address, count);
-         // if (res) {  // ping was succesfull
-         //    srv.write_response_prompt();
-         //    sprintf(rsl,"%.2f", Ping.averageTime());
-         //    srv.write_cstr((const char *) rsl);
-         //    srv.write_line_end();
-         //    return chAT::CommandStatus::OK;
-         // }
          srv.write_response_prompt();
-         srv.write_error();
+         srv.write_str((const char *) rsl);
          srv.write_line_end();
-         return chAT::CommandStatus::ERROR;
+         return chAT::CommandStatus::OK;
+
       }
       default:
          return chAT::CommandStatus::ERROR;

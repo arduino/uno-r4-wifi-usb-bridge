@@ -16,4 +16,4 @@ struct ping_statistics {
     volatile ping_error error;
 };
 
-ping_statistics execute_ping(const char* address, uint8_t count=3);
+ping_statistics execute_ping(const char* address, uint8_t ttl, uint8_t count);
