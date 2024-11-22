@@ -2,6 +2,7 @@
 #define CMDS_ESP_GENERIC_H
 
 #include "at_handler.h"
+#include "ping.h"
 
 extern "C" {
    #include "esp32-hal-tinyusb.h"
@@ -360,7 +361,7 @@ void CAtHandler::add_cmds_esp_generic() {
             return chAT::CommandStatus::ERROR;
       }
    };
-   
+
    /* ....................................................................... */
    command_table[_GETTIME] = [this](auto & srv, auto & parser) {
    /* ....................................................................... */
@@ -384,6 +385,52 @@ void CAtHandler::add_cmds_esp_generic() {
          }
          default:
             return chAT::CommandStatus::ERROR;
+      }
+   };
+
+/* ....................................................................... */
+   command_table[_PING] = [this](auto & srv, auto & parser) {
+/* ....................................................................... */
+      switch (parser.cmd_mode) {
+      case chAT::CommandMode::Write: {
+         if (parser.args.size() != 4) {
+            return chAT::CommandStatus::ERROR;
+         }
+
+         // get IP
+         auto &target = parser.args[1];
+         if (target.empty()) {
+            return chAT::CommandStatus::ERROR;
+         }
+
+         // get ttl
+         auto &ttl = parser.args[2];
+         if (ttl.empty()) {
+            return chAT::CommandStatus::ERROR;
+         }
+
+         // get count
+         auto &cnt = parser.args[3];
+         if (cnt.empty()) {
+            return chAT::CommandStatus::ERROR;
+         }
+
+         auto ping_res = execute_ping(target.c_str(), atoi(ttl.c_str()), atoi(cnt.c_str()));
+         char rsl[8];
+         if (ping_res.status == ping_status::SUCCESS) {
+           sprintf(rsl,"%.0f", ping_res.averagertt);
+         } else {
+           sprintf(rsl,"%d", ping_res.status);
+         }
+
+         srv.write_response_prompt();
+         srv.write_str((const char *) rsl);
+         srv.write_line_end();
+         return chAT::CommandStatus::OK;
+
+      }
+      default:
+         return chAT::CommandStatus::ERROR;
       }
    };
 }
