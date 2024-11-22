@@ -77,7 +77,7 @@ ping_statistics execute_ping(const char* address, uint8_t ttl, uint8_t count) {
     esp_ping_start(ping);
 
     // wait for the end of ping session
-    while(_stats.status != ping_status::RUNNING) {
+    while(_stats.status == ping_status::RUNNING) {
         delay(10);
     }
 
