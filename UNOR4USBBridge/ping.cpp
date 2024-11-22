@@ -24,9 +24,15 @@ static void ping_timeout(esp_ping_handle_t hdl, void *args) {
 }
 
 static void ping_end(esp_ping_handle_t hdl, void *args) {
-    _stats.status = ping_status::SUCCESS;
     esp_ping_stop(hdl);
     esp_ping_delete_session(hdl);
+    if(_stats.success_count == 0) {
+        // all ping request have timed out
+        _stats.status = ping_status::TIMEOUT;
+    } else {
+        // at least one ping as succeded and we can return rtt value
+        _stats.status = ping_status::SUCCESS;
+    }
 }
 
 ping_statistics execute_ping(const char* address, uint8_t ttl, uint8_t count) {
