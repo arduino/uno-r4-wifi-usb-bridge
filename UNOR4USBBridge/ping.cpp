@@ -24,7 +24,7 @@ static void ping_timeout(esp_ping_handle_t hdl, void *args) {
 }
 
 static void ping_end(esp_ping_handle_t hdl, void *args) {
-    _stats.error = SUCCESS;
+    _stats.status = ping_status::SUCCESS;
 }
 
 ping_statistics execute_ping(const char* address, uint8_t ttl, uint8_t count) {
@@ -39,7 +39,7 @@ ping_statistics execute_ping(const char* address, uint8_t ttl, uint8_t count) {
 
     if(getaddrinfo(address, NULL, &hint, &res) != 0) {
         log_e("resolution error");
-        _stats.error = DNS_RESOLUTION_ERROR;
+        _stats.status = ping_status::DNS_RESOLUTION_ERROR;
         return _stats;
     }
 
@@ -62,14 +62,14 @@ ping_statistics execute_ping(const char* address, uint8_t ttl, uint8_t count) {
     cbs.cb_args         = NULL;
 
     memset(&_stats, 0, sizeof(_stats));
-    _stats.error = RUNNING;
+    _stats.status = ping_status::RUNNING;
 
     esp_ping_handle_t ping; // FIXME do I need this?
     esp_ping_new_session(&ping_config, &cbs, &ping);
     esp_ping_start(ping);
 
     // wait for the end of ping session
-    while(_stats.error != RUNNING) {
+    while(_stats.status != ping_status::RUNNING) {
         delay(10);
     }
 
