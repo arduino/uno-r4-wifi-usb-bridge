@@ -47,14 +47,12 @@ ping_statistics execute_ping(const char* address, uint8_t ttl, uint8_t count) {
     inet_addr_to_ip4addr(ip_2_ip4(&target_addr), &addr4);
     freeaddrinfo(res);
 
-
-    //FIXME check that the address is resolved
     esp_ping_config_t ping_config = ESP_PING_DEFAULT_CONFIG();
     ping_config.target_addr = target_addr;          // target IP address
     ping_config.ttl = ttl;
 
     // for simplification we are not pinging indefinetly
-    ping_config.count = count > 0? count : 10;
+    ping_config.count = count > 0 ? count : 1;
 
     /* set callback functions */
     esp_ping_callbacks_t cbs;
