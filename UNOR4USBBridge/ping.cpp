@@ -42,6 +42,7 @@ ping_statistics execute_ping(const char* address, uint8_t ttl, uint8_t count) {
     struct addrinfo *res = NULL;
     memset(&hint, 0, sizeof(hint));
     memset(&target_addr, 0, sizeof(target_addr));
+    memset(&_stats, 0, sizeof(_stats));
 
     log_e("resolving \"%s\"", address);
 
@@ -69,7 +70,6 @@ ping_statistics execute_ping(const char* address, uint8_t ttl, uint8_t count) {
     cbs.on_ping_end     = ping_end;
     cbs.cb_args         = NULL;
 
-    memset(&_stats, 0, sizeof(_stats));
     _stats.status = ping_status::RUNNING;
 
     esp_ping_handle_t ping; // FIXME do I need this?
