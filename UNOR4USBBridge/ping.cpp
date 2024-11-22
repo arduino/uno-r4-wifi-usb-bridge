@@ -68,8 +68,6 @@ ping_statistics execute_ping(const char* address, uint8_t ttl, uint8_t count) {
     cbs.on_ping_end     = ping_end;
     cbs.cb_args         = NULL;
 
-    _stats.status = ping_status::RUNNING;
-
     if(esp_ping_new_session(&ping_config, &cbs, &esp_ping_handle) != ESP_OK) {
         _stats.status = ping_status::ERROR;
         return _stats;
@@ -80,6 +78,8 @@ ping_statistics execute_ping(const char* address, uint8_t ttl, uint8_t count) {
         esp_ping_delete_session(esp_ping_handle);
         return _stats;
     }
+
+    _stats.status = ping_status::RUNNING;
 
     // wait for the end of ping session
     while(_stats.status == ping_status::RUNNING) {
