@@ -86,11 +86,6 @@ void CAtHandler::add_cmds_esp_generic() {
       switch (parser.cmd_mode) {
          case chAT::CommandMode::Read: {
             srv.write_response_prompt();
-
-
-
-            log_e("version 0x%X, 0x%X", *((uint32_t*)version), &version);
-
             srv.write_data(version, sizeof(version));
             srv.write_line_end();
             return chAT::CommandStatus::OK;
