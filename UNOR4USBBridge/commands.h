@@ -105,6 +105,8 @@ enum file_op {
 #define _UDPREMOTEPORT           "+UDPREMOTEPORT"
 #define _UDPSTOP                 "+UDPSTOP"
 
+#define _PING                    "+PING"
+
 #define _FWVERSION               "+FWVERSION"
 #define _FWVERSION_U32           "+FWVERSION_U32"
 
