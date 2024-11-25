@@ -90,6 +90,3 @@ ping_statistics execute_ping(const char* address, uint8_t ttl, uint8_t count) {
 
     return _stats;
 }
-
-
-
