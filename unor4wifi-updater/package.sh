@@ -55,7 +55,7 @@ function package_macos() {
 
 }
 
-VERSION="0.4.1"
+VERSION="0.5.0"
 
 # Cleanup before starting
 rm -rf unor4wifi-update-linux*
