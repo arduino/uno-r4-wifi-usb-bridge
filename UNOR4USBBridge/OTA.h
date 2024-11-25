@@ -46,7 +46,7 @@ public:
   };
 
   using Arduino_ESP32_OTA::begin;
-  Arduino_ESP32_OTA::Error begin(const char* file_path, uint32_t magic = ARDUINO_RA4M1_OTA_MAGIC);
+  Arduino_ESP32_OTA::Error begin(const char* file_path, uint32_t magic = ARDUINO_RA4M1_OTA_MAGIC, bool formatOnfail = false);
 
   using Arduino_ESP32_OTA::download;
   int download(const char * ota_url, const char* file_path);

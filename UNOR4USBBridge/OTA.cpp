@@ -41,12 +41,12 @@ Arduino_UNOWIFIR4_OTA::~Arduino_UNOWIFIR4_OTA() {
   closeStorage();
 }
 
-Arduino_ESP32_OTA::Error Arduino_UNOWIFIR4_OTA::begin(const char* file_path, uint32_t magic)
+Arduino_ESP32_OTA::Error Arduino_UNOWIFIR4_OTA::begin(const char* file_path, uint32_t magic, bool formatOnFail)
 {
   /* ... configure board Magic number */
   setMagic(magic);
 
-  if(!SPIFFS.begin()) {
+  if(!SPIFFS.begin(formatOnFail)) {
     DEBUG_ERROR("%s: failed to initialize SPIFFS", __FUNCTION__);
     return Error::OtaStorageInit;
   }
