@@ -355,7 +355,7 @@ void CAtHandler::add_cmds_esp_generic() {
             return chAT::CommandStatus::ERROR;
       }
    };
-   
+
    /* ....................................................................... */
    command_table[_GETTIME] = [this](auto & srv, auto & parser) {
    /* ....................................................................... */
