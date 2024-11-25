@@ -57,7 +57,7 @@ void CAtHandler::add_cmds_ota() {
             return chAT::CommandStatus::OK;
          }
          case chAT::CommandMode::Write: {
-            if (parser.args.size() != 1) {
+            if (parser.args.size() != 1 && parser.args.size() != 2) {
                return chAT::CommandStatus::ERROR;
             }
 
@@ -66,7 +66,16 @@ void CAtHandler::add_cmds_ota() {
                return chAT::CommandStatus::ERROR;
             }
 
-            Arduino_ESP32_OTA::Error ota_error = OTA.begin(path.c_str());
+            bool formatOnFail = false;
+            if (parser.args.size() == 2) {
+               auto &format = parser.args[1];
+               if (format.empty()) {
+                  return chAT::CommandStatus::ERROR;
+               }
+               formatOnFail =  strtol(format.c_str(), NULL, 10) != 0;
+            }
+
+            Arduino_ESP32_OTA::Error ota_error = OTA.begin(path.c_str(), ARDUINO_RA4M1_OTA_MAGIC, formatOnFail);
             String error = String((int)ota_error) + _ENDL;
             srv.write_response_prompt();
             srv.write_str((const char *)(error.c_str()));
