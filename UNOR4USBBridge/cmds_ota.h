@@ -66,7 +66,7 @@ void CAtHandler::add_cmds_ota() {
                return chAT::CommandStatus::ERROR;
             }
 
-            bool formatOnFail = false;
+            bool formatOnFail = true;
             if (parser.args.size() == 2) {
                auto &format = parser.args[1];
                if (format.empty()) {
