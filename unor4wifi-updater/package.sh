@@ -12,7 +12,7 @@ function package_windows() {
     unzip /tmp/unor4wifi-reboot-windows.zip -d unor4wifi-update-windows/bin
 
     sed s#VVERSION#$VERSION#g update_windows.bat > unor4wifi-update-windows/update.bat
-    cp ../UNOR4USBBridge/build/esp32-patched.esp32.arduino_unor4wifi_usb_bridge/S3-ALL.bin unor4wifi-update-windows/firmware/UNOR4-WIFI-S3-$VERSION.bin
+    cp ../UNOR4USBBridge/build/esp32-patched.esp32.arduino_unor4wifi_usb_bridge/S3-BOOT-APP.bin unor4wifi-update-windows/firmware/UNOR4-WIFI-S3-$VERSION.bin
 
     zip -r unor4wifi-update-windows.zip unor4wifi-update-windows
 
@@ -30,7 +30,7 @@ function package_linux() {
     unzip /tmp/unor4wifi-reboot-linux64.zip -d unor4wifi-update-linux/bin
 
     sed s#VVERSION#$VERSION#g update_linux.sh > unor4wifi-update-linux/update.sh
-    cp ../UNOR4USBBridge/build/esp32-patched.esp32.arduino_unor4wifi_usb_bridge/S3-ALL.bin unor4wifi-update-linux/firmware/UNOR4-WIFI-S3-$VERSION.bin
+    cp ../UNOR4USBBridge/build/esp32-patched.esp32.arduino_unor4wifi_usb_bridge/S3-BOOT-APP.bin unor4wifi-update-linux/firmware/UNOR4-WIFI-S3-$VERSION.bin
 
     zip -r unor4wifi-update-linux.zip unor4wifi-update-linux
 
@@ -49,13 +49,18 @@ function package_macos() {
     unzip /tmp/unor4wifi-reboot-macos.zip -d unor4wifi-update-macos/bin
 
     sed s#VVERSION#$VERSION#g update_mac.command > unor4wifi-update-macos/update.command
-    cp ../UNOR4USBBridge/build/esp32-patched.esp32.arduino_unor4wifi_usb_bridge/S3-ALL.bin unor4wifi-update-macos/firmware/UNOR4-WIFI-S3-$VERSION.bin
+    cp ../UNOR4USBBridge/build/esp32-patched.esp32.arduino_unor4wifi_usb_bridge/S3-BOOT-APP.bin unor4wifi-update-macos/firmware/UNOR4-WIFI-S3-$VERSION.bin
 
     zip -r unor4wifi-update-macos.zip unor4wifi-update-macos
 
 }
 
-VERSION="0.5.0"
+if [ -z "$1" ]; then
+    echo "No argument supplied"
+    exit 1
+fi
+
+VERSION=$1
 
 # Cleanup before starting
 rm -rf unor4wifi-update-linux*
