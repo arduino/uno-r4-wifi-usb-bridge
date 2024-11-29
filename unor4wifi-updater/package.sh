@@ -55,7 +55,12 @@ function package_macos() {
 
 }
 
-VERSION="0.5.0"
+if [ -z "$1" ]; then
+    echo "No argument supplied"
+    exit 1
+fi
+
+VERSION=$1
 
 # Cleanup before starting
 rm -rf unor4wifi-update-linux*
