@@ -144,6 +144,7 @@ void setup() {
   USB.PID(0x1002);
   USB.manufacturerName("Arduino");
   USB.productName("UNO WiFi R4 CMSIS-DAP");
+  USB.firmwareVersion(U8TOBCD(FIRMWARE_MAJOR) << 8 | U8TOBCD(FIRMWARE_MINOR));
   //USB.enableDFU();
   DAP.begin();
   SERIAL_USER.onEvent(usbEventCallback);

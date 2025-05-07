@@ -20,6 +20,8 @@
 #define FIRMWARE_MINOR    5
 #define FIRMWARE_PATCH    2
 
+#define U8TOBCD(u) ((((u/10)%10)<<4)|(u%10))
+
 #define GPIO_BOOT   9
 #define GPIO_RST    4
 
