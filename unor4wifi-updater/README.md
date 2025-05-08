@@ -63,4 +63,4 @@ Disconnect and connect again your UNO R4 WiFi from your PC and re-run the script
 
 Follow the "**Run espflash directly**" instructions provided in this Arduino Help Center article:
 
-https://support.arduino.cc/hc/en-us/articles/9670986058780-Update-the-connectivity-module-firmware-on-UNO-R4-WiFi#espflash
+https://support.arduino.cc/hc/en-us/articles/16379769332892-Restore-the-USB-connectivity-firmware-on-UNO-R4-WiFi-with-espflash

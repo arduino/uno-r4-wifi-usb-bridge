@@ -49,7 +49,7 @@ espflash write-bin -b 115200 0x0 S3.bin
 
 ## Update your board
 
-To flash the firmware the board needs to be in `ESP download` mode. This can be done [manually](https://support.arduino.cc/hc/en-us/articles/9670986058780-Update-the-connectivity-module-firmware-on-UNO-R4-WiFi#espflash) or using the [unor4wifi-updater](unor4wifi-updater) script.
+To flash the firmware the board needs to be in `ESP download` mode. This can be done [manually](https://support.arduino.cc/hc/en-us/articles/16379769332892-Restore-the-USB-connectivity-firmware-on-UNO-R4-WiFi-with-espflash) or using the [unor4wifi-updater](unor4wifi-updater) script.
 
 Alternatively you can also use the `download.sh` script to update the firmware using the `arduino-cli`. Also in this case the `download.sh` script
 should be invoked after putting the board in `ESP download` mode.
