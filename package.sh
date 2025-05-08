@@ -1,4 +1,4 @@
-VERSION="0.5.2"
+VERSION="0.6.0"
 mkdir -p $VERSION
 echo "Build in release mode"
 bash export.sh > $VERSION/release.log 2>&1
