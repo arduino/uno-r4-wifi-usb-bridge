@@ -81,6 +81,8 @@ enum file_op {
 #define _SSLAVAILABLE            "+SSLAVAILABLE"
 #define _SSLCLIENTSTATUS         "+SSLCLIENTSTATUS"
 #define _SSLCLIENTFLUSH          "+SSLCLIENTFLUSH"
+#define _SSLCLIENTSETCERT        "+SSLCLIENTSETCERT"
+#define _SSLCLIENTSETPKEY        "+SSLCLIENTSETPKEY"
 #define _SSLREMOTEIP             "+SSLREMOTEIP"
 #define _SSLREMOTEPORT           "+SSLREMOTEPORT"
 #define _SSLPEEK                 "+SSLPEEK"
