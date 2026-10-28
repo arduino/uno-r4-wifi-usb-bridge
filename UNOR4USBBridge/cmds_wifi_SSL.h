@@ -806,6 +806,106 @@ void CAtHandler::add_cmds_wifi_SSL() {
       }
    };
 
+      command_table[_SSLCLIENTSETCERT] = [this](auto & srv, auto & parser) {
+   /* ....................................................................... */
+      switch (parser.cmd_mode) {
+
+         case chAT::CommandMode::Write: {
+            if (parser.args.size() != 2) {
+               return chAT::CommandStatus::ERROR;
+            }
+
+            auto &socket_num = parser.args[0];
+            if (socket_num.empty()) {
+               return chAT::CommandStatus::ERROR;
+            }
+
+            int sock = atoi(socket_num.c_str());
+            CClientWrapper the_client = getClient(sock);
+
+            if (the_client.sslclient == nullptr) {
+               return chAT::CommandStatus::ERROR;
+            }
+
+            const int internal_sock = the_client.can_delete;
+            if (internal_sock == -1) {
+               return chAT::CommandStatus::ERROR;
+            }
+
+            int size = atoi(parser.args[1].c_str());
+            clients_cert_pem[internal_sock] = srv.inhibit_read(size);
+
+            size_t offset = clients_cert_pem[internal_sock].size();
+
+            if(offset < size) {
+
+               clients_cert_pem[internal_sock].resize(size);
+               do {
+                  offset += serial->read(clients_cert_pem[internal_sock].data() + offset, size - offset);
+               } while (offset < size);
+            }
+
+            the_client.sslclient->setCertificate((const char *)clients_cert_pem[internal_sock].data());
+            srv.continue_read();
+
+            srv.write_response_prompt();
+            srv.write_line_end();
+            return chAT::CommandStatus::OK;
+         }
+         default:
+            return chAT::CommandStatus::ERROR;
+      }
+   };
+
+      command_table[_SSLCLIENTSETPKEY] = [this](auto & srv, auto & parser) {
+   /* ....................................................................... */
+      switch (parser.cmd_mode) {
+
+         case chAT::CommandMode::Write: {
+            if (parser.args.size() != 2) {
+               return chAT::CommandStatus::ERROR;
+            }
+            auto &socket_num = parser.args[0];
+            if (socket_num.empty()) {
+               return chAT::CommandStatus::ERROR;
+            }
+            int sock = atoi(socket_num.c_str());
+            CClientWrapper the_client = getClient(sock);
+
+            if (the_client.sslclient == nullptr) {
+               return chAT::CommandStatus::ERROR;
+            }
+
+            const int internal_sock = the_client.can_delete;
+            if (internal_sock == -1) {
+               return chAT::CommandStatus::ERROR;
+            }
+
+            int size = atoi(parser.args[1].c_str());
+            clients_key_pem[internal_sock] = srv.inhibit_read(size);
+
+            size_t offset = clients_key_pem[internal_sock].size();
+
+            if(offset < size) {
+
+               clients_key_pem[internal_sock].resize(size);
+               do {
+                  offset += serial->read(clients_key_pem[internal_sock].data() + offset, size - offset);
+               } while (offset < size);
+            }
+
+            the_client.sslclient->setPrivateKey((const char *)clients_key_pem[internal_sock].data()); // string is expected to be null terminated
+            srv.continue_read();
+
+            srv.write_response_prompt();
+            srv.write_line_end();
+            return chAT::CommandStatus::OK;
+         }
+         default:
+            return chAT::CommandStatus::ERROR;
+      }
+   };
+
    /* ....................................................................... */
    command_table[_SSLREMOTEIP] = [this](auto & srv, auto & parser) {
    /* ....................................................................... */
