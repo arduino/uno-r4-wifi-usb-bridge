@@ -28,7 +28,7 @@ Running the compile script will:
 The `compile.sh` script will produce a bunch of binary files that can be flashed using [esptool](https://github.com/espressif/esptool/releases) from the build directory:
 
 ```
-esptool --chip esp32s3 --port "/dev/ttyACM0" --baud 921600  --before default_reset --after hard_reset write_flash  -z --flash_mode dio --flash_freq 80m --flash_size 4MB 0x0 "UNOR4USBBridge.ino.bootloader.bin" 0x8000 "UNOR4USBBridge.ino.partitions.bin" 0xe000 "../../../boot/boot_app0.bin" 0x10000 "UNOR4USBBridge.ino.bin"
+esptool --chip esp32s3 --port "/dev/ttyACM0" --baud 921600  --before default_reset --after hard_reset write_flash  -z --flash_mode dio --flash_freq 80m --flash_size 4MB 0x0 "UNOR4USBBridge.ino.bootloader.bin" 0x8000 "UNOR4USBBridge.ino.partitions.bin" 0x9000 "../../../boot/boot_app0.bin" 0x50000 "UNOR4USBBridge.ino.bin"
 ```
 
 ## Package a single binary
